@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="60 seconds">
+    <appender name="STDOUT_JSON" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
+    </appender>
+
+    <appender name="STDOUT_JSON_TJENESTEKALL" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <providers>
+
+                <timestamp/>
+                <version/>
+                <loggerName/>
+                <logLevel/>
+                <logLevelValue/>
+                <stackTrace/>
+                <pattern>
+                    <pattern>
+                        {
+                        "message": "%replace(%msg){'Authorization([^\\n]+)', 'Authorization: *******'}"
+                        }
+                    </pattern>
+                </pattern>
+                <mdc/>
+            </providers>
+        </encoder>
+    </appender>
+
+    <appender name="METRICS" class="io.prometheus.client.logback.InstrumentedAppender"/>
+
+    <logger name="no.nav" level="INFO" additivity="false">
+        <appender-ref ref="STDOUT_JSON"/>
+        <appender-ref ref="METRICS"/>
+    </logger>
+
+    <logger name="org.opensaml" level="WARN" additivity="false">
+        <appender-ref ref="STDOUT_JSON"/>
+        <appender-ref ref="METRICS"/>
+    </logger>
+
+    <logger name="org.flyway" level="DEBUG" additivity="false">
+        <appender-ref ref="STDOUT_JSON"/>
+        <appender-ref ref="METRICS"/>
+    </logger>
+
+    <logger name="org.glassfish.jersey.logging" level="INFO" additivity="false">
+        <appender-ref ref="STDOUT_JSON_TJENESTEKALL"/>
+    </logger>
+
+    <root level="INFO">
+        <appender-ref ref="STDOUT_JSON"/>
+        <appender-ref ref="METRICS"/>
+    </root>
+
+</configuration>
+

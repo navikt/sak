@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="60 seconds">
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>[%d %level %logger %mdc{uuid}] - %m%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="METRICS" class="io.prometheus.client.logback.InstrumentedAppender"/>
+
+    <logger name="no.nav" level="OFF" additivity="false">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="METRICS"/>
+    </logger>
+
+    <logger name="org.opensaml" level="OFF" additivity="false">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="METRICS"/>
+    </logger>
+
+    <logger name="io.gatling" level="OFF" additivity="false">
+        <appender-ref ref="STDOUT"/>
+    </logger>
+
+    <logger name="io.gatling.http.ahc" level="OFF" additivity="false">
+        <appender-ref ref="STDOUT"/>
+    </logger>
+
+    <logger name="io.gatling.http.response" level="OFF" additivity="false">
+        <appender-ref ref="STDOUT"/>
+    </logger>
+
+    <logger name="org.ldaptive" level="OFF" additivity="false">
+        <appender-ref ref="STDOUT"/>
+    </logger>
+
+    <root level="OFF">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="METRICS"/>
+    </root>
+
+</configuration>

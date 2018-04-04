@@ -1,0 +1,414 @@
+package no.nav.sak;
+
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import no.nav.sak.infrastruktur.Database;
+import no.nav.sak.infrastruktur.JunitDatabase;
+import no.nav.sak.infrastruktur.JunitTransactionSupport;
+import no.nav.sak.infrastruktur.authentication.saml.SAMLSupport;
+import no.nav.sak.infrastruktur.oicd.JwtTestData;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.glassfish.jersey.test.JerseyTest;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.Application;
+import javax.ws.rs.core.Response;
+import java.io.ByteArrayInputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.util.Base64;
+import java.util.List;
+
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
+import static no.nav.sak.infrastruktur.authentication.basic.JunitBasicAuthenticator.PASSWORD;
+import static no.nav.sak.infrastruktur.authentication.basic.JunitBasicAuthenticator.USERNAME;
+import static no.nav.sikkerhet.authentication.Authenticator.SAML;
+import static org.apache.commons.lang3.RandomStringUtils.random;
+import static org.assertj.core.api.Assertions.assertThat;
+
+class SakResourceTest extends JerseyTest {
+
+    private static final Database database = JunitDatabase.get();
+    private static final SakRepository sakRepository = new SakRepository(database);
+    private static String authHeaderSaml;
+    private static String correlationId = "junit";
+    private final JunitTransactionSupport junitTransactionSupport = new JunitTransactionSupport(database);
+
+    @BeforeAll
+    static void setup() {
+        SakConfiguration sakConfiguration = new SakConfiguration();
+        SAMLSupport samlSupport = new SAMLSupport(sakConfiguration);
+        String samlToken = samlSupport.createNewToken();
+        authHeaderSaml = SAML + " " + samlToken;
+    }
+
+    @BeforeEach
+    void before() throws Exception {
+        super.setUp();
+        junitTransactionSupport.initTransaction();
+    }
+
+    @Override
+    protected Application configure() {
+        return new SakJunitApplication();
+    }
+
+    @Test
+    void henter_sak_for_gitt_id() {
+        Sak opprettetSak = sakRepository.lagre(new SakTestData()
+            .fagsakNr("12")
+            .aktoerId("123").build());
+
+        Response response = executeGetRequest(sakRootTarget().path(String.valueOf(opprettetSak.getId())));
+
+        assertThat(response.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
+        assertThat(response.getHeaderString("Content-Type")).isEqualTo("application/json");
+
+        JsonObject jsonObject = new JsonParser().parse(stream(response.getEntity())).getAsJsonObject();
+        verifyEqual(jsonObject, opprettetSak);
+    }
+
+    @Test
+    void gir_404_naar_sak_ikke_finnes_for_gitt_id() {
+        Response response = executeGetRequest(sakRootTarget().path("1"));
+
+        JsonObject jsonObject = new JsonParser().parse(stream(response.getEntity())).getAsJsonObject();
+        assertThat(jsonObject.get("feilmelding").getAsString()).isNotBlank();
+        assertThat(response.getStatus()).isEqualTo(Response.Status.NOT_FOUND.getStatusCode());
+    }
+
+    @Test
+    void gir_404_naar_ressurs_ikke_finnes() {
+        Response response = executeGetRequest(target("/v1/finnesikke").path("1"));
+        assertThat(response.getStatus()).isEqualTo(Response.Status.NOT_FOUND.getStatusCode());
+    }
+
+    @Test
+    void gir_405_naar_operasjon_ikke_tillatt() {
+        Response response = target("/v1/saker").path("1")
+            .request()
+            .header("Authorization", authHeaderSaml)
+            .header("X-Correlation-ID", correlationId)
+            .post(Entity.json(
+                new SakJsonTestData(new SakTestData().build()).buildJsonString()));
+
+        assertThat(response.getStatus()).isEqualTo(Response.Status.METHOD_NOT_ALLOWED.getStatusCode());
+    }
+
+    @Test
+    void oppretter_sak_for_aktoer() {
+        Sak sak = new SakTestData()
+            .aktoerId("1")
+            .build();
+        JsonObject jsonObject = createAndRetrieveAtLocation(sak);
+        assertThat(jsonObject.get("id").getAsLong()).isNotNull();
+        assertThat(jsonObject.get("aktoerId").getAsString()).isEqualTo(sak.getAktoerId());
+        assertThat(jsonObject.get("orgnr").isJsonNull()).isTrue();
+    }
+
+    @Test
+    void gir_400_naar_hverken_aktoer_eller_organisasjon_er_utfylt_ved_opprettelse_av_sak() {
+        Response createdResponse = executePost(Entity.json(new SakJsonTestData()
+            .medApplikasjon(random(3))
+            .medTema(random(3))
+            .buildJsonString()));
+        verify400(createdResponse);
+    }
+
+    @Test
+    void beskyttede_ressurser_tilgjengelige_naar_gyldig_authheader_for_oidc() throws Exception {
+        String authHeaderOIDC = "Bearer " + new JwtTestData().build();
+        verifyBeskyttedeRessurserTilgjengelig(authHeaderOIDC);
+    }
+
+    @Test
+    void beskyttede_ressurser_tilgjengelig_naar_gyldig_basic_auth_header() throws Exception {
+        String unencoded = USERNAME + ":" + PASSWORD;
+        String authHeaderBasic = "Basic " + Base64.getEncoder().encodeToString(unencoded.getBytes("utf-8"));
+        verifyBeskyttedeRessurserTilgjengelig(authHeaderBasic);
+    }
+
+    @Test
+    void oppretter_sak_for_organisasjon() {
+        Sak sak = new SakTestData()
+            .orgnr("123456789")
+            .build();
+        JsonObject jsonObject = createAndRetrieveAtLocation(sak);
+        assertThat(jsonObject.get("id").getAsLong()).isNotNull();
+        assertThat(jsonObject.get("orgnr").getAsString()).isEqualTo(sak.getOrgnr());
+        assertThat(jsonObject.get("aktoerId").isJsonNull()).isTrue();
+    }
+
+    @Test
+    void gir_konflikt_og_oppretter_ikke_ny_sak_dersom_fagsak_finnes_fra_foer() {
+        Sak sak = new SakTestData()
+            .aktoerId("123")
+            .fagsakNr("321")
+            .applikasjon("Gosys")
+            .build();
+        Entity<String> json = Entity.json(
+            new SakJsonTestData(sak).buildJsonString());
+
+        Response firstResponse = executePost(json);
+
+        assertThat(firstResponse.getStatus()).isEqualTo(Response.Status.CREATED.getStatusCode());
+        assertThat(firstResponse.getHeaderString("Content-Type")).isEqualTo("application/json");
+
+        Response secondResponse = executePost(json);
+
+        assertThat(secondResponse.getStatus()).isEqualTo(Response.Status.CONFLICT.getStatusCode());
+        assertThat(secondResponse.getHeaderString("Content-Type")).isEqualTo("application/json");
+
+        assertThat(sakRepository.finnSaker(SakSearchCriteria.create())).hasSize(1);
+    }
+
+    private void verifyBeskyttedeRessurserTilgjengelig(String header) {
+        Sak sak = new SakTestData().build();
+        Entity<String> json = Entity.json(
+            new SakJsonTestData(sak).buildJsonString());
+
+
+        Response opprettResponse = sakRootTarget()
+            .request()
+            .header("Authorization", header)
+            .header("X-Correlation-ID", correlationId)
+            .post(json);
+
+        assertThat(opprettResponse.getStatus()).isEqualTo(Response.Status.CREATED.getStatusCode());
+
+        Response searchResponse = sakRootTarget().queryParam("aktoerId", sak.getAktoerId())
+            .request()
+            .header("Authorization", header)
+            .header("X-Correlation-ID", correlationId)
+            .get();
+        assertThat(searchResponse.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
+
+        Sak opprettetSak = sakRepository.lagre(new SakTestData().aktoerId("123").build());
+
+        Response getResponse = sakRootTarget().path(String.valueOf(opprettetSak.getId()))
+            .request()
+            .header("Authorization", header)
+            .header("X-Correlation-ID", correlationId)
+            .get();
+
+        assertThat(getResponse.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
+    }
+
+    private Response executePost(Entity<String> json) {
+        return sakRootTarget()
+            .request()
+            .header("Authorization", authHeaderSaml)
+            .header("X-Correlation-ID", correlationId)
+            .post(json);
+    }
+
+    @Test
+    void soeker_opp_saker_for_aktoer_id() {
+        opprett100Tilfeldigesaker();
+        String aktoerId = RandomStringUtils.randomNumeric(9);
+        Sak sak1 = sakRepository.lagre(new SakTestData().aktoerId(aktoerId).build());
+        Sak sak2 = sakRepository.lagre(new SakTestData().aktoerId(aktoerId).build());
+
+        Response response = executeGetRequest(sakRootTarget().queryParam("aktoerId", aktoerId));
+
+        verifySearchResponseMatching(response, asList(sak1, sak2));
+    }
+
+    @Test
+    void soeker_opp_saker_for_tema() {
+        opprett100Tilfeldigesaker();
+        String tema = RandomStringUtils.randomAlphabetic(4);
+        Sak sak = sakRepository.lagre(new SakTestData().tema(tema).build());
+
+        Response response = executeGetRequest(sakRootTarget()
+            .queryParam("tema", sak.getTema())
+            .queryParam("aktoerId", sak.getAktoerId()));
+
+        verifySearchResponseMatching(response, singletonList(sak));
+    }
+
+    @Test
+    void soeker_opp_saker_for_fagsaknr() {
+        opprett100Tilfeldigesaker();
+        String fagsaknr = RandomStringUtils.randomNumeric(9);
+        Sak sak = sakRepository.lagre(new SakTestData().fagsakNr(fagsaknr).build());
+
+        Response response = executeGetRequest(sakRootTarget()
+            .queryParam("fagsakNr", sak.getFagsakNr()));
+        verifySearchResponseMatching(response, singletonList(sak));
+    }
+
+    @Test
+    void soeker_opp_saker_for_orgnr() {
+        opprett100Tilfeldigesaker();
+        String orgnr = RandomStringUtils.randomNumeric(9);
+        Sak sak = sakRepository.lagre(new SakTestData().orgnr(orgnr).build());
+
+        Response response = sakRootTarget()
+            .queryParam("orgnr", sak.getOrgnr())
+            .request()
+            .header("X-Correlation-ID", "Junit")
+            .header("Authorization", authHeaderSaml)
+            .get();
+
+        verifySearchResponseMatching(response, singletonList(sak));
+    }
+
+    @Test
+    void soeker_opp_saker_for_applikasjon() {
+        opprett100Tilfeldigesaker();
+        String applikasjon = RandomStringUtils.randomAlphabetic(9);
+        Sak sak = sakRepository.lagre(new SakTestData().applikasjon(applikasjon).build());
+
+        Response response = executeGetRequest(
+            sakRootTarget()
+                .queryParam("applikasjon", sak.getApplikasjon())
+                .queryParam("aktoerId", sak.getAktoerId()));
+
+        verifySearchResponseMatching(response, singletonList(sak));
+    }
+
+    @Test
+    void soeker_opp_saker_for_kombinasjon_av_kriterier() {
+        opprett100Tilfeldigesaker();
+        String fagsaknr = RandomStringUtils.randomNumeric(9);
+        String applikasjon = RandomStringUtils.randomAlphabetic(9);
+        String orgnr = RandomStringUtils.randomNumeric(9);
+        String tema = RandomStringUtils.randomAlphabetic(4);
+
+        sakRepository.lagre(new SakTestData()
+            .applikasjon(applikasjon)
+            .orgnr(orgnr)
+            .tema(tema)
+            .build());
+
+        sakRepository.lagre(new SakTestData()
+            .fagsakNr(fagsaknr)
+            .orgnr(orgnr)
+            .tema(tema)
+            .build());
+
+        sakRepository.lagre(new SakTestData()
+            .fagsakNr(fagsaknr)
+            .applikasjon(applikasjon)
+            .tema(tema)
+            .build());
+
+        sakRepository.lagre(new SakTestData()
+            .fagsakNr(fagsaknr)
+            .applikasjon(applikasjon)
+            .orgnr(orgnr)
+            .build());
+
+        Sak enesteGyldigeTreff = sakRepository.lagre(new SakTestData()
+            .fagsakNr(fagsaknr)
+            .applikasjon(applikasjon)
+            .orgnr(orgnr)
+            .tema(tema)
+            .build());
+
+        Response response = executeGetRequest(
+            sakRootTarget()
+                .queryParam("fagsakNr", enesteGyldigeTreff.getFagsakNr())
+                .queryParam("applikasjon", enesteGyldigeTreff.getApplikasjon())
+                .queryParam("orgnr", enesteGyldigeTreff.getOrgnr())
+                .queryParam("tema", enesteGyldigeTreff.getTema()));
+
+        verifySearchResponseMatching(response, singletonList(enesteGyldigeTreff));
+    }
+
+    @Test
+    void gir_400_naar_hverken_aktoer_orgnr_eller_faksaknr_er_angitt_i_soek() {
+        opprett100Tilfeldigesaker();
+
+        Response response = executeGetRequest(sakRootTarget());
+        verify400(response);
+    }
+
+    private Response executeGetRequest(WebTarget target) {
+        return target.request()
+            .header("Authorization", authHeaderSaml)
+            .header("X-Correlation-ID", correlationId)
+            .get();
+
+    }
+
+    private void verify400(Response response) {
+        JsonObject jsonObject = new JsonParser().parse(stream(response.getEntity())).getAsJsonObject();
+        assertThat(response.getStatus()).isEqualTo(Response.Status.BAD_REQUEST.getStatusCode());
+        assertThat(response.getHeaderString("Content-Type")).isEqualTo("application/json");
+        assertThat(jsonObject.get("uuid")).isNotNull();
+        assertThat(jsonObject.get("feilmelding")).isNotNull();
+    }
+
+    private JsonArray verifySearchResponse(Response response, int expectedSize) {
+        assertThat(response.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
+        assertThat(response.getHeaderString("Content-Type")).isEqualTo("application/json");
+        JsonArray jsonArray = new JsonParser().parse(stream(response.getEntity())).getAsJsonArray();
+        assertThat(jsonArray.size()).isEqualTo(expectedSize);
+        return jsonArray;
+    }
+
+    private void verifySearchResponseMatching(Response response, List<Sak> skalMatche) {
+        JsonArray jsonArray = verifySearchResponse(response, skalMatche.size());
+        for (int i = 0; i < skalMatche.size(); i++) {
+            verifyEqual(jsonArray.get(i).getAsJsonObject(), skalMatche.get(i));
+        }
+    }
+
+    private void opprett100Tilfeldigesaker() {
+        for (int i = 0; i < 50; i++) {
+            sakRepository.lagre(new SakTestData().aktoerId(RandomStringUtils.randomNumeric(5)).build());
+            sakRepository.lagre(new SakTestData().orgnr(RandomStringUtils.randomNumeric(9)).build());
+        }
+    }
+
+    private void verifyEqual(JsonObject sakJson, Sak sak) {
+        assertThat(sakJson.get("id").getAsLong()).isEqualTo(sak.getId());
+        assertThat(sakJson.get("tema").getAsString()).isEqualTo(sak.getTema());
+        if (StringUtils.isNotBlank(sak.getAktoerId())) {
+            assertThat(sakJson.get("aktoerId").getAsString()).isEqualTo(sak.getAktoerId());
+        } else if (StringUtils.isNotBlank(sak.getOrgnr())) {
+            assertThat(sakJson.get("orgnr").getAsString()).isEqualTo(sak.getOrgnr());
+        }
+        if (StringUtils.isNotBlank(sak.getFagsakNr())) {
+            assertThat(sakJson.get("fagsakNr").getAsString()).isEqualTo(sak.getFagsakNr());
+        }
+        assertThat(sakJson.get("applikasjon").getAsString()).isEqualTo(sak.getApplikasjon());
+    }
+
+    private JsonObject createAndRetrieveAtLocation(Sak sak) {
+        Response createdResponse = executePost(Entity.json(new SakJsonTestData(sak).buildJsonString()));
+
+        assertThat(createdResponse.getStatus()).isEqualTo(Response.Status.CREATED.getStatusCode());
+
+        Response getResponse = executeGetRequest(client()
+            .target(createdResponse.getHeaderString("location")));
+
+        assertThat(getResponse.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
+        return new JsonParser().parse(stream(getResponse.getEntity())).getAsJsonObject();
+    }
+
+    private WebTarget sakRootTarget() {
+        return target("/v1/saker");
+    }
+
+    private Reader stream(Object entity) {
+        return new InputStreamReader((ByteArrayInputStream) entity);
+    }
+
+    @AfterEach
+    void after() throws Exception {
+        super.tearDown();
+        junitTransactionSupport.rollback();
+    }
+}
