@@ -1,0 +1,50 @@
+image: "docker.adeo.no:5000/sak"
+replicas:
+  min: 2
+  max: 4
+  cpuThresholdPercentage: 75
+port: 8080
+healthcheck:
+  liveness:
+    path: internal/alive
+    initialDelay: 30
+  readiness:
+    path: internal/ready
+    initialDelay: 30
+prometheus:
+  enabled: true
+  path: internal/metrics
+resources:
+  limits:
+    cpu: 4000m
+fasitResources:
+  used:
+    - alias: SAKDS
+      resourceType: datasource
+    - alias: abac.pdp.endpoint
+      resourceType: restservice
+      propertyMap:
+         url: ABAC_PDP_ENDPOINT
+    - alias: ISSO-JWKS
+      resourceType: baseUrl
+      propertyMap:
+         url: OPENIDCONNECT_ISSO_JWKS
+    - alias: ISSO-ISSUER
+      resourceType: baseurl
+      propertyMap:
+         url: OPENIDCONNECT_ISSO_ISSUER
+    - alias: LDAP
+      resourceType: ldap
+      propertyMap:
+         url: LDAP_URL
+         username: LDAP_USERNAME
+         password: LDAP_PASSWORD
+         serviceuser_base_dn: LDAP_SERVICEUSER_BASEDN
+
+  exposed:
+    - alias: sak.saker
+      resourceType: restservice
+      path: /api/v1/saker
+    - alias: sak.alive
+      resourceType: restservice
+      path: /internal/alive

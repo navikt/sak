@@ -1,0 +1,202 @@
+{
+    "provider": {
+        "name": "SakResource"
+    },
+    "consumer": {
+        "name": "Ruting"
+    },
+    "interactions": [
+        {
+            "description": "Henter sak som eksisterer for person og tema.",
+            "request": {
+                "method": "GET",
+                "path": "/api/v1/saker/",
+                "query": "aktoerId=***gammelt_fnr***57&tema=BAR",
+                "headers": {
+                    "X-Correlation-ID": "0"
+                }
+            },
+            "response": {
+                "status": 200,
+                "headers": {
+                    "Content-Type": "application/json"
+                },
+                "body": [
+                    {
+                        "id": 1,
+                        "tema": "?",
+                        "aktoerId": "?",
+                        "applikasjon": "?",
+                        "opprettetAv": "?",
+                        "opprettetTidspunkt": "1970-01-01T00:00:00+01:00"
+                    }
+                ],
+                "matchingRules": {
+                    "$.body[0].tema": {
+                        "regex": "\\w+"
+                    },
+                    "$.body[0].aktoerId": {
+                        "regex": "[0-9]+"
+                    },
+                    "$.body[0].applikasjon": {
+                        "regex": "\\w+"
+                    },
+                    "$.body[0].opprettetAv": {
+                        "regex": "\\w+"
+                    }
+                }
+            },
+            "providerState": "hentSakSomEksistererPerson"
+        },
+        {
+            "description": "Henter sak som eksisterer for organisasjon og tema.",
+            "request": {
+                "method": "GET",
+                "path": "/api/v1/saker",
+                "query": "orgnr=993554421&tema=TIL",
+                "headers": {
+                    "X-Correlation-ID": "0"
+                }
+            },
+            "response": {
+                "status": 200,
+                "headers": {
+                    "Content-Type": "application/json"
+                },
+                "body": [
+                    {
+                        "id": 1,
+                        "tema": "?",
+                        "orgnr": "?",
+                        "applikasjon": "?",
+                        "opprettetAv": "?",
+                        "opprettetTidspunkt": "1970-01-01T00:00:00+01:00"
+                    }
+                ],
+                "matchingRules": {
+                    "$.body[0].tema": {
+                        "regex": "\\w+"
+                    },
+                    "$.body[0].orgnr": {
+                        "regex": "[0-9]{9}"
+                    },
+                    "$.body[0].applikasjon": {
+                        "regex": "\\w+"
+                    },
+                    "$.body[0].opprettetAv": {
+                        "regex": "\\w+"
+                    }
+                }
+            },
+            "providerState": "hentSakSomEksistererOrganisasjon"
+        },
+        {
+            "description": "Henter sak som ikke eksisterer.",
+            "request": {
+                "method": "GET",
+                "path": "/api/v1/saker/1",
+                "headers": {
+                    "X-Correlation-ID": "0"
+                }
+            },
+            "response": {
+                "status": 404,
+                "headers": {
+                    "Content-Type": "application/json"
+                }
+            }
+        },
+        {
+            "description": "Oppretter sak for person.",
+            "request": {
+                "method": "POST",
+                "path": "/api/v1/saker/",
+                "headers": {
+                    "X-Correlation-ID": "0"
+                },
+                "body": {
+                    "aktoerId": "***gammelt_fnr***0",
+                    "tema": "etTema",
+                    "applikasjon": "Ruting",
+                    "fagsakNr": "etFagSakNr"
+                }
+            },
+            "response": {
+                "status": 201,
+                "headers": {
+                    "Content-Type": "application/json"
+                },
+                "body": {
+                    "id": "?",
+                    "aktoerId": "***gammelt_fnr***0",
+                    "tema": "etTema",
+                    "applikasjon": "Ruting",
+                    "fagsakNr": "etFagSakNr",
+                    "opprettetAv": "?",
+                    "opprettetTidspunkt": "?"
+                },
+                "matchingRules": {
+                    "$.body.id": {
+                        "regex": "[0-9]"
+                    },
+                    "$.body.opprettetAv": {
+                        "regex": ".+"
+                    },
+                    "$.body.opprettetTidspunkt": {
+                        "regex": ".+"
+                    }
+                }
+            }
+        },
+        {
+            "description": "Oppretter sak for organisasjon.",
+            "request": {
+                "method": "POST",
+                "path": "/api/v1/saker/",
+                "headers": {
+                    "X-Correlation-ID": "0"
+                },
+                "body": {
+                    "orgnr": "123456789",
+                    "tema": "etTema",
+                    "applikasjon": "Ruting",
+                    "fagsakNr": "etFagSakNr"
+                }
+            },
+            "response": {
+                "status": 201,
+                "headers": {
+                    "Content-Type": "application/json"
+                },
+                "body": {
+                    "id": "?",
+                    "orgnr": "123456789",
+                    "tema": "etTema",
+                    "applikasjon": "Ruting",
+                    "fagsakNr": "etFagSakNr",
+                    "opprettetAv": "?",
+                    "opprettetTidspunkt": "?"
+                },
+                "matchingRules": {
+                    "$.body.id": {
+                        "regex": "[0-9]"
+                    },
+                    "$.body.opprettetAv": {
+                        "regex": ".+"
+                    },
+                    "$.body.opprettetTidspunkt": {
+                        "regex": ".+"
+                    }
+                }
+            }
+        }
+    ],
+    "metadata": {
+        "pact-specification": {
+            "version": "2.0.0"
+        },
+        "pact-jvm": {
+            "version": "3.5.13"
+        }
+    }
+}

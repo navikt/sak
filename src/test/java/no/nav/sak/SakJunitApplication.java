@@ -1,0 +1,60 @@
+package no.nav.sak;
+
+import no.nav.sak.infrastruktur.Database;
+import no.nav.sak.infrastruktur.JunitDataSource;
+import no.nav.sak.infrastruktur.JunitDatabase;
+import no.nav.sak.infrastruktur.abac.ABACJunitClient;
+import no.nav.sak.infrastruktur.authentication.AuthenticationFilter;
+import no.nav.sak.infrastruktur.authentication.basic.JunitBasicAuthenticator;
+import no.nav.sak.infrastruktur.oicd.JunitJsonWebKey;
+import no.nav.sak.infrastruktur.oicd.JwtClaimsTestData;
+import no.nav.sikkerhet.abac.ABACService;
+import no.nav.sikkerhet.authentication.Authenticator;
+import no.nav.sikkerhet.authentication.basic.LdapConfiguration;
+import no.nav.sikkerhet.authentication.oidc.OidcTokenValidator;
+import no.nav.sikkerhet.authentication.saml.SAMLValidator;
+import org.jose4j.keys.resolvers.JwksVerificationKeyResolver;
+
+import javax.sql.DataSource;
+
+import static java.util.Collections.singletonList;
+
+public class SakJunitApplication extends SakApplication {
+    protected DataSource createDataSource(SakConfiguration sakConfiguration) {
+        return JunitDataSource.get();
+    }
+
+    protected Database createDatabase(DataSource dataSource) {
+        return JunitDatabase.get();
+    }
+
+    void registerAuthenticationFilter(SakConfiguration sakConfiguration) {
+        OidcTokenValidator oidcTokenValidator = new OidcTokenValidator(
+            new JwksVerificationKeyResolver(
+                singletonList(JunitJsonWebKey.get())), JwtClaimsTestData.ISSUER);
+
+        SAMLValidator samlValidator = new SAMLValidator(
+            sakConfiguration.getRequiredString("sak.junit-truststore.path"),
+            sakConfiguration.getRequiredString("sak.junit-truststore.password"));
+
+        LdapConfiguration ldapConfiguration = new LdapConfiguration(
+            sakConfiguration.getRequiredString("LDAP_SERVICEUSER_BASEDN"),
+            sakConfiguration.getRequiredString("LDAP_URL"),
+            sakConfiguration.getRequiredString("LDAP_USERNAME"),
+            null);
+
+        JunitBasicAuthenticator junitBasicAuthenticator = new JunitBasicAuthenticator(ldapConfiguration);
+
+        Authenticator authenticator = new Authenticator(oidcTokenValidator, samlValidator, junitBasicAuthenticator);
+        register(new AuthenticationFilter(authenticator));
+    }
+
+    void registerApiResources(Database database, SakConfiguration sakConfiguration) {
+        register(new SakResource(
+            new SakRepository(database),
+            new ABACService(ABACJunitClient.create()),
+            sakConfiguration.getBoolean("ABAC_ENABLED", false))
+        );
+    }
+
+}

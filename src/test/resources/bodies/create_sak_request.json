@@ -1,0 +1,7 @@
+{
+    "tema": "${tema}",
+    "aktoerId": null,
+    "orgnr": "${orgnr}",
+    "applikasjon": "${applikasjon}",
+    "fagsakNr": null
+}
