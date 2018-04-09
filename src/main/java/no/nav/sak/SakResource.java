@@ -26,8 +26,6 @@ import static java.util.stream.Collectors.toList;
 import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 import static no.nav.sak.infrastruktur.authentication.AuthenticationFilter.REQUEST_CONSUMERID;
 import static no.nav.sak.infrastruktur.authentication.AuthenticationFilter.REQUEST_USERNAME;
-import static no.nav.sikkerhet.abac.ABACService.RESOURCE_TYPE_SAK;
-import static no.nav.sikkerhet.abac.ABACService.SAK_DOMENE;
 
 
 @Produces(MediaType.APPLICATION_JSON)
@@ -72,8 +70,11 @@ import static no.nav.sikkerhet.abac.ABACService.SAK_DOMENE;
 )
 )
 public class SakResource {
-    public static final String READ = "read";
-    public static final String CREATE = "create";
+    private static final String READ = "read";
+    private static final String CREATE = "create";
+    private static final String SAK_DOMENE = "sak";
+    private static final String RESOURCE_TYPE_SAK = "no.nav.abac.attributter.resource.sak.sak";
+
     private static final Logger log = LoggerFactory.getLogger(SakResource.class);
     private final SakRepository sakRepository;
     private final ABACService abacService;
