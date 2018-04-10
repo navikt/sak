@@ -42,9 +42,3 @@ fasitResources:
          serviceuser_base_dn: LDAP_SERVICEUSER_BASEDN
 
   exposed:
-    - alias: sak.saker
-      resourceType: restservice
-      path: /api/v1/saker
-    - alias: sak.alive
-      resourceType: restservice
-      path: /internal/alive
