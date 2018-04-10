@@ -101,7 +101,9 @@ class OidcAuthenticator {
                     if (response.getStatusLine().getStatusCode() == 200) {
                         return resultTransformer.apply(responseString);
                     } else {
-                        throw new IllegalStateException("Uventet response fra openam");
+                        throw new IllegalStateException(String.format("Uventet response fra openam: %s, %s",
+                            response.getStatusLine().getStatusCode(),
+                            response.getStatusLine().getReasonPhrase()));
                     }
                 }
             }
