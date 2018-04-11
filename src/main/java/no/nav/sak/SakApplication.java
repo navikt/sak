@@ -47,10 +47,10 @@ public class SakApplication extends ResourceConfig {
         DefaultExports.initialize();
 
         SakConfiguration sakConfiguration = new SakConfiguration();
-        DataSource dataSource = createDataSource(sakConfiguration);
-        Database database = createDatabase(dataSource);
+        DataSource sakdataSource = createSakDataSource(sakConfiguration);
+        Database database = createDatabase(sakdataSource);
 
-        migrate(dataSource);
+        migrate(sakdataSource);
 
         registerAuthenticationFilter(sakConfiguration);
         registerApiResources(database, sakConfiguration);
@@ -96,8 +96,8 @@ public class SakApplication extends ResourceConfig {
             sakConfiguration.getRequiredString("OPENIDCONNECT_ISSO_ISSUER"));
 
         SAMLValidator samlValidator = new SAMLValidator(
-            sakConfiguration.getRequiredString("sak.junit-truststore.path"),
-            sakConfiguration.getRequiredString("sak.junit-truststore.password"));
+            sakConfiguration.getRequiredString("javax.net.ssl.trustStore"),
+            sakConfiguration.getRequiredString("javax.net.ssl.trustStorePassword"));
 
         LdapConfiguration ldapConfiguration = new LdapConfiguration(
             sakConfiguration.getRequiredString("LDAP_SERVICEUSER_BASEDN"),
@@ -170,7 +170,7 @@ public class SakApplication extends ResourceConfig {
     }
 
 
-    protected DataSource createDataSource(SakConfiguration sakConfiguration) {
+    protected DataSource createSakDataSource(SakConfiguration sakConfiguration) {
         HikariDataSource dataSource = new HikariDataSource();
         dataSource.setMetricsTrackerFactory(new PrometheusMetricsTrackerFactory());
 
