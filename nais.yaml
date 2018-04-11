@@ -41,10 +41,10 @@ fasitResources:
          password: LDAP_PASSWORD
          serviceuser_base_dn: LDAP_SERVICEUSER_BASEDN
 
- exposed:
-    - alias: sak.saker.test
+  exposed:
+    - alias: sak.saker
       resourceType: restservice
       path: /api/v1/saker
-    - alias: sak.alive.test
+    - alias: sak.alive
       resourceType: restservice
       path: /internal/alive
