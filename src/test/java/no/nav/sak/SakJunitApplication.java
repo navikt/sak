@@ -20,7 +20,7 @@ import javax.sql.DataSource;
 import static java.util.Collections.singletonList;
 
 public class SakJunitApplication extends SakApplication {
-    protected DataSource createDataSource(SakConfiguration sakConfiguration) {
+    protected DataSource createSakDataSource(SakConfiguration sakConfiguration) {
         return JunitDataSource.get();
     }
 

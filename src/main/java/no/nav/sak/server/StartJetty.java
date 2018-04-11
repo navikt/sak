@@ -25,22 +25,10 @@ public class StartJetty {
     public void start() throws Exception {
         ServletContextHandler context = new ServletContextHandler(server, "/");
 
-        ServletHolder defaultServlet = new ServletHolder(new DefaultServlet());
-        context.addServlet(defaultServlet, "/*");
-
-        ServletHolder jerseyServlet = new ServletHolder(new ServletContainer());
-        jerseyServlet.setInitParameter("javax.ws.rs.Application", "no.nav.sak.SakApplication");
-        context.addServlet(jerseyServlet, "/api/*");
-
-        ServletHolder readyServlet = new ServletHolder(new ReadyCheckServlet());
-        context.addServlet(readyServlet, "/internal/ready/*");
-
-        ServletHolder aliveServlet = new ServletHolder(new AliveCheckServlet());
-        context.addServlet(aliveServlet, "/internal/alive/*");
-
-        ServletHolder metricsServlet = new ServletHolder(new MetricsServlet());
-        context.addServlet(metricsServlet, "/internal/metrics/*");
-
+        registerDefaultServlet(context);
+        registerJerseyApplication(context);
+        registerNaisServlets(context);
+        registerMetricsServlet(context);
         context.setBaseResource(Resource.newClassPathResource("META-INF/resources/webjars/swagger-ui/3.9.2"));
 
         server.setHandler(context);
@@ -55,6 +43,30 @@ public class StartJetty {
         stats.setHandler(contextHandler);
         server.setHandler(stats);
         new JettyStatisticsCollector(stats).register();
+    }
+
+    private void registerMetricsServlet(ServletContextHandler context) {
+        ServletHolder metricsServlet = new ServletHolder(new MetricsServlet());
+        context.addServlet(metricsServlet, "/internal/metrics/*");
+    }
+
+    void registerJerseyApplication(ServletContextHandler context) {
+        ServletHolder jerseyServlet = new ServletHolder(new ServletContainer());
+        jerseyServlet.setInitParameter("javax.ws.rs.Application", "no.nav.oppgave.OppgaveApplication");
+        context.addServlet(jerseyServlet, "/api/*");
+    }
+
+    private void registerDefaultServlet(ServletContextHandler context) {
+        ServletHolder defaultServlet = new ServletHolder(new DefaultServlet());
+        context.addServlet(defaultServlet, "/*");
+    }
+
+    private void registerNaisServlets(ServletContextHandler context) {
+        ServletHolder readyServlet = new ServletHolder(new ReadyCheckServlet());
+        context.addServlet(readyServlet, "/internal/ready/*");
+
+        ServletHolder aliveServlet = new ServletHolder(new AliveCheckServlet());
+        context.addServlet(aliveServlet, "/internal/alive/*");
     }
 
     private int getPort() {

@@ -41,4 +41,3 @@ fasitResources:
          password: LDAP_PASSWORD
          serviceuser_base_dn: LDAP_SERVICEUSER_BASEDN
 
-  exposed:
