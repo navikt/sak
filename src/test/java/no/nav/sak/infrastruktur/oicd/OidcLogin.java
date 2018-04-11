@@ -11,28 +11,28 @@ import com.nimbusds.oauth2.sdk.id.ClientID;
 import com.nimbusds.openid.connect.sdk.OIDCTokenResponse;
 import com.nimbusds.openid.connect.sdk.OIDCTokenResponseParser;
 import com.nimbusds.openid.connect.sdk.op.OIDCProviderMetadata;
-import org.apache.commons.lang3.Validate;
+import no.nav.sak.SakConfiguration;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 
-import static java.lang.System.getenv;
-
 public class OidcLogin {
+    private SakConfiguration sakConfiguration = new SakConfiguration();
+
     public String getIdToken() throws Exception {
         OIDCProviderMetadata providerMetadata = getOidcProviderMetadata();
         String redirectUrl = "https://sak.nais.preprod.local/";
 
-        String testLoginUsername = Validate.notNull(getenv("testLoginUsername"), "Env property 'testLoginUsername' er påkrevd");
+        String testLoginUsername = sakConfiguration.getRequiredString("testLoginUsername");
         String testLogin***passord=gammelt_passord***");
 
         OidcAuthenticator oidcAuthenticator = new OidcAuthenticator(providerMetadata.getAuthorizationEndpointURI(), redirectUrl);
         String authorizationCode = oidcAuthenticator.getAuthorizationCode(testLoginUsername, testLoginPassword);
 
-        String clientId = Validate.notNull(getenv("isso-rp-issuer"), "Env property 'isso-rp-issuer' er påkrevd");
-        String clientSecret = Validate.notNull(getenv("OpenIdConnectAgent.password"), "Env property 'OpenIdConnectAgent.password' er påkrevd");
+        String clientId = sakConfiguration.getRequiredString("isso-rp-issuer");
+        String clientSecret = sakConfiguration.getRequiredString("OpenIdConnectAgent.password");
 
         TokenRequest tokenRequest = new TokenRequest(
             providerMetadata.getTokenEndpointURI(),
