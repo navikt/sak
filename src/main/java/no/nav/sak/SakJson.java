@@ -3,6 +3,7 @@ package no.nav.sak;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 import no.nav.sak.validering.ExactlyOneOf;
+import no.nav.sak.validering.Organisasjonsnummer;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -26,6 +27,7 @@ public class SakJson {
     @Size(message = "{no.nav.sak.aktoerId.Size}", max = 40)
     private String aktoerId;
 
+    @Organisasjonsnummer
     @Size(message = "{no.nav.sak.orgnr.Size}", max = 9)
     private String orgnr;
 
