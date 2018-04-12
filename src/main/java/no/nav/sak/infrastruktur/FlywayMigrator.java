@@ -13,7 +13,12 @@ public class FlywayMigrator {
 
     public FlywayMigrator(DataSource dataSource, String... locations) {
         this.dataSource = dataSource;
-        this.locations = locations;
+        if (locations.length == 0) {
+            this.locations = new String[]{"classpath:/db/migration"};
+        } else {
+            this.locations = locations;
+        }
+
     }
 
     public void migrate() {
