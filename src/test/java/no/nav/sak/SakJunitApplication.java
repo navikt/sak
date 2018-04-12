@@ -1,6 +1,7 @@
 package no.nav.sak;
 
 import no.nav.sak.infrastruktur.Database;
+import no.nav.sak.infrastruktur.FlywayMigrator;
 import no.nav.sak.infrastruktur.JunitDataSource;
 import no.nav.sak.infrastruktur.JunitDatabase;
 import no.nav.sak.infrastruktur.abac.ABACJunitClient;
@@ -49,6 +50,10 @@ public class SakJunitApplication extends SakApplication {
         register(new AuthenticationFilter(authenticator));
     }
 
+    void migrateSak(DataSource dataSource) {
+        new FlywayMigrator(dataSource, "classpath:db/migration").migrate();
+    }
+
     void registerApiResources(Database database, SakConfiguration sakConfiguration) {
         register(new SakResource(
             new SakRepository(database),
@@ -56,5 +61,7 @@ public class SakJunitApplication extends SakApplication {
             sakConfiguration.getBoolean("ABAC_ENABLED", false))
         );
     }
+
+    void migrateDataWarehouse(SakConfiguration sakConfiguration){}
 
 }
