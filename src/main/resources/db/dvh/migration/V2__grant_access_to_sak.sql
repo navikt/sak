@@ -1,1 +1,2 @@
-grant insert on gsak_gr to sak;
+grant insert on sak_gr to sak;
+grant select on sak_gr to sak;
