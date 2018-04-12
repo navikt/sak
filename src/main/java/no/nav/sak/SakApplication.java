@@ -153,6 +153,7 @@ public class SakApplication extends ResourceConfig {
         beanConfig.setScan();
         register(ApiListingResource.class);
         register(SwaggerSerializers.class);
+
     }
 
     protected Database createDatabase(DataSource dataSource) {

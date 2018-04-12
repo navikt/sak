@@ -25,11 +25,11 @@ public class OidcLogin {
         OIDCProviderMetadata providerMetadata = getOidcProviderMetadata();
         String redirectUrl = "https://sak.nais.preprod.local/";
 
-        String testLoginUsername = sakConfiguration.getRequiredString("testLoginUsername");
-        String testLoginPassword = sakConfiguration.getRequiredString("testLoginPassword");
+        String username = sakConfiguration.getRequiredString("testLoginUsername");
+        String password = sakConfiguration.getRequiredString("testLoginPassword");
 
         OidcAuthenticator oidcAuthenticator = new OidcAuthenticator(providerMetadata.getAuthorizationEndpointURI(), redirectUrl);
-        String authorizationCode = oidcAuthenticator.getAuthorizationCode(testLoginUsername, testLoginPassword);
+        String authorizationCode = oidcAuthenticator.getAuthorizationCode(username, password);
 
         String clientId = sakConfiguration.getRequiredString("isso-rp-issuer");
         String clientSecret = sakConfiguration.getRequiredString("OpenIdConnectAgent.password");

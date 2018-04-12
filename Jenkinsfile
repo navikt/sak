@@ -98,7 +98,7 @@ pipeline {
             steps {
                 milestone(4)
                 withCredentials([
-                    usernamePassword([credentialsId: 'idaBruker', usernameVariable: 'testLoginUsername', passwordVariable: 'testLoginPassword']),
+                    usernamePassword([credentialsId: 'systembruker', usernameVariable: 'testLoginUsername', passwordVariable: 'testLoginPassword']),
                     usernamePassword([credentialsId: 'sak-t0', usernameVariable: 'isso-rp-issuer', passwordVariable: 'OpenIdConnectAgent.password']),
                     usernamePassword([credentialsId: 'systembruker', usernameVariable: 'systembruker.username', passwordVariable: 'systembruker.password']),
                     usernamePassword([credentialsId: 'sakds.lasttest', usernameVariable: 'sakds.lasttest.user', passwordVariable: 'sakds.lasttest.password']),
