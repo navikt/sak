@@ -9,7 +9,7 @@
 
     <appender name="METRICS" class="io.prometheus.client.logback.InstrumentedAppender"/>
 
-    <logger name="no.nav" level="DEBUG" additivity="false">
+    <logger name="no.nav" level="OFF" additivity="false">
         <appender-ref ref="STDOUT"/>
         <appender-ref ref="METRICS"/>
     </logger>
@@ -35,7 +35,7 @@
         <appender-ref ref="STDOUT"/>
     </logger>
 
-    <root level="DEBUG">
+    <root level="OFF">
         <appender-ref ref="STDOUT"/>
         <appender-ref ref="METRICS"/>
     </root>
