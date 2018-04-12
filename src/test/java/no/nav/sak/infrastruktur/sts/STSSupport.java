@@ -56,8 +56,8 @@ public class STSSupport {
         File tempFile = File.createTempFile("nav_truststore" + System.currentTimeMillis(), ".tmp");
         tempFile.deleteOnExit();
         FileUtils.copyInputStreamToFile(trustStore, tempFile);
-        System.setProperty("sak.junit-truststore.path", tempFile.getAbsolutePath());
-        System.setProperty("sak.junit-truststore.password", getEnvVariable(TRUSTSTORE_PASSWORD));
+        System.setProperty("javax.net.ssl.trustStore", tempFile.getAbsolutePath());
+        System.setProperty("javax.net.ssl.trustStorePassword", getEnvVariable(TRUSTSTORE_PASSWORD));
     }
 
     private String getEnvVariable(String name) {
