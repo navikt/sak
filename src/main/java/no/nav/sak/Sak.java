@@ -1,5 +1,6 @@
 package no.nav.sak;
 
+import no.nav.sak.validering.OrganisasjonsnummerValidator;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -152,6 +153,7 @@ public class Sak {
             Validate.notBlank(applikasjon, "Applikasjon må være angitt");
             Validate.notBlank(opprettetAv, "OpprettetAv må være angitt");
             Validate.notNull(opprettetTidspunkt, "Opprettet tidspunkt må være angitt");
+            Validate.validState(OrganisasjonsnummerValidator.isValid(orgnr));
             return new Sak(this);
         }
     }
