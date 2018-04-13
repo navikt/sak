@@ -9,6 +9,6 @@ DECLARE
  IF inserting THEN endringstype :='I'; END IF;
 
  INSERT INTO sak_gr.sak_gr
- (sak_gr_id, sak_id, tema, applikasjon, fagsaknr, opprettet_av, opprettet_tidspunkt, dato_overfort_grensesnitt, endring_type)
- VALUES (sak_gr.SAK_SEQ.nextval, :new.id, :new.tema, :new.applikasjon, :new.fagsaknr, :new.opprettet_av, :new.opprettet_tidspunkt, CURRENT_TIMESTAMP, endringstype);
+ (sak_gr_id, sak_id, aktoerid, orgnr, tema, applikasjon, fagsaknr, opprettet_av, opprettet_tidspunkt, dato_overfort_grensesnitt, endring_type)
+ VALUES (sak_gr.SAK_SEQ.nextval, :new.id, :new.aktoerid, :new.orgnr, :new.tema, :new.applikasjon, :new.fagsaknr, :new.opprettet_av, :new.opprettet_tidspunkt, CURRENT_TIMESTAMP, endringstype);
 END;
