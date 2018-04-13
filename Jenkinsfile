@@ -90,7 +90,7 @@ pipeline {
         stage('Nais deploy (preprod - lasttest)') {
             steps {
                 milestone(3)
-                naisDeployPreprod("sak", versjon, "u1", "u2")
+                naisDeployPreprod("sak", versjon, "t8", "t8")
             }
         }
 
