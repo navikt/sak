@@ -23,19 +23,25 @@ public class StartJetty {
     }
 
     public void start() throws Exception {
-        ServletContextHandler context = new ServletContextHandler(server, "/");
+        try{
+            ServletContextHandler context = new ServletContextHandler(server, "/");
+            registerDefaultServlet(context);
+            registerJerseyApplication(context);
+            registerNaisServlets(context);
+            registerMetricsServlet(context);
+            context.setBaseResource(Resource.newClassPathResource("META-INF/resources/webjars/swagger-ui/3.9.2"));
 
-        registerDefaultServlet(context);
-        registerJerseyApplication(context);
-        registerNaisServlets(context);
-        registerMetricsServlet(context);
-        context.setBaseResource(Resource.newClassPathResource("META-INF/resources/webjars/swagger-ui/3.9.2"));
+            server.setHandler(context);
+            registerJettyMetrics(context);
 
-        server.setHandler(context);
-        registerJettyMetrics(context);
+            server.start();
+            log.info("Startet jetty");
+        } catch(Exception e){
+            log.error("Kunne ikke starte opp server", e);
+            server.stop();
+        }
 
-        server.start();
-        log.info("Startet jetty");
+
     }
 
     void registerJettyMetrics(ServletContextHandler contextHandler) {
