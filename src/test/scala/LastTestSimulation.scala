@@ -11,7 +11,7 @@ class LastTestSimulation extends Simulation {
     private val authHeaderOidc = "Bearer " + new OidcLogin().getIdToken
     private val authHeaderSaml = "Saml " + new STSSupport().getSystemSAMLTokenFromSTS
 
-    private val httpProtocol = http.baseURL("https://sak-u2.nais.preprod.local/api/v1").warmUp("http://confluence.adeo.no")
+    private val httpProtocol = http.baseURL("https://sak-t8.nais.preprod.local/api/v1").warmUp("http://confluence.adeo.no")
 
     private val orgnrFeeder = csv("data/orgnr.csv").circular
     private val temaFeeder = csv("data/tema.csv").circular
