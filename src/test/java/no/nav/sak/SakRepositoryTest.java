@@ -65,10 +65,10 @@ class SakRepositoryTest {
     @Test
     void finner_saker_for_flere_kriterier() {
         String tema = RandomStringUtils.randomAlphabetic(3);
-        String orgnr = RandomStringUtils.randomNumeric(9);
+        String orgnr = "974652250";
 
         Sak sak1 = sakRepository.lagre(new SakTestData().orgnr(orgnr).tema(tema).build());
-        sakRepository.lagre(new SakTestData().orgnr(randomNumeric(9)).build());
+        sakRepository.lagre(new SakTestData().orgnr(SakTestData.generateValidOrgnr()).build());
         sakRepository.lagre(new SakTestData().aktoerId(randomNumeric(5)).build());
         Sak sak2 = sakRepository.lagre(new SakTestData().orgnr(orgnr).tema(tema).build());
 

@@ -22,7 +22,7 @@ public class GatlingJDBCCleaner {
     public void resetState() {
 
         try {
-            URI uri = GatlingJDBCCleaner.class.getResource("/data/orgnr.csv").toURI();
+            URI uri = GatlingJDBCCleaner.class.getResource("/data/aktoerId.csv").toURI();
             Files.readAllLines(Paths.get(uri)).stream()
                 .skip(1)
                 .map(s -> s.replaceAll(",", ""))
@@ -32,8 +32,8 @@ public class GatlingJDBCCleaner {
         }
     }
 
-    private void deleteSak(String orgnr) {
-        database.execute("delete from sak where orgnr = ?", orgnr);
+    private void deleteSak(String aktoerId) {
+        database.execute("delete from sak where aktoerId = ?", aktoerId);
     }
 
 }
