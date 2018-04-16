@@ -29,7 +29,7 @@ object SakTests {
 
     val searchSaker = (authHeaderValue: String) => exec(
         http("searchSaker")
-            .get("/saker?orgnr=${orgnr}")
+            .get("/saker?aktoerId=${aktoerId}")
             .header("Content-Type", "application/json")
             .header("Authorization", authHeaderValue)
             .header("X-Correlation-ID", "gatling")
