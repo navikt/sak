@@ -140,7 +140,7 @@ class SakResourceTest extends JerseyTest {
     @Test
     void oppretter_sak_for_organisasjon() {
         Sak sak = new SakTestData()
-            .orgnr("123456789")
+            .orgnr(SakTestData.generateValidOrgnr())
             .build();
         JsonObject jsonObject = createAndRetrieveAtLocation(sak);
         assertThat(jsonObject.get("id").getAsLong()).isNotNull();
@@ -250,7 +250,7 @@ class SakResourceTest extends JerseyTest {
     @Test
     void soeker_opp_saker_for_orgnr() {
         opprett100Tilfeldigesaker();
-        String orgnr = RandomStringUtils.randomNumeric(9);
+        String orgnr = "974652250";
         Sak sak = sakRepository.lagre(new SakTestData().orgnr(orgnr).build());
 
         Response response = sakRootTarget()
@@ -282,7 +282,7 @@ class SakResourceTest extends JerseyTest {
         opprett100Tilfeldigesaker();
         String fagsaknr = RandomStringUtils.randomNumeric(9);
         String applikasjon = RandomStringUtils.randomAlphabetic(9);
-        String orgnr = RandomStringUtils.randomNumeric(9);
+        String orgnr = SakTestData.generateValidOrgnr();
         String tema = RandomStringUtils.randomAlphabetic(4);
 
         sakRepository.lagre(new SakTestData()
@@ -368,7 +368,7 @@ class SakResourceTest extends JerseyTest {
     private void opprett100Tilfeldigesaker() {
         for (int i = 0; i < 50; i++) {
             sakRepository.lagre(new SakTestData().aktoerId(RandomStringUtils.randomNumeric(5)).build());
-            sakRepository.lagre(new SakTestData().orgnr(RandomStringUtils.randomNumeric(9)).build());
+            sakRepository.lagre(new SakTestData().orgnr(SakTestData.generateValidOrgnr()).build());
         }
     }
 

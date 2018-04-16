@@ -1,11 +1,14 @@
 package no.nav.sak;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.RandomUtils;
 
 import java.time.LocalDateTime;
+import java.util.Random;
 
 
 public class SakTestData {
+    private static final String[] gyldigeOrgnr = {"999263550", "991012133", "895106402"};
     private String tema = RandomStringUtils.randomAlphabetic(3);
     private String aktoerId = RandomStringUtils.randomAlphabetic(9);
     private String orgnr;
@@ -13,6 +16,7 @@ public class SakTestData {
     private String applikasjon = RandomStringUtils.randomAlphabetic(3);
     private String opprettetAv = RandomStringUtils.randomAlphabetic(8);
     private LocalDateTime opprettetTidspunkt = LocalDateTime.now();
+
 
     public Sak build() {
         return new Sak.Builder()
@@ -52,6 +56,10 @@ public class SakTestData {
     SakTestData applikasjon(String applikasjon) {
         this.applikasjon = applikasjon;
         return this;
+    }
+
+    static String generateValidOrgnr() {
+        return gyldigeOrgnr[RandomUtils.nextInt(0, 3)];
     }
 }
 

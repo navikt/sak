@@ -13,7 +13,7 @@ class LastTestSimulation extends Simulation {
 
     private val httpProtocol = http.baseURL("https://sak-t8.nais.preprod.local/api/v1").warmUp("http://confluence.adeo.no")
 
-    private val orgnrFeeder = csv("data/orgnr.csv").circular
+    private val aktoerIdFeeder = csv("data/aktoerId.csv").circular
     private val temaFeeder = csv("data/tema.csv").circular
     private val applikasjonFeeder = csv("data/applikasjon.csv").circular
 
@@ -25,7 +25,7 @@ class LastTestSimulation extends Simulation {
     private val opprettOgHentSakScenario = scenario("Opprett og hent sak")
         .group("OIDC") {
             feed(temaFeeder)
-                .feed(orgnrFeeder)
+                .feed(aktoerIdFeeder)
                 .feed(applikasjonFeeder)
                 .exec(
                     SakTests.createSak(authHeaderOidc),
@@ -34,7 +34,7 @@ class LastTestSimulation extends Simulation {
         }
         .group("SAML") {
             feed(temaFeeder)
-                .feed(orgnrFeeder)
+                .feed(aktoerIdFeeder)
                 .feed(applikasjonFeeder)
                 .exec(
                     SakTests.createSak(authHeaderSaml),
@@ -45,13 +45,13 @@ class LastTestSimulation extends Simulation {
     private val soekSakerScenario = scenario("Søk etter saker")
         .group("OIDC") {
             feed(temaFeeder)
-                .feed(orgnrFeeder)
+                .feed(aktoerIdFeeder)
                 .feed(applikasjonFeeder)
                 .exec(SakTests.searchSaker(authHeaderOidc))
         }
         .group("SAML") {
             feed(temaFeeder)
-                .feed(orgnrFeeder)
+                .feed(aktoerIdFeeder)
                 .feed(applikasjonFeeder)
                 .exec(SakTests.searchSaker(authHeaderSaml))
         }
