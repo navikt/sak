@@ -47,10 +47,15 @@ public class SakApplication extends ResourceConfig {
         DefaultExports.initialize();
 
         SakConfiguration sakConfiguration = new SakConfiguration();
-        DataSource sakdataSource = createSakDataSource(sakConfiguration);
-        Database database = createDatabase(sakdataSource);
+        DataSource sakDataSource = createSakDataSource(sakConfiguration);
 
-        migrate(sakdataSource);
+
+        migrateDataWarehouse(sakConfiguration);
+
+        migrateSak(sakDataSource);
+
+
+        Database database = createDatabase(sakDataSource);
 
         registerAuthenticationFilter(sakConfiguration);
         registerApiResources(database, sakConfiguration);
@@ -61,6 +66,11 @@ public class SakApplication extends ResourceConfig {
         initSAML();
 
         log.info("Jersey-Application ferdig initialisert");
+    }
+
+    void migrateDataWarehouse(SakConfiguration sakConfiguration) {
+        DataSource sakGrDataSource = createSakGrDataSource(sakConfiguration);
+        migrateSakGr(sakGrDataSource);
     }
 
     private void registerFeatures() {
@@ -160,8 +170,12 @@ public class SakApplication extends ResourceConfig {
         return new Database(dataSource);
     }
 
-    private void migrate(DataSource dataSource) {
-        new FlywayMigrator(dataSource).migrate();
+    void migrateSak(DataSource dataSource) {
+        new FlywayMigrator(dataSource, "classpath:db/migration", "classpath:db/oracle/migration").migrate();
+    }
+
+    private void migrateSakGr(DataSource sakGrDataSource) {
+        new FlywayMigrator(sakGrDataSource, "classpath:db/dvh/migration").migrate();
     }
 
     private void registerLoggingFeature() {
@@ -180,6 +194,17 @@ public class SakApplication extends ResourceConfig {
         dataSource.setJdbcUrl(sakConfiguration.getRequiredString("SAKDS_URL"));
 
         log.info("Opprettet datasource: {}", dataSource.getJdbcUrl());
+        return dataSource;
+    }
+
+    private DataSource createSakGrDataSource(SakConfiguration sakConfiguration) {
+        HikariDataSource dataSource = new HikariDataSource();
+
+        dataSource.setUsername(sakConfiguration.getRequiredString("SAK_GR_DS_USERNAME"));
+        dataSource.setPassword(sakConfiguration.getRequiredString("SAK_GR_DS_PASSWORD"));
+        dataSource.setJdbcUrl(sakConfiguration.getRequiredString("SAK_GR_DS_URL"));
+
+        log.info("Opprettet datasource for dvh: {}", dataSource.getJdbcUrl());
         return dataSource;
     }
 }
