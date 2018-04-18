@@ -32,7 +32,7 @@ import static no.nav.sak.infrastruktur.authentication.AuthenticationFilter.REQUE
 @Consumes(MediaType.APPLICATION_JSON)
 @EnableApiFilters
 @Path("/v1/saker")
-@Api(value = "v1/oppgaver", authorizations = {
+@Api(value = "v1/saker", authorizations = {
     @Authorization(value = "Bearer"),
     @Authorization(value = "Saml"),
     @Authorization(value = "Basic")
