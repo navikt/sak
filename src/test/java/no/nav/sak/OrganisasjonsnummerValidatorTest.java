@@ -3,11 +3,10 @@ package no.nav.sak;
 import no.nav.sak.validering.OrganisasjonsnummerValidator;
 import org.junit.jupiter.api.Test;
 
-import static no.nav.sak.validering.OrganisasjonsnummerValidator.ORGNR_VEKTER;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class OrganisasjonsnummerValidatorTest {
-
+    private static final int[] ORGNR_VEKTER = {3, 2, 7, 6, 5, 4, 3, 2};
     private static final String GYLDIG_ORGNR_STARTSIFFER_9 = "979312059";
     private static final String GYLDIG_ORGNR_STARTSIFFER_8 = "891046642";
 
