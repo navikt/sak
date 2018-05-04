@@ -32,9 +32,10 @@ import static no.nav.sak.infrastruktur.authentication.AuthenticationFilter.REQUE
 @Consumes(MediaType.APPLICATION_JSON)
 @EnableApiFilters
 @Path("/v1/saker")
-@Api(value = "v1/saker", authorizations = {
+@Api(value = "v1/oppgaver", authorizations = {
     @Authorization(value = "Bearer"),
-    @Authorization(value = "Saml")
+    @Authorization(value = "Saml"),
+    @Authorization(value = "Basic")
 })
 @SwaggerDefinition(securityDefinition =
 @SecurityDefinition(apiKeyAuthDefinitions = {
@@ -42,9 +43,9 @@ import static no.nav.sak.infrastruktur.authentication.AuthenticationFilter.REQUE
         name = "Authorization",
         key = "Bearer",
         in = HEADER,
-        description = "JWT via OAuth2.0. Om en ikke har en JWT for hånden anbefales det å bruke SAML token" +
-            " istedenfor da det ikke er noe verktøy for å enkelt få tak i JWT i skrivende stund.\n" +
-            " Følgende format må brukes i input-feltet \"Value\" under: <strong>\"Bearer token\"</strong>.\n" +
+        description = "OIDC-token (JWT via OAuth2.0). Dette preferert autentiseringsmekanisme, og <strong>skal</strong>" +
+            " benyttes ved tjenestekall initiert av en bruker for å propagere konteksten (unntatt i særtilfeller - se Saml) \n" +
+            " Følgende format må brukes i input-feltet \"Value\" under: <strong>\"Bearer {token}\"</strong>.\n" +
             " Eksempel på verdi i input-felt: <strong>Bearer eYdmifml0ejugm</strong>\n\n" +
             " Et gyldig token kommer til å ha mange flere karakterer enn i eksempelet."),
 
@@ -52,21 +53,18 @@ import static no.nav.sak.infrastruktur.authentication.AuthenticationFilter.REQUE
         name = "Authorization",
         key = "Saml",
         in = HEADER,
-        description = "I denne konteksten er et SAML token en SAML assertion som er Base 64 enkodet. Man kan lett generere" +
-            " en SAML assertion i IDA (http://ida.adeo.no) under SAML-token tabben etter å ha valgt en testbruker" +
-            " i \"Mine AD-identer\" (consumerId bør være en gyldig systembruker). For å bruke dette videre må" +
-            " resultatet Base64 enkodes og limes inn i \"Value\" feltet under på riktig format.\n" +
-            " Formatet skal være som følger: <strong>\"Saml token\"</strong>.\n" +
+        description = "P.t støttes ikke konvertering fra SAML til OIDC-token og det er derfor implementert støtte for Saml for å propagere brukercontext fra legacy-systemer " +
+            " (i.e. fra et system som kun eksponerer soap-tjenester og som skal gjøre tjenestekall videre mot Oppgave.\n" +
+            " I denne konteksten er et SAML token en SAML assertion som er Base 64 enkodet. \n" +
+            " Formatet skal være som følger: <strong>\"Saml {token}\"</strong>.\n" +
             " Eksempel på verdi i input-felt: <strong>Saml eYdmifml0ejugm</strong>\n\n" +
-            " Et gyldig token kommer til å ha mange flere karakterer enn i eksempelet."),
-
-    @ApiKeyAuthDefinition(
-        name = "Authorization",
-        key = "Basic",
-        in = HEADER,
-        description = "Basic auth kan brukes når det er snakk om system til system kommunikasjon" +
-            "Formatet vil da typisk være \"<strong>Basic brukernavn:passord</strong>\" hvor \"brukernavn:passord\" er Base64 enkodet.\n\n" +
-            "Eksempelverdi på input-felt: <strong>Basic eYdmifml0ejugm</strong>")}
+            " Et gyldig token kommer til å ha mange flere karakterer enn i eksempelet.")
+},
+    basicAuthDefinitions = {
+        @BasicAuthDefinition(
+            key = "Basic",
+            description = "Basic auth kan brukes når det er snakk om system-til-system kommunikasjon")
+    }
 )
 )
 public class SakResource {
