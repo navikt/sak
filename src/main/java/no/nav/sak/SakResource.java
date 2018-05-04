@@ -32,7 +32,7 @@ import static no.nav.sak.infrastruktur.authentication.AuthenticationFilter.REQUE
 @Consumes(MediaType.APPLICATION_JSON)
 @EnableApiFilters
 @Path("/v1/saker")
-@Api(value = "v1/oppgaver", authorizations = {
+@Api(value = "v1/saker", authorizations = {
     @Authorization(value = "Bearer"),
     @Authorization(value = "Saml"),
     @Authorization(value = "Basic")
@@ -87,6 +87,7 @@ public class SakResource {
     @GET
     @Path("/{id}")
     @ApiOperation(value = "Henter sak for en gitt id", response = SakJson.class)
+    @ApiImplicitParams({@ApiImplicitParam(name = "X-Correlation-ID", required = true, dataType = "string", paramType = "header")})
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "OK"),
         @ApiResponse(code = 401, message = "Konsument mangler gyldig token"),
@@ -119,6 +120,7 @@ public class SakResource {
     @GET
     @ApiOperation(value = "Finner saker for angitte søkekriterier",
         response = SakJson.class, responseContainer = "List")
+    @ApiImplicitParams({@ApiImplicitParam(name = "X-Correlation-ID", required = true, dataType = "string", paramType = "header")})
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "OK"),
         @ApiResponse(code = 400, message = "Ugyldig input"),
@@ -138,6 +140,7 @@ public class SakResource {
 
     @POST
     @ApiOperation(value = "Oppretter en ny sak", notes = "Merk at en sak enten skal tilhøre en aktør <b>eller</b> et foretak. Begge er p.t. ikke tillatt. ")
+    @ApiImplicitParams({@ApiImplicitParam(name = "X-Correlation-ID", required = true, dataType = "string", paramType = "header")})
     @ApiResponses(value = {
         @ApiResponse(code = 201, message = "Saken er opprettet", responseHeaders = @ResponseHeader(name = "location", description = "Angir URI til den opprettede saken")),
         @ApiResponse(code = 400, message = "Ugyldig input"),
