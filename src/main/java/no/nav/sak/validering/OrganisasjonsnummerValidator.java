@@ -7,10 +7,12 @@ import javax.validation.ConstraintValidatorContext;
 
 public class OrganisasjonsnummerValidator implements ConstraintValidator<Organisasjonsnummer, String> {
 
-    public static final int[] ORGNR_VEKTER = {3, 2, 7, 6, 5, 4, 3, 2};
+    private static final int[] ORGNR_VEKTER = {3, 2, 7, 6, 5, 4, 3, 2};
 
     @Override
-    public void initialize(Organisasjonsnummer orgnr) {}
+    public void initialize(Organisasjonsnummer orgnr) {
+        //sonar
+    }
 
     @Override
     public boolean isValid(String orgnr, ConstraintValidatorContext constraintValidatorContext) {
