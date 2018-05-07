@@ -66,5 +66,7 @@ public class PrometheusFilter implements ContainerRequestFilter, ContainerRespon
         if (timer != null) {
             timer.observeDuration();
         }
+
+
     }
 }

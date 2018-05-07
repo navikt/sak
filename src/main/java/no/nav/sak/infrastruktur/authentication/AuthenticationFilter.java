@@ -13,15 +13,19 @@ import javax.annotation.Priority;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.container.ContainerResponseContext;
+import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
+
+import java.io.IOException;
 
 import static javax.ws.rs.core.HttpHeaders.AUTHORIZATION;
 
 @Provider
 @EnableApiFilters
 @Priority(Priorities.AUTHENTICATION)
-public class AuthenticationFilter implements ContainerRequestFilter {
+public class AuthenticationFilter implements ContainerRequestFilter, ContainerResponseFilter {
     public static final String REQUEST_USERNAME = "username";
     public static final String REQUEST_CONSUMERID = "consumerid";
 
@@ -40,7 +44,7 @@ public class AuthenticationFilter implements ContainerRequestFilter {
             log.warn("Autentisering feilet: {}", result.getErrorMessage());
             abortAsUnauthorized(ctx);
         }
-
+        MDC.put(REQUEST_CONSUMERID, result.getConsumerId());
         ctx.setProperty(REQUEST_CONSUMERID, result.getConsumerId());
         ctx.setProperty(REQUEST_USERNAME, result.getUser());
     }
@@ -49,5 +53,10 @@ public class AuthenticationFilter implements ContainerRequestFilter {
         ctx.abortWith(Response.status(Response.Status.UNAUTHORIZED)
             .entity(new ErrorResponse(MDC.get("uuid"), "Autentisering feilet - se Kibana for årsak"))
             .build());
+    }
+
+    @Override
+    public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) throws IOException {
+        MDC.remove(REQUEST_CONSUMERID);
     }
 }
