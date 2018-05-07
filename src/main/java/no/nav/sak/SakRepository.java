@@ -12,11 +12,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static org.apache.commons.lang3.StringUtils.defaultString;
+
 public class SakRepository {
     private static final Counter opprettedeSakerCounter = Counter.build("saker_opprettet_total", "Antall saker opprettet totalt")
         .labelNames("tema", "type", "applikasjon", "consumer").register();
 
-    private static final Histogram latencyHisto = Histogram.build("repository_latency_seconds", "Repository latency in seconds")
+    private static final Histogram latencyHisto = Histogram.build("repository_duration_seconds", "Repository latency in seconds")
         .labelNames("operation", "consumer")
         .register();
 
@@ -42,7 +44,11 @@ public class SakRepository {
         } finally {
             timer.observeDuration();
         }
-        opprettedeSakerCounter.labels(sak.getTema(), sak.getFagsakNr() != null ? "Fagsak" : "Generell", sak.getApplikasjon(), MDC.get("consumerid")).inc();
+        opprettedeSakerCounter.labels(
+            sak.getTema(),
+            sak.getFagsakNr() != null ? "Fagsak" : "Generell",
+            sak.getApplikasjon(),
+            defaultString(MDC.get("consumerid"), "N/A")).inc();
         return sak;
     }
 
@@ -91,7 +97,7 @@ public class SakRepository {
         return latencyHisto
             .labels(
                 operation,
-                MDC.get("consumerid")).startTimer();
+                defaultString(MDC.get("consumerid"), "N/A")).startTimer();
     }
 
     private static class Query {

@@ -51,8 +51,8 @@ class StartJettyTest {
             .header(authHeaderSaml).get("internal/alive");
 
         assertThat(RestAssured.given().port(8099).get("internal/metrics").getBody().asString()).contains(
-            "requests_latency_seconds_bucket{path=\"/api/v1/saker\",queryparams=\"N/A\",method=\"GET\"",
-            "requests_latency_seconds_bucket{path=\"/api/v1/saker/{id}\",queryparams=\"N/A\",method=\"GET\""
+            "requests_duration_seconds_bucket{path=\"/api/v1/saker\",queryparams=\"N/A\",method=\"GET\"",
+            "requests_duration_seconds_bucket{path=\"/api/v1/saker/{id}\",queryparams=\"N/A\",method=\"GET\""
         );
     }
 
