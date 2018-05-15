@@ -144,8 +144,8 @@ public class SakApplication extends ResourceConfig {
 
         if (sakConfiguration.getBoolean("ABAC_ENABLED", false)) {
             Username***passord=gammelt_passord***(
-                sakConfiguration.getRequiredString("srvsak_username"),
-                sakConfiguration.getRequiredString("srvsak_password"));
+                sakConfiguration.getRequiredString("SRVSAK_USERNAME"),
+                sakConfiguration.getRequiredString("SRVSAK_PASSWORD"));
 
             CredentialsProvider provider = new BasicCredentialsProvider();
             provider.setCredentials(AuthScope.ANY, credentials);
