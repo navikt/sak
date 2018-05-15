@@ -90,7 +90,12 @@ pipeline {
         stage('Nais deploy (preprod - lasttest)') {
             steps {
                 milestone(3)
-                naisDeployPreprod("sak", versjon, "t8", "t8")
+                script {
+                      if (env.BRANCH_NAME == 'master') {
+                           naisDeployPreprod("sak", versjon, "t8", "t8")
+                      } else {
+                         echo "Last-tester kjører kun på master. Deploy ikke utført"}
+                }
             }
         }
 
@@ -104,7 +109,12 @@ pipeline {
                     usernamePassword([credentialsId: 'sakds.lasttest', usernameVariable: 'sakds.lasttest.user', passwordVariable: 'sakds.lasttest.password']),
                     string(credentialsId: 'truststore-password', variable: 'truststore.password')
                 ]){
-                    sh "mvn gatling:test"
+                     script {
+                         if (env.BRANCH_NAME == 'master') {
+                             sh "mvn gatling:test"
+                         } else {
+                             echo "Last-tester kjører kun på master"}
+                         }
                 }
             }
         }
@@ -112,7 +122,7 @@ pipeline {
         stage('Nais deploy (preprod - default)') {
             steps {
                 milestone(5)
-                naisDeployPreprod("sak", versjon, "q1", "q1")
+                naisDeployPreprod("sak", versjon, "u1")
                 slackSend (color: '#90ee90', message: "Deployet til preprod: ${env.BRANCH_NAME} Sak:" + versjon)
             }
         }

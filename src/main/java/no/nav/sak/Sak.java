@@ -40,7 +40,7 @@ public class Sak {
         this.id = id;
     }
 
-    String getTema() {
+    public String getTema() {
         return tema;
     }
 
@@ -52,7 +52,7 @@ public class Sak {
         return fagsakNr;
     }
 
-    String getAktoerId() {
+    public String getAktoerId() {
         return aktoerId;
     }
 
@@ -102,7 +102,7 @@ public class Sak {
         Builder() {
         }
 
-        public static Builder enSak() {
+        static Builder enSak() {
             return new Builder();
         }
 
@@ -121,27 +121,27 @@ public class Sak {
             return this;
         }
 
-        public Builder medFagsakNr(String fagsakNr) {
+        Builder medFagsakNr(String fagsakNr) {
             this.fagsakNr = fagsakNr;
             return this;
         }
 
-        public Builder medAktoerId(String aktoerId) {
+        Builder medAktoerId(String aktoerId) {
             this.aktoerId = aktoerId;
             return this;
         }
 
-        public Builder medOrgnr(String orgnr) {
+        Builder medOrgnr(String orgnr) {
             this.orgnr = orgnr;
             return this;
         }
 
-        public Builder medOpprettetAv(String opprettetAv) {
+        Builder medOpprettetAv(String opprettetAv) {
             this.opprettetAv = opprettetAv;
             return this;
         }
 
-        public Builder medOpprettetTidspunkt(LocalDateTime opprettetTidspunkt) {
+        Builder medOpprettetTidspunkt(LocalDateTime opprettetTidspunkt) {
             this.opprettetTidspunkt = opprettetTidspunkt;
             return this;
         }

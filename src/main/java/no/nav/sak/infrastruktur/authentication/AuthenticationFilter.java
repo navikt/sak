@@ -22,8 +22,12 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
 
 import java.io.IOException;
+import java.util.Objects;
 
 import static javax.ws.rs.core.HttpHeaders.AUTHORIZATION;
+import static no.nav.sikkerhet.authentication.AuthenticationHeaderIdentifier.BASIC;
+import static no.nav.sikkerhet.authentication.AuthenticationHeaderIdentifier.OIDC;
+import static no.nav.sikkerhet.authentication.AuthenticationHeaderIdentifier.SAML;
 import static org.apache.commons.lang3.StringUtils.defaultString;
 import static org.apache.commons.lang3.StringUtils.trim;
 
@@ -53,7 +57,9 @@ public class AuthenticationFilter implements ContainerRequestFilter, ContainerRe
     public void filter(ContainerRequestContext ctx) {
         String authHeader = ctx.getHeaderString(AUTHORIZATION);
         String authIdentifier = StringUtils.substringBefore(trim(authHeader), " ");
-
+        if(!(Objects.equals(authIdentifier, SAML.getValue()) || Objects.equals(authIdentifier, OIDC.getValue()) || Objects.equals(authIdentifier, BASIC.getValue()))) {
+            authIdentifier = "N/A";
+        }
         Histogram.Timer timer = authenticationHistogram
             .labels(
                 defaultString(authIdentifier, "N/A"))

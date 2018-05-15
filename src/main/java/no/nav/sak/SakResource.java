@@ -3,8 +3,8 @@ package no.nav.sak;
 import io.swagger.annotations.*;
 import no.nav.sak.infrastruktur.EnableApiFilters;
 import no.nav.sak.infrastruktur.ErrorResponse;
+import no.nav.sak.infrastruktur.abac.SakPEP;
 import no.nav.sikkerhet.abac.ABACResult;
-import no.nav.sikkerhet.abac.ABACService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -68,19 +68,14 @@ import static no.nav.sak.infrastruktur.authentication.AuthenticationFilter.REQUE
 )
 )
 public class SakResource {
-    private static final String READ = "read";
-    private static final String CREATE = "create";
-    private static final String SAK_DOMENE = "sak";
-    private static final String RESOURCE_TYPE_SAK = "no.nav.abac.attributter.resource.sak.sak";
-
     private static final Logger log = LoggerFactory.getLogger(SakResource.class);
     private final SakRepository sakRepository;
-    private final ABACService abacService;
     private final boolean abacEnabled;
+    private SakPEP sakPEP;
 
-    SakResource(SakRepository sakRepository, ABACService abacService, boolean abacEnabled) {
+    SakResource(SakRepository sakRepository, SakPEP sakPEP, boolean abacEnabled) {
         this.sakRepository = sakRepository;
-        this.abacService = abacService;
+        this.sakPEP = sakPEP;
         this.abacEnabled = abacEnabled;
     }
 
@@ -96,26 +91,28 @@ public class SakResource {
     }
     )
     public Response hentSak(@PathParam("id") Long id, @Context ContainerRequestContext ctx) {
-        ABACResult abacResult = hasAccess(ctx, READ);
+        log.debug("Henter sak med id: {}", id);
+        Optional<Sak> sak = sakRepository.hentSak(id);
+
+        if (!sak.isPresent()) {
+            log.warn("Mottatt oppslag på sak som ikke eksisterer, id: {}, consumer: {}", id, ctx.getProperty(REQUEST_CONSUMERID));
+            return Response.status(NOT_FOUND).entity(
+                new ErrorResponse(MDC.get("uuid"), String.format("Fant ingen sak med id: %s", id))
+            ).build();
+        }
+
+        Sak eksisterendeSak = sak.get();
+        ABACResult abacResult = authorize(ctx, eksisterendeSak);
         if (!abacResult.hasAccess()) {
             log.warn("Autorisering feilet: {}", abacResult.getErrorMessage());
             return Response.status(Response.Status.FORBIDDEN)
                 .entity(new ErrorResponse(MDC.get("uuid"), "Autorisering feilet - se Kibana for årsak"))
                 .build();
         } else {
-            log.debug("Henter sak med id: {}", id);
-            Optional<Sak> sak = sakRepository.hentSak(id);
-
-            return sak.map(s -> Response.ok(new SakJson(s)).build())
-                .orElseGet(() -> {
-                        log.warn("Mottatt oppslag på sak som ikke eksisterer, id: {}, consumer: {}", id, ctx.getProperty(REQUEST_CONSUMERID));
-                        return Response.status(NOT_FOUND).entity(
-                            new ErrorResponse(MDC.get("uuid"), String.format("Fant ingen sak med id: %s", id))
-                        ).build();
-                    }
-                );
+            return Response.ok(new SakJson(eksisterendeSak)).build();
         }
     }
+
 
     @GET
     @ApiOperation(value = "Finner saker for angitte søkekriterier",
@@ -133,6 +130,7 @@ public class SakResource {
         List<Sak> saker = sakRepository.finnSaker(sakSearchRequest.toCriteria());
         return Response.ok(
             saker.stream()
+                .filter(s -> authorize(ctx, s).hasAccess())
                 .map(SakJson::new)
                 .collect(toList()))
             .build();
@@ -151,15 +149,15 @@ public class SakResource {
     )
     public Response opprettSak(@Valid
                                @ApiParam(value = "Saken som skal opprettes", required = true) SakJson sakJson, @Context UriInfo uriInfo, @Context ContainerRequestContext ctx) throws URISyntaxException {
-        ABACResult abacResult = hasAccess(ctx, CREATE);
+        String user = (String) ctx.getProperty(REQUEST_USERNAME);
+        Sak innsendtSak = sakJson.toSak(user);
+        ABACResult abacResult = authorize(ctx, innsendtSak);
         if (!abacResult.hasAccess()) {
             log.warn("Autorisering feilet: {}", abacResult.getErrorMessage());
             return Response.status(Response.Status.FORBIDDEN)
                 .entity(new ErrorResponse(MDC.get("uuid"), "Autorisering feilet - se Kibana for årsak"))
                 .build();
         } else {
-            String user = (String) ctx.getProperty(REQUEST_USERNAME);
-            Sak innsendtSak = sakJson.toSak(user);
             if (fagSakFinnesFraFoer(innsendtSak)) {
                 return Response.status(Response.Status.CONFLICT).entity(
                     new ErrorResponse(MDC.get("uuid"), String.format("Det finnes allerede en sak for fagsaksnr: %s, applikasjon: %s, aktør: %s orgnr: %s",
@@ -177,15 +175,10 @@ public class SakResource {
         }
     }
 
-    private ABACResult hasAccess(@Context ContainerRequestContext ctx, String operation) {
+    private ABACResult authorize(@Context ContainerRequestContext ctx, Sak sak) {
         if (abacEnabled) {
-            if ("read".equals(operation)) {
-                return abacService.hasReadAccess(ctx, RESOURCE_TYPE_SAK, SAK_DOMENE);
-            } else {
-                return abacService.hasCreateAccess(ctx, RESOURCE_TYPE_SAK, SAK_DOMENE);
-            }
+            return sakPEP.autoriser(ctx, sak);
         }
-
         return ABACResult.success();
     }
 

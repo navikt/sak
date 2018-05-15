@@ -3,7 +3,7 @@ package no.nav.sak;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import no.nav.sak.infrastruktur.DefaultExceptionMapper;
-import no.nav.sikkerhet.abac.ABACService;
+import no.nav.sak.infrastruktur.abac.SakPEP;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
 import org.junit.jupiter.api.BeforeEach;
@@ -46,7 +46,7 @@ public class SakResourceExceptionHandlingTest extends JerseyTest {
         SakRepository sakRepository = mock(SakRepository.class);
         Mockito.doThrow(new IllegalStateException("Jeg feiler")).when(sakRepository).hentSak(Mockito.anyLong());
 
-        resourceConfig.registerInstances(new SakResource(sakRepository, mock(ABACService.class), false));
+        resourceConfig.registerInstances(new SakResource(sakRepository, mock(SakPEP.class), false));
         return resourceConfig;
     }
 }

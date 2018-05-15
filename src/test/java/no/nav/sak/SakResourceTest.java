@@ -31,7 +31,7 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static no.nav.sak.infrastruktur.authentication.basic.JunitBasicAuthenticator.PASSWORD;
 import static no.nav.sak.infrastruktur.authentication.basic.JunitBasicAuthenticator.USERNAME;
-import static no.nav.sikkerhet.authentication.Authenticator.SAML;
+import static no.nav.sikkerhet.authentication.AuthenticationHeaderIdentifier.SAML;
 import static org.apache.commons.lang3.RandomStringUtils.random;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -48,7 +48,7 @@ class SakResourceTest extends JerseyTest {
         SakConfiguration sakConfiguration = new SakConfiguration();
         SAMLSupport samlSupport = new SAMLSupport(sakConfiguration);
         String samlToken = samlSupport.createNewToken();
-        authHeaderSaml = SAML + " " + samlToken;
+        authHeaderSaml = SAML.getValue() + " " + samlToken;
     }
 
     @BeforeEach
