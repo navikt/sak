@@ -33,11 +33,13 @@
         <logstash.encoder.version>4.10</logstash.encoder.version>
         <jose4j.version>0.6.3</jose4j.version>
         <nimbusds.version>5.47</nimbusds.version>
-        <abac.attribute.version>2.7.6</abac.attribute.version>
+        <abac.attribute.version>3.2.5</abac.attribute.version>
         <ojdbc.version>12.2.0.1</ojdbc.version>
         <cxf.version>3.2.2</cxf.version>
         <pact.version>3.5.13</pact.version>
-        <oppgavehandtering-security.version>1.4</oppgavehandtering-security.version>
+        <ldaptive.version>1.0</ldaptive.version>
+        <logback-sylog4j.version>1.0.0</logback-sylog4j.version>
+        <oppgavehandtering-security.version>1.5-SNAPSHOT</oppgavehandtering-security.version>
 
         <!--Managed transitive deps -->
         <akka.actor.version>2.5.4</akka.actor.version>
@@ -418,7 +420,7 @@
         <dependency>
             <groupId>org.ldaptive</groupId>
             <artifactId>ldaptive</artifactId>
-            <version>1.0</version>
+            <version>${ldaptive.version}</version>
         </dependency>
 
         <!--NAV avhengigheter-->
@@ -427,12 +429,23 @@
             <artifactId>oppgavehandtering-security</artifactId>
             <version>${oppgavehandtering-security.version}</version>
         </dependency>
+        <dependency>
+            <groupId>no.nav.abac.policies</groupId>
+            <artifactId>abac-attribute-constants</artifactId>
+            <version>${abac.attribute.version}</version>
+        </dependency>
 
         <!--Runtime -->
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
             <version>${commons.io.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.papertrailapp</groupId>
+            <artifactId>logback-syslog4j</artifactId>
+            <version>${logback-sylog4j.version}</version>
             <scope>runtime</scope>
         </dependency>
 

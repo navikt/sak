@@ -7,10 +7,10 @@ import io.swagger.jaxrs.config.BeanConfig;
 import io.swagger.jaxrs.listing.ApiListingResource;
 import io.swagger.jaxrs.listing.SwaggerSerializers;
 import no.nav.sak.infrastruktur.*;
+import no.nav.sak.infrastruktur.abac.SakPEP;
 import no.nav.sak.infrastruktur.authentication.AuthenticationFilter;
 import no.nav.sak.validering.ConstraintValidationExceptionMapper;
 import no.nav.sikkerhet.abac.ABACClient;
-import no.nav.sikkerhet.abac.ABACService;
 import no.nav.sikkerhet.authentication.Authenticator;
 import no.nav.sikkerhet.authentication.basic.BasicAuthenticator;
 import no.nav.sikkerhet.authentication.basic.LdapConfiguration;
@@ -95,7 +95,7 @@ public class SakApplication extends ResourceConfig {
         ABACClient abacClient = new ABACClient(sakConfiguration.getRequiredString("ABAC_PDP_ENDPOINT"), createHttpClient(sakConfiguration));
         register(new SakResource(
             new SakRepository(database),
-            new ABACService(abacClient),
+            new SakPEP(abacClient),
             sakConfiguration.getBoolean("ABAC_ENABLED", false))
         );
     }
