@@ -157,7 +157,7 @@
                     "X-Correlation-ID": "0"
                 },
                 "body": {
-                    "orgnr": "123456789",
+                    "orgnr": "993554421",
                     "tema": "etTema",
                     "applikasjon": "Ruting",
                     "fagsakNr": "etFagSakNr"
@@ -170,7 +170,7 @@
                 },
                 "body": {
                     "id": "?",
-                    "orgnr": "123456789",
+                    "orgnr": "993554421",
                     "tema": "etTema",
                     "applikasjon": "Ruting",
                     "fagsakNr": "etFagSakNr",

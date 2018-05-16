@@ -19,6 +19,7 @@ import org.apache.http.message.BasicHeader;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.jupiter.api.Tag;
 import org.junit.runner.RunWith;
 
 import javax.sql.DataSource;
@@ -30,7 +31,8 @@ import static no.nav.sikkerhet.authentication.AuthenticationHeaderIdentifier.SAM
 @RunWith(PactRunner.class)
 @Provider("SakResource")
 @PactFolder("pacts")
-public class SakResourceContractVerification {
+@Tag("integration-test")
+public class RutingContractVerification {
 
     private static final int JETTY_PORT = 8101;
     private static Header authHeaderSaml;
