@@ -122,10 +122,12 @@ pipeline {
         stage('Nais deploy (preprod - default)') {
             steps {
                 milestone(5)
-                environment = "t8"
-                namespace = "default"
-                naisDeployPreprod("sak", versjon, environment, namespace)
-                slackSend (color: '#90ee90', message: "Deployet til preprod (environment: ${environment} - namespace: ${namespace} ${env.BRANCH_NAME} Sak:" + versjon)
+                script {
+                     environment = "t8"
+                     namespace = "default"
+                     naisDeployPreprod("sak", versjon, environment, namespace)
+                     slackSend (color: '#90ee90', message: "Deployet til preprod (environment: ${environment} - namespace: ${namespace} ${env.BRANCH_NAME} Sak:" + versjon)
+                }
             }
         }
 
