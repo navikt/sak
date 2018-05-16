@@ -126,7 +126,7 @@ pipeline {
                      environment = "t8"
                      namespace = "default"
                      naisDeployPreprod("sak", versjon, environment, namespace)
-                     slackSend (color: '#90ee90', message: "Deployet til preprod (environment: ${environment} - namespace: ${namespace} ${env.BRANCH_NAME} Sak:" + versjon)
+                     slackSend (color: '#90ee90', message: "Deployet til preprod (environment: ${environment} - namespace: ${namespace}) ${env.BRANCH_NAME} Sak:" + versjon)
                 }
             }
         }
