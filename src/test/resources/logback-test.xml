@@ -35,7 +35,7 @@
         <appender-ref ref="STDOUT"/>
     </logger>
 
-    <logger name="securitylog" level="info" additivity="false">
+    <logger name="securitylog" level="OFF" additivity="false">
         <appender-ref ref="STDOUT"/>
     </logger>
 
