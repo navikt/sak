@@ -1,5 +1,6 @@
 package no.nav.sak.infrastruktur.abac;
 
+import io.prometheus.client.Counter;
 import io.prometheus.client.Histogram;
 import no.nav.abac.xacml.StandardAttributter;
 import no.nav.sak.Sak;
@@ -28,6 +29,9 @@ public class SakPEP {
     private static final Histogram authHistogram = Histogram.build("authorization_request_duration_seconds", "Authorization request duration in seconds")
         .labelNames("consumer", "tokenId")
         .register();
+    private static final Counter authorizationCounter = Counter.build("authorization_result_count", "Authorization result count")
+        .labelNames("permission")
+        .register();
     public SakPEP(ABACClient abacClient) {
         this.abacClient = abacClient;
     }
@@ -54,7 +58,9 @@ public class SakPEP {
         } else {
             throw new IllegalStateException("Fant ingen gyldig authenticationHeader");
         }
-        Histogram.Timer timer = authHistogram.labels(ctx.getHeaderString(REQUEST_CONSUMERID), authIdentifier).startTimer();
+        Histogram.Timer timer = authHistogram.labels(
+            defaultString(ctx.getHeaderString(REQUEST_CONSUMERID), "N/A"),
+            defaultString(authIdentifier, "N/A")).startTimer();
         ABACResult abacResult;
         try {
             abacResult = abacClient.execute(abacRequest);
@@ -64,6 +70,7 @@ public class SakPEP {
                 ctx.getRequest().getMethod(),
                 abacRequest,
                 abacResult);
+            authorizationCounter.labels(abacResult.hasAccess() ? "permit" : "deny").inc();
         } finally {
             timer.observeDuration();
         }

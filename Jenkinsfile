@@ -122,7 +122,7 @@ pipeline {
         stage('Nais deploy (preprod - default)') {
             steps {
                 milestone(5)
-                naisDeployPreprod("sak", versjon, "u1")
+                naisDeployPreprod("sak", versjon, "u1", "u1")
                 slackSend (color: '#90ee90', message: "Deployet til preprod: ${env.BRANCH_NAME} Sak:" + versjon)
             }
         }
