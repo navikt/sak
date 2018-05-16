@@ -2,6 +2,7 @@ package no.nav.sak.infrastruktur.abac;
 
 import io.prometheus.client.Counter;
 import io.prometheus.client.Histogram;
+import no.nav.abac.xacml.NavAttributter;
 import no.nav.abac.xacml.StandardAttributter;
 import no.nav.sak.Sak;
 import no.nav.sikkerhet.abac.ABACAttribute;
@@ -25,6 +26,8 @@ import static org.apache.commons.lang3.StringUtils.*;
 public class SakPEP {
     private static final Logger log = LoggerFactory.getLogger("securitylog");
     private static final String RESOURCE_TYPE_SAK = "no.nav.abac.attributter.resource.sak.sak";
+    private static final String SUBJECT_TYPE_SYSTEMBRUKER="systemressurs";
+
     private final ABACClient abacClient;
     private static final Histogram authHistogram = Histogram.build("authorization_request_duration_seconds", "Authorization request duration in seconds")
         .labelNames("consumer", "tokenId")
@@ -38,7 +41,8 @@ public class SakPEP {
 
     public ABACResult autoriser(ContainerRequestContext ctx, Sak sak) {
         ABACRequest abacRequest = ABACRequest.newRequest()
-              .addResource(new ABACAttribute(RESOURCE_FELLES_DOMENE, "sak"))
+            .addEnvironment(new ABACAttribute(ENVIRONMENT_FELLES_PEP_ID ,"sak"))
+            .addResource(new ABACAttribute(RESOURCE_FELLES_DOMENE, "sak"))
             .addResource(new ABACAttribute(RESOURCE_FELLES_RESOURCE_TYPE, RESOURCE_TYPE_SAK))
             .addResource(new ABACAttribute(RESOURCE_FELLES_TEMA, sak.getTema()));
 
@@ -49,7 +53,8 @@ public class SakPEP {
         String authIdentifier = substringBefore(trim(ctx.getHeaderString(AUTHORIZATION)), " ");
         String token = substringAfter(trim(ctx.getHeaderString(AUTHORIZATION)), " ");
         if(Objects.equals(BASIC.getValue(), authIdentifier)) {
-            abacRequest.addAccessSubject(new ABACAttribute(StandardAttributter.SUBJECT_ID, ctx.getHeaderString(REQUEST_USERNAME)));
+            abacRequest.addAccessSubject(new ABACAttribute(StandardAttributter.SUBJECT_ID, (String)ctx.getProperty(REQUEST_USERNAME)));
+            abacRequest.addAccessSubject(new ABACAttribute(NavAttributter.SUBJECT_FELLES_SUBJECTTYPE, SUBJECT_TYPE_SYSTEMBRUKER));
         } else if(Objects.equals(OIDC.getValue(), authIdentifier)) {
             String tokenBody = substringBetween(token, ".");
             abacRequest.addEnvironment(new ABACAttribute(ENVIRONMENT_FELLES_OIDC_TOKEN_BODY, tokenBody));
@@ -58,6 +63,8 @@ public class SakPEP {
         } else {
             throw new IllegalStateException("Fant ingen gyldig authenticationHeader");
         }
+
+
         Histogram.Timer timer = authHistogram.labels(
             defaultString(ctx.getHeaderString(REQUEST_CONSUMERID), "N/A"),
             defaultString(authIdentifier, "N/A")).startTimer();
