@@ -64,11 +64,11 @@ public class SakPEP {
         ABACResult abacResult;
         try {
             abacResult = abacClient.execute(abacRequest);
-            log.info("Autorisering for bruker: {} til endepunkt: {}, metode: {}. Autorisasjonsforespørsel: {}. Autorisasjonsresultat: {}",
+            log.info("Autorisering for bruker: \"{}\" mot endepunkt: \"{}\", metode: \"{}\". Autorisasjonsforespørsel: {}. Autorisasjonsresultat: {}",
                 ctx.getProperty(REQUEST_USERNAME),
                 ctx.getUriInfo().getAbsolutePath(),
                 ctx.getRequest().getMethod(),
-                abacRequest,
+                abacRequest.getResource().getAttributes(),
                 abacResult);
             authorizationCounter.labels(abacResult.hasAccess() ? "permit" : "deny").inc();
         } finally {
