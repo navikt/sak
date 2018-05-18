@@ -66,7 +66,7 @@ public class SakPEP {
 
 
         Histogram.Timer timer = authHistogram.labels(
-            defaultString(ctx.getHeaderString(REQUEST_CONSUMERID), "N/A"),
+            defaultString((String)ctx.getProperty(REQUEST_CONSUMERID), "N/A"),
             defaultString(authIdentifier, "N/A")).startTimer();
         ABACResult abacResult;
         try {
