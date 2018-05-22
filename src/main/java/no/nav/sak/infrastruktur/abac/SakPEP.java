@@ -26,7 +26,7 @@ import static org.apache.commons.lang3.StringUtils.*;
 public class SakPEP {
     private static final Logger log = LoggerFactory.getLogger("securitylog");
     private static final String RESOURCE_TYPE_SAK = "no.nav.abac.attributter.resource.sak.sak";
-    private static final String SUBJECT_TYPE_SYSTEMBRUKER="systemressurs";
+    private static final String SUBJECT_TYPE_SYSTEMBRUKER="Systemressurs";
 
     private final ABACClient abacClient;
     private static final Histogram authHistogram = Histogram.build("authorization_request_duration_seconds", "Authorization request duration in seconds")
