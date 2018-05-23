@@ -4,6 +4,7 @@ import io.swagger.annotations.*;
 import no.nav.sak.infrastruktur.EnableApiFilters;
 import no.nav.sak.infrastruktur.ErrorResponse;
 import no.nav.sak.infrastruktur.abac.SakPEP;
+import no.nav.sikkerhet.abac.ABACDecision;
 import no.nav.sikkerhet.abac.ABACResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -104,7 +105,7 @@ public class SakResource {
         Sak eksisterendeSak = sak.get();
         ABACResult abacResult = authorize(ctx, eksisterendeSak);
         if (!abacResult.hasAccess()) {
-            log.warn("Autorisering feilet: {}", abacResult.getErrorMessage());
+            log.warn("Autorisering feilet: {}", abacResult.getAssociatedAdvice());
             return Response.status(Response.Status.FORBIDDEN)
                 .entity(new ErrorResponse(MDC.get("uuid"), "Autorisering feilet - se Kibana for årsak"))
                 .build();
@@ -153,9 +154,9 @@ public class SakResource {
         Sak innsendtSak = sakJson.toSak(user);
         ABACResult abacResult = authorize(ctx, innsendtSak);
         if (!abacResult.hasAccess()) {
-            log.warn("Autorisering feilet: {}", abacResult.getErrorMessage());
+            log.warn("Autorisering feilet: {}", abacResult.getAssociatedAdvice());
             return Response.status(Response.Status.FORBIDDEN)
-                .entity(new ErrorResponse(MDC.get("uuid"), "Autorisering feilet - se Kibana for årsak"))
+                .entity(new ErrorResponse(MDC.get("uuid"), "Autorisering feilet: - se Kibana for årsak"))
                 .build();
         } else {
             if (fagSakFinnesFraFoer(innsendtSak)) {
@@ -179,7 +180,7 @@ public class SakResource {
         if (abacEnabled) {
             return sakPEP.autoriser(ctx, sak);
         }
-        return ABACResult.success();
+        return new ABACResult(ABACDecision.PERMIT.getValue(), null);
     }
 
     private boolean fagSakFinnesFraFoer(Sak sak) {
