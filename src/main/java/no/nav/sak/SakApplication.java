@@ -57,9 +57,8 @@ public class SakApplication extends ResourceConfig {
 
         Database database = createDatabase(sakDataSource);
 
-        registerAuthenticationFilter(sakConfiguration);
         registerApiResources(database, sakConfiguration);
-        registerFilters();
+        registerFilters(sakConfiguration);
         registerExceptionmappers();
         registerFeatures();
         registerSwaggerResources();
@@ -86,9 +85,10 @@ public class SakApplication extends ResourceConfig {
         register(new ParamExceptionMapper());
     }
 
-    private void registerFilters() {
+    private void registerFilters(SakConfiguration sakConfiguration) {
         register(new CorrelationFilter());
         register(new PrometheusFilter());
+        registerAuthenticationFilter(sakConfiguration);
     }
 
     void registerApiResources(Database database, SakConfiguration sakConfiguration) {
