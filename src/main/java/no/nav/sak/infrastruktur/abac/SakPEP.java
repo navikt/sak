@@ -97,7 +97,9 @@ public class SakPEP {
     }
 
     private boolean performAuthorization(ContainerRequestContext ctx) {
-        return sakConfiguration.getBoolean("ABAC_ENABLED", true) &&
-            (sakConfiguration.getBoolean("ABAC_ENABLED_SERVICEUSERS", true) || !StringUtil.startsWithIgnoreCase("srv", (String) ctx.getProperty(REQUEST_USERNAME)));
+        boolean abacEnabled = sakConfiguration.getBoolean("ABAC_ENABLED", true);
+        boolean abacEnabledServiceUsers = sakConfiguration.getBoolean("ABAC_ENABLED_SERVICEUSERS", true);
+        boolean serviceUser = StringUtils.startsWithIgnoreCase((String) ctx.getProperty(REQUEST_USERNAME), "srv");
+        return abacEnabled && (abacEnabledServiceUsers  || !serviceUser);
     }
 }
