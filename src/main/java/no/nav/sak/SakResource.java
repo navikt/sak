@@ -103,9 +103,10 @@ public class SakResource {
         Sak eksisterendeSak = sak.get();
         ABACResult abacResult = authorize(ctx, eksisterendeSak);
         if (!abacResult.hasAccess()) {
-            log.warn("Autorisering feilet: {}", abacResult.getAssociatedAdvice());
+            String user = (String) ctx.getProperty(REQUEST_USERNAME);
+            log.warn("Autorisering feilet for: {}", user);
             return Response.status(Response.Status.FORBIDDEN)
-                .entity(new ErrorResponse(MDC.get("uuid"), "Autorisering feilet - se Kibana for årsak"))
+                .entity(new ErrorResponse(MDC.get("uuid"), "Bruker kunne ikke autoriseres for denne operasjonen"))
                 .build();
         } else {
             return Response.ok(new SakJson(eksisterendeSak)).build();
@@ -153,9 +154,9 @@ public class SakResource {
         Sak innsendtSak = sakJson.toSak(user);
         ABACResult abacResult = authorize(ctx, innsendtSak);
         if (!abacResult.hasAccess()) {
-            log.warn("Autorisering feilet: {}", abacResult.getAssociatedAdvice());
+            log.warn("Autorisering feilet for: {}", user);
             return Response.status(Response.Status.FORBIDDEN)
-                .entity(new ErrorResponse(MDC.get("uuid"), "Autorisering feilet: - se Kibana for årsak"))
+                .entity(new ErrorResponse(MDC.get("uuid"), "Bruker kunne ikke autoriseres for denne operasjonen"))
                 .build();
         } else {
             if (fagSakFinnesFraFoer(innsendtSak)) {
