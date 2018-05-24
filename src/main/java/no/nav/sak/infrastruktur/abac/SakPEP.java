@@ -71,7 +71,7 @@ public class SakPEP {
         ABACResult abacResult;
         try {
             abacResult = abacClient.execute(abacRequest);
-            log.info("bruker: \"{}\"; endepunkt: \"{}\"; metode: \"{}\"; Autorisasjonsforespørsel: \"{}\"; Autorisasjonsresultat: \"{}\"",
+            log.info("Bruker: \"{}\"; Endepunkt: \"{}\"; Metode: \"{}\"; Autorisasjonsforespørsel: \"{}\"; Autorisasjonsresultat: \"{}\"",
                 ctx.getProperty(REQUEST_USERNAME),
                 ctx.getUriInfo().getAbsolutePath(),
                 ctx.getRequest().getMethod(),
