@@ -93,7 +93,7 @@ public class SakResource {
     }
     )
     public Response hentSak(@PathParam("id") Long id, @Context ContainerRequestContext ctx) {
-        log.debug("Henter sak med id: {}", id);
+        log.info("Henter sak med id: {}", id);
         Optional<Sak> sak = sakRepository.hentSak(id);
 
         if (!sak.isPresent()) {
@@ -128,7 +128,7 @@ public class SakResource {
     }
     )
     public Response finnSaker(@Valid @BeanParam SakSearchRequest sakSearchRequest, @Context ContainerRequestContext ctx) {
-        log.debug("Søker etter saker for: {}", sakSearchRequest);
+        log.info("Søker etter saker for: {}", sakSearchRequest);
         List<Sak> saker = sakRepository.finnSaker(sakSearchRequest.toCriteria());
         return Response.ok(
             saker.stream()
