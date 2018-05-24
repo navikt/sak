@@ -5,11 +5,10 @@ import io.prometheus.client.Histogram;
 import no.nav.abac.xacml.NavAttributter;
 import no.nav.abac.xacml.StandardAttributter;
 import no.nav.sak.Sak;
-import no.nav.sikkerhet.abac.ABACAttribute;
-import no.nav.sikkerhet.abac.ABACClient;
-import no.nav.sikkerhet.abac.ABACRequest;
-import no.nav.sikkerhet.abac.ABACResult;
+import no.nav.sak.SakConfiguration;
+import no.nav.sikkerhet.abac.*;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.jetty.util.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,17 +28,29 @@ public class SakPEP {
     private static final String SUBJECT_TYPE_SYSTEMBRUKER="Systemressurs";
 
     private final ABACClient abacClient;
+    private SakConfiguration sakConfiguration;
     private static final Histogram authHistogram = Histogram.build("authorization_request_duration_seconds", "Authorization request duration in seconds")
         .labelNames("consumer", "tokenId")
         .register();
     private static final Counter authorizationCounter = Counter.build("authorization_result_count", "Authorization result count")
         .labelNames("permission")
         .register();
-    public SakPEP(ABACClient abacClient) {
+    public SakPEP(ABACClient abacClient, SakConfiguration sakConfiguration) {
         this.abacClient = abacClient;
+        this.sakConfiguration = sakConfiguration;
     }
 
     public ABACResult autoriser(ContainerRequestContext ctx, Sak sak) {
+        if(!performAuthorization(ctx)) {
+            log.info("ConsumerID: \"{}\"; User: \"{}\"; Endpoint: \"{}\"; Method: \"{}\"; Authorization disabled for {}",
+                ctx.getProperty(REQUEST_CONSUMERID),
+                ctx.getProperty(REQUEST_USERNAME),
+                ctx.getUriInfo().getAbsolutePath(),
+                ctx.getRequest().getMethod(),
+                !sakConfiguration.getBoolean("ABAC_ENABLED", true) ? "ALL" : "SERVICE USERS");
+            return new ABACResult(ABACDecision.PERMIT.getValue(), null);
+        }
+
         ABACRequest abacRequest = ABACRequest.newRequest()
             .addEnvironment(new ABACAttribute(ENVIRONMENT_FELLES_PEP_ID ,"sak"))
             .addResource(new ABACAttribute(RESOURCE_FELLES_DOMENE, "sak"))
@@ -83,5 +94,10 @@ public class SakPEP {
             timer.observeDuration();
         }
        return abacResult;
+    }
+
+    private boolean performAuthorization(ContainerRequestContext ctx) {
+        return sakConfiguration.getBoolean("ABAC_ENABLED", true) &&
+            (sakConfiguration.getBoolean("ABAC_ENABLED_SERVICEUSERS", true) || !StringUtil.startsWithIgnoreCase("srv", (String) ctx.getProperty(REQUEST_USERNAME)));
     }
 }
