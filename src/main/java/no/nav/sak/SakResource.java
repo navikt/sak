@@ -87,6 +87,7 @@ public class SakResource {
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "OK"),
         @ApiResponse(code = 401, message = "Konsument mangler gyldig token"),
+        @ApiResponse(code = 403, message = "Konsument har ikke tilgang til å gjennomføre handlingen"),
         @ApiResponse(code = 404, message = "Det finnes ingen sak for angitt id"),
         @ApiResponse(code = 500, message = "Ukjent feilsituasjon har oppstått i Sak")
     }
@@ -144,6 +145,7 @@ public class SakResource {
         @ApiResponse(code = 201, message = "Saken er opprettet", responseHeaders = @ResponseHeader(name = "location", description = "Angir URI til den opprettede saken")),
         @ApiResponse(code = 400, message = "Ugyldig input"),
         @ApiResponse(code = 401, message = "Konsument mangler gyldig token"),
+        @ApiResponse(code = 403, message = "Konsument har ikke tilgang til å gjennomføre handlingen"),
         @ApiResponse(code = 409, message = "Det finnes allerede en sak for angitt kombinasjon av fagsaknr og applikasjon for aktør eller orgnr"),
         @ApiResponse(code = 500, message = "Ukjent feilsituasjon har oppstått i Sak")
     }
