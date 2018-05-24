@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
+import javax.annotation.Priority;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ContainerResponseContext;
@@ -16,6 +17,7 @@ import java.util.UUID;
 
 @EnableApiFilters
 @Provider
+@Priority(0)
 public class CorrelationFilter implements ContainerRequestFilter, ContainerResponseFilter {
     private static final String CORRELATION_HEADER = "X-Correlation-ID";
 
