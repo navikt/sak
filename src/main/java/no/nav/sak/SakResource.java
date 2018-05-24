@@ -4,7 +4,6 @@ import io.swagger.annotations.*;
 import no.nav.sak.infrastruktur.EnableApiFilters;
 import no.nav.sak.infrastruktur.ErrorResponse;
 import no.nav.sak.infrastruktur.abac.SakPEP;
-import no.nav.sikkerhet.abac.ABACDecision;
 import no.nav.sikkerhet.abac.ABACResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,13 +70,11 @@ import static no.nav.sak.infrastruktur.authentication.AuthenticationFilter.REQUE
 public class SakResource {
     private static final Logger log = LoggerFactory.getLogger(SakResource.class);
     private final SakRepository sakRepository;
-    private final boolean abacEnabled;
-    private SakPEP sakPEP;
+    private final SakPEP sakPEP;
 
-    SakResource(SakRepository sakRepository, SakPEP sakPEP, boolean abacEnabled) {
+    SakResource(SakRepository sakRepository, SakPEP sakPEP) {
         this.sakRepository = sakRepository;
         this.sakPEP = sakPEP;
-        this.abacEnabled = abacEnabled;
     }
 
     @GET
@@ -179,11 +176,9 @@ public class SakResource {
     }
 
     private ABACResult authorize(@Context ContainerRequestContext ctx, Sak sak) {
-        if (abacEnabled) {
-            return sakPEP.autoriser(ctx, sak);
-        }
-        return new ABACResult(ABACDecision.PERMIT.getValue(), null);
+        return sakPEP.autoriser(ctx, sak);
     }
+
 
     private boolean fagSakFinnesFraFoer(Sak sak) {
         SakSearchCriteria sakSearchCriteria = SakSearchCriteria.create().medOrgnr(sak.getOrgnr()).medAktoerId(sak.getAktoerId()).medFagsakNr(sak.getFagsakNr()).medApplikasjon(sak.getApplikasjon());
