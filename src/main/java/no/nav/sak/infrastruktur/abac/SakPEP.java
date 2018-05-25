@@ -6,9 +6,9 @@ import no.nav.abac.xacml.NavAttributter;
 import no.nav.abac.xacml.StandardAttributter;
 import no.nav.sak.Sak;
 import no.nav.sak.SakConfiguration;
+import no.nav.sak.infrastruktur.ContextExtractor;
 import no.nav.sikkerhet.abac.*;
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.jetty.util.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,6 +17,7 @@ import java.util.Objects;
 
 import static javax.ws.rs.core.HttpHeaders.AUTHORIZATION;
 import static no.nav.abac.xacml.NavAttributter.*;
+import static no.nav.sak.infrastruktur.SubjectType.SUBJECT_TYPE_SYSTEMBRUKER;
 import static no.nav.sak.infrastruktur.authentication.AuthenticationFilter.REQUEST_CONSUMERID;
 import static no.nav.sak.infrastruktur.authentication.AuthenticationFilter.REQUEST_USERNAME;
 import static no.nav.sikkerhet.authentication.AuthenticationHeaderIdentifier.*;
@@ -24,17 +25,20 @@ import static org.apache.commons.lang3.StringUtils.*;
 
 public class SakPEP {
     private static final Logger log = LoggerFactory.getLogger("securitylog");
+
     private static final String RESOURCE_TYPE_SAK = "no.nav.abac.attributter.resource.sak.sak";
-    private static final String SUBJECT_TYPE_SYSTEMBRUKER="Systemressurs";
 
     private final ABACClient abacClient;
-    private SakConfiguration sakConfiguration;
+    private final SakConfiguration sakConfiguration;
+
     private static final Histogram authHistogram = Histogram.build("authorization_request_duration_seconds", "Authorization request duration in seconds")
-        .labelNames("consumer", "tokenId")
+        .labelNames("consumer", "tokenId", "subjecttype")
         .register();
+
     private static final Counter authorizationCounter = Counter.build("authorization_result_count", "Authorization result count")
         .labelNames("permission")
         .register();
+
     public SakPEP(ABACClient abacClient, SakConfiguration sakConfiguration) {
         this.abacClient = abacClient;
         this.sakConfiguration = sakConfiguration;
@@ -65,7 +69,7 @@ public class SakPEP {
         String token = substringAfter(trim(ctx.getHeaderString(AUTHORIZATION)), " ");
         if(Objects.equals(BASIC.getValue(), authIdentifier)) {
             abacRequest.addAccessSubject(new ABACAttribute(StandardAttributter.SUBJECT_ID, (String)ctx.getProperty(REQUEST_USERNAME)));
-            abacRequest.addAccessSubject(new ABACAttribute(NavAttributter.SUBJECT_FELLES_SUBJECTTYPE, SUBJECT_TYPE_SYSTEMBRUKER));
+            abacRequest.addAccessSubject(new ABACAttribute(NavAttributter.SUBJECT_FELLES_SUBJECTTYPE, SUBJECT_TYPE_SYSTEMBRUKER.getValue()));
         } else if(Objects.equals(OIDC.getValue(), authIdentifier)) {
             String tokenBody = substringBetween(token, ".");
             abacRequest.addEnvironment(new ABACAttribute(ENVIRONMENT_FELLES_OIDC_TOKEN_BODY, tokenBody));
@@ -78,7 +82,10 @@ public class SakPEP {
 
         Histogram.Timer timer = authHistogram.labels(
             defaultString((String)ctx.getProperty(REQUEST_CONSUMERID), "N/A"),
-            defaultString(authIdentifier, "N/A")).startTimer();
+            defaultString(authIdentifier, "N/A"),
+            ContextExtractor.getSubjectType(ctx).getValue()
+        ).startTimer();
+
         ABACResult abacResult;
         try {
             abacResult = abacClient.execute(abacRequest);
@@ -99,7 +106,7 @@ public class SakPEP {
     private boolean performAuthorization(ContainerRequestContext ctx) {
         boolean abacEnabled = sakConfiguration.getBoolean("ABAC_ENABLED", true);
         boolean abacEnabledServiceUsers = sakConfiguration.getBoolean("ABAC_ENABLED_SERVICEUSERS", true);
-        boolean serviceUser = StringUtils.startsWithIgnoreCase((String) ctx.getProperty(REQUEST_USERNAME), "srv");
+        boolean serviceUser = Objects.equals(SUBJECT_TYPE_SYSTEMBRUKER, ContextExtractor.getSubjectType(ctx));
         return abacEnabled && (abacEnabledServiceUsers  || !serviceUser);
     }
 }
