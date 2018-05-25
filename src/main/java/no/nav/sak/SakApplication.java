@@ -132,7 +132,7 @@ public class SakApplication extends ResourceConfig {
         Cache<String, AuthenticationResult> cache =
             cacheManager.getCache("basicAuth", String.class, AuthenticationResult.class);
 
-        BasicAuthenticator basicAuthenticator = new BasicAuthenticator(ldapConfiguration);
+        BasicAuthenticator basicAuthenticator = new BasicAuthenticator(ldapConfiguration, cache);
         Authenticator authenticator = new Authenticator(oidcTokenValidator, samlValidator, basicAuthenticator);
         register(new AuthenticationFilter(authenticator));
     }
