@@ -20,14 +20,12 @@ import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
-
 import java.io.IOException;
 import java.util.Objects;
 
 import static javax.ws.rs.core.HttpHeaders.AUTHORIZATION;
-import static no.nav.sikkerhet.authentication.AuthenticationHeaderIdentifier.BASIC;
-import static no.nav.sikkerhet.authentication.AuthenticationHeaderIdentifier.OIDC;
-import static no.nav.sikkerhet.authentication.AuthenticationHeaderIdentifier.SAML;
+import static no.nav.sak.infrastruktur.ContextExtractor.getSubjectType;
+import static no.nav.sikkerhet.authentication.AuthenticationHeaderIdentifier.*;
 import static org.apache.commons.lang3.StringUtils.defaultString;
 import static org.apache.commons.lang3.StringUtils.trim;
 
@@ -43,7 +41,7 @@ public class AuthenticationFilter implements ContainerRequestFilter, ContainerRe
         .register();
 
     private static final Counter authCounter = Counter.build("authentication_counter", "Antall autentiseringer")
-        .labelNames("consumerid", "valid", "authidentifier").register();
+        .labelNames("consumerid", "subjecttype", "valid", "authidentifier").register();
 
     private static final Logger log = LoggerFactory.getLogger(AuthenticationFilter.class);
 
@@ -57,7 +55,7 @@ public class AuthenticationFilter implements ContainerRequestFilter, ContainerRe
     public void filter(ContainerRequestContext ctx) {
         String authHeader = ctx.getHeaderString(AUTHORIZATION);
         String authIdentifier = StringUtils.substringBefore(trim(authHeader), " ");
-        if(!(Objects.equals(authIdentifier, SAML.getValue()) || Objects.equals(authIdentifier, OIDC.getValue()) || Objects.equals(authIdentifier, BASIC.getValue()))) {
+        if (!(Objects.equals(authIdentifier, SAML.getValue()) || Objects.equals(authIdentifier, OIDC.getValue()) || Objects.equals(authIdentifier, BASIC.getValue()))) {
             authIdentifier = "N/A";
         }
         Histogram.Timer timer = authenticationHistogram
@@ -72,13 +70,16 @@ public class AuthenticationFilter implements ContainerRequestFilter, ContainerRe
                 abortAsUnauthorized(ctx);
                 authCounter.labels(
                     defaultString(result.getConsumerId(), "N/A"),
+                    getSubjectType(ctx).getValue(),
                     "NO",
-                    defaultString(authIdentifier, "N/A"));
+                    defaultString(authIdentifier, "N/A")).inc();
             }
             MDC.put(REQUEST_CONSUMERID, result.getConsumerId());
             ctx.setProperty(REQUEST_CONSUMERID, result.getConsumerId());
             ctx.setProperty(REQUEST_USERNAME, result.getUser());
-            authCounter.labels(defaultString(result.getConsumerId(), "N/A"), "YES", defaultString(authIdentifier, "N/A")).inc();
+            authCounter.labels(defaultString(result.getConsumerId(), "N/A"),
+                "YES",
+                defaultString(authIdentifier, "N/A")).inc();
         } finally {
             timer.observeDuration();
         }
