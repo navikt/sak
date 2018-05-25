@@ -9,7 +9,7 @@ public class BasicAuthTestHeaderProvider {
     private SakConfiguration sakConfiguration = new SakConfiguration();
 
     public String getHeader() {
-        String unencoded = sakConfiguration.getRequiredString("SYSTEMBRUKER_USERNAME") + ":" + sakConfiguration.getRequiredString("SYSTEMBRUKER_PASSWORD");
+        String unencoded = sakConfiguration.getRequiredString("SRVSAK_USERNAME") + ":" + sakConfiguration.getRequiredString("SRVSAK_PASSWORD");
         try {
             return "Basic " + Base64.getEncoder().encodeToString(unencoded.getBytes("utf-8"));
         } catch (UnsupportedEncodingException e) {
