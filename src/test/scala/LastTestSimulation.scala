@@ -3,6 +3,7 @@ import io.gatling.http.Predef._
 import no.nav.sak.infrastruktur.GatlingJDBCCleaner
 import no.nav.sak.infrastruktur.oicd.OidcLogin
 import no.nav.sak.infrastruktur.sts.STSSupport
+import no.nav.sak.infrastruktur.basic.BasicAuthTestHeaderProvider
 
 import scala.concurrent.duration._
 
@@ -21,7 +22,6 @@ class LastTestSimulation extends Simulation {
     before {
         new GatlingJDBCCleaner().resetState()
     }
-
 
     private val opprettOgHentSakScenario = scenario("Opprett og hent sak")
         .group("OIDC") {
