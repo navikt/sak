@@ -47,8 +47,8 @@ class LastTestSimulation extends Simulation {
                 .feed(aktoerIdFeeder)
                 .feed(applikasjonFeeder)
                 .exec(
-                    SakTests.createSak(authHeaderOidc),
-                    SakTests.getSak(authHeaderOidc)
+                    SakTests.createSak(authHeaderBasic),
+                    SakTests.getSak(authHeaderBasic)
                 )
         }
 
@@ -69,7 +69,7 @@ class LastTestSimulation extends Simulation {
             feed(temaFeeder)
                 .feed(aktoerIdFeeder)
                 .feed(applikasjonFeeder)
-                .exec(SakTests.searchSaker(authHeaderSaml))
+                .exec(SakTests.searchSaker(authHeaderBasic))
         }
 
     setUp(opprettOgHentSakScenario.inject(constantUsersPerSec(2) during (2 minutes))

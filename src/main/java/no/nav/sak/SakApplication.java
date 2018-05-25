@@ -11,6 +11,7 @@ import no.nav.sak.infrastruktur.abac.SakPEP;
 import no.nav.sak.infrastruktur.authentication.AuthenticationFilter;
 import no.nav.sak.validering.ConstraintValidationExceptionMapper;
 import no.nav.sikkerhet.abac.ABACClient;
+import no.nav.sikkerhet.authentication.AuthenticationResult;
 import no.nav.sikkerhet.authentication.Authenticator;
 import no.nav.sikkerhet.authentication.basic.BasicAuthenticator;
 import no.nav.sikkerhet.authentication.basic.LdapConfiguration;
@@ -23,6 +24,12 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.ehcache.Cache;
+import org.ehcache.CacheManager;
+import org.ehcache.config.builders.CacheConfigurationBuilder;
+import org.ehcache.config.builders.CacheManagerBuilder;
+import org.ehcache.config.builders.ExpiryPolicyBuilder;
+import org.ehcache.config.builders.ResourcePoolsBuilder;
 import org.glassfish.jersey.jackson.JacksonFeature;
 import org.glassfish.jersey.logging.LoggingFeature;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -35,6 +42,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import javax.sql.DataSource;
+import java.time.Duration;
 import java.util.logging.Level;
 
 import static java.util.logging.Logger.getLogger;
@@ -113,6 +121,16 @@ public class SakApplication extends ResourceConfig {
             sakConfiguration.getRequiredString("LDAP_URL"),
             sakConfiguration.getRequiredString("LDAP_USERNAME"),
             sakConfiguration.getString("LDAP_PASSWORD", null));
+
+        CacheManager cacheManager = CacheManagerBuilder.newCacheManagerBuilder()
+            .withCache("basicAuth",
+                CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, AuthenticationResult.class, ResourcePoolsBuilder.heap(100))
+                    .withExpiry(ExpiryPolicyBuilder.timeToLiveExpiration(Duration.ofMinutes(5))))
+            .build();
+        cacheManager.init();
+
+        Cache<String, AuthenticationResult> cache =
+            cacheManager.getCache("basicAuth", String.class, AuthenticationResult.class);
 
         BasicAuthenticator basicAuthenticator = new BasicAuthenticator(ldapConfiguration);
         Authenticator authenticator = new Authenticator(oidcTokenValidator, samlValidator, basicAuthenticator);
