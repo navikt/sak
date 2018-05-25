@@ -78,6 +78,7 @@ public class AuthenticationFilter implements ContainerRequestFilter, ContainerRe
             ctx.setProperty(REQUEST_CONSUMERID, result.getConsumerId());
             ctx.setProperty(REQUEST_USERNAME, result.getUser());
             authCounter.labels(defaultString(result.getConsumerId(), "N/A"),
+                getSubjectType(ctx).getValue(),
                 "YES",
                 defaultString(authIdentifier, "N/A")).inc();
         } finally {
