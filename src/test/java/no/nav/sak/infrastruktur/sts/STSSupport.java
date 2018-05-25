@@ -78,8 +78,8 @@ public class STSSupport {
         stsClient.setAllowRenewing(false);
 
         HashMap<String, Object> properties = new HashMap<>();
-        properties.put(SecurityConstants.USERNAME, sakConfiguration.getRequiredString("SYSTEMBRUKER_USERNAME"));
-        properties.put(SecurityConstants.PASSWORD, sakConfiguration.getRequiredString("SYSTEMBRUKER_PASSWORD"));
+        properties.put(SecurityConstants.USERNAME, sakConfiguration.getRequiredString("SRVSAK_USERNAME"));
+        properties.put(SecurityConstants.PASSWORD, sakConfiguration.getRequiredString("SRVSAK_PASSWORD"));
         stsClient.setProperties(properties);
         stsClient.setCustomContent("<wst:SecondaryParameters xmlns:wst=\"http://docs.oasis-open.org/ws-sx/ws-trust/200512\">" +
             "<wst:TokenType>" + TOKEN_TYPE + "</wst:TokenType>" +
@@ -125,8 +125,8 @@ public class STSSupport {
             stsClient.setEndpointQName(new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/wsdl", "SecurityTokenServiceSOAP"));
             stsClient.getClient().getRequestContext().put(Message.ENDPOINT_ADDRESS, "https://sts-t8.test.local/SecurityTokenServiceProvider/");
             HashMap<String, Object> properties = new HashMap<>();
-            properties.put(SecurityConstants.USERNAME, sakConfiguration.getRequiredString("SYSTEMBRUKER_USERNAME"));
-            properties.put(SecurityConstants.PASSWORD, sakConfiguration.getRequiredString("SYSTEMBRUKER_PASSWORD"));
+            properties.put(SecurityConstants.USERNAME, sakConfiguration.getRequiredString("SRVSAK_USERNAME"));
+            properties.put(SecurityConstants.PASSWORD, sakConfiguration.getRequiredString("SRVSAK_PASSWORD"));
             stsClient.setProperties(properties);
             stsClient.setTokenType(TOKEN_TYPE);
             stsClient.setKeyType(KEY_TYPE);
