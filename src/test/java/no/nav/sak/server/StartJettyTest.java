@@ -8,7 +8,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import static no.nav.sikkerhet.authentication.Authenticator.SAML;
+import static no.nav.sikkerhet.authentication.AuthenticationHeaderIdentifier.SAML;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class StartJettyTest {
@@ -22,7 +22,7 @@ class StartJettyTest {
         System.setProperty("sak.port", "8099");
         SakConfiguration sakConfiguration = new SakConfiguration();
         SAMLSupport samlSupport = new SAMLSupport(sakConfiguration);
-        authHeaderSaml = new Header("Authorization", SAML + " " + samlSupport.createNewToken());
+        authHeaderSaml = new Header("Authorization", SAML.getValue() + " " + samlSupport.createNewToken());
         devJetty = new DevJetty();
         devJetty.start();
     }
@@ -51,8 +51,8 @@ class StartJettyTest {
             .header(authHeaderSaml).get("internal/alive");
 
         assertThat(RestAssured.given().port(8099).get("internal/metrics").getBody().asString()).contains(
-            "requests_latency_seconds_bucket{path=\"/api/v1/saker\",queryparams=\"N/A\",method=\"GET\"",
-            "requests_latency_seconds_bucket{path=\"/api/v1/saker/{id}\",queryparams=\"N/A\",method=\"GET\""
+            "requests_duration_seconds_bucket{path=\"/api/v1/saker\",queryparams=\"N/A\",method=\"GET\"",
+            "requests_duration_seconds_bucket{path=\"/api/v1/saker/{id}\",queryparams=\"N/A\",method=\"GET\""
         );
     }
 

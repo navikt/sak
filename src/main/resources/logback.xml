@@ -26,6 +26,19 @@
         </encoder>
     </appender>
 
+    <appender name="SECURITYLOG" class="com.papertrailapp.logback.Syslog4jAppender">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <pattern>%m%n%xEx</pattern>
+        </layout>
+
+        <syslogConfig class="org.productivity.java.syslog4j.impl.net.tcp.TCPNetSyslogConfig">
+            <host>audit.nais</host>
+            <port>6514</port>
+            <ident>sak</ident>
+            <maxMessageLength>128000</maxMessageLength>
+        </syslogConfig>
+    </appender>
+
     <appender name="METRICS" class="io.prometheus.client.logback.InstrumentedAppender"/>
 
     <logger name="no.nav" level="INFO" additivity="false">
@@ -45,6 +58,12 @@
 
     <logger name="org.glassfish.jersey.logging" level="INFO" additivity="false">
         <appender-ref ref="STDOUT_JSON_TJENESTEKALL"/>
+    </logger>
+
+    <logger name="securitylog" level="INFO" additivity="false">
+        <appender-ref ref="STDOUT_JSON"/>
+        <appender-ref ref="SECURITYLOG"/>
+
     </logger>
 
     <root level="INFO">

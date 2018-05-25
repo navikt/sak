@@ -15,7 +15,7 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Response;
 
-import static no.nav.sikkerhet.authentication.Authenticator.SAML;
+import static no.nav.sikkerhet.authentication.AuthenticationHeaderIdentifier.SAML;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class AuthenticationFilterTest extends JerseyTest {
@@ -82,7 +82,7 @@ public class AuthenticationFilterTest extends JerseyTest {
     void skal_nektes_adgang_naar_token_enda_ikke_gyldig() {
         String token = samlSupport.createNewToken(DateTime.now().plusDays(1), DateTime.now().plusDays(1));
 
-        String header = SAML + " " + token;
+        String header = SAML.getValue() + " " + token;
         Response response = sakRootTarget().request()
             .header("X-Correlation-ID", "Junit")
             .header("Authorization", header).get();
@@ -93,7 +93,7 @@ public class AuthenticationFilterTest extends JerseyTest {
     void skal_nektes_adgang_naar_token_er_expired() {
         String token = samlSupport.createNewToken(DateTime.now().minusDays(2), DateTime.now().minusDays(1));
 
-        String header = SAML + " " + token;
+        String header = SAML.getValue() + " " + token;
         Response response = sakRootTarget().request()
             .header("X-Correlation-ID", "Junit")
             .header("Authorization", header).get();

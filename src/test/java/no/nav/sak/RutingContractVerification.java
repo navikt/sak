@@ -19,18 +19,20 @@ import org.apache.http.message.BasicHeader;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.jupiter.api.Tag;
 import org.junit.runner.RunWith;
 
 import javax.sql.DataSource;
 import java.time.LocalDateTime;
 
 import static java.lang.String.valueOf;
-import static no.nav.sikkerhet.authentication.Authenticator.SAML;
+import static no.nav.sikkerhet.authentication.AuthenticationHeaderIdentifier.SAML;
 
 @RunWith(PactRunner.class)
 @Provider("SakResource")
 @PactFolder("pacts")
-public class SakResourceContractTest {
+@Tag("integration-test")
+public class RutingContractVerification {
 
     private static final int JETTY_PORT = 8101;
     private static Header authHeaderSaml;
@@ -49,7 +51,7 @@ public class SakResourceContractTest {
         System.setProperty("ABAC_ENABLED", "false");
         SakConfiguration sakConfiguration = new SakConfiguration();
         SAMLSupport samlSupport = new SAMLSupport(sakConfiguration);
-        authHeaderSaml = new BasicHeader("Authorization", SAML + " " + samlSupport.createNewToken());
+        authHeaderSaml = new BasicHeader("Authorization", SAML.getValue() + " " + samlSupport.createNewToken());
         dataSource = JunitDataSource.get();
         sakRepository = new SakRepository(new Database(dataSource));
         devJetty = new DevJetty();
