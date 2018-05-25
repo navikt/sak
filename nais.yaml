@@ -42,6 +42,8 @@ fasitResources:
          username: LDAP_USERNAME
          password: LDAP_PASSWORD
          serviceuser_base_dn: LDAP_SERVICEUSER_BASEDN
+    - alias: srvsak
+      resourceType: credential
 
   exposed:
     - alias: sak.saker

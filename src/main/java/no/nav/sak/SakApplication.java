@@ -7,10 +7,10 @@ import io.swagger.jaxrs.config.BeanConfig;
 import io.swagger.jaxrs.listing.ApiListingResource;
 import io.swagger.jaxrs.listing.SwaggerSerializers;
 import no.nav.sak.infrastruktur.*;
+import no.nav.sak.infrastruktur.abac.SakPEP;
 import no.nav.sak.infrastruktur.authentication.AuthenticationFilter;
 import no.nav.sak.validering.ConstraintValidationExceptionMapper;
 import no.nav.sikkerhet.abac.ABACClient;
-import no.nav.sikkerhet.abac.ABACService;
 import no.nav.sikkerhet.authentication.Authenticator;
 import no.nav.sikkerhet.authentication.basic.BasicAuthenticator;
 import no.nav.sikkerhet.authentication.basic.LdapConfiguration;
@@ -57,9 +57,8 @@ public class SakApplication extends ResourceConfig {
 
         Database database = createDatabase(sakDataSource);
 
-        registerAuthenticationFilter(sakConfiguration);
         registerApiResources(database, sakConfiguration);
-        registerFilters();
+        registerFilters(sakConfiguration);
         registerExceptionmappers();
         registerFeatures();
         registerSwaggerResources();
@@ -86,17 +85,17 @@ public class SakApplication extends ResourceConfig {
         register(new ParamExceptionMapper());
     }
 
-    private void registerFilters() {
+    private void registerFilters(SakConfiguration sakConfiguration) {
         register(new CorrelationFilter());
         register(new PrometheusFilter());
+        registerAuthenticationFilter(sakConfiguration);
     }
 
     void registerApiResources(Database database, SakConfiguration sakConfiguration) {
         ABACClient abacClient = new ABACClient(sakConfiguration.getRequiredString("ABAC_PDP_ENDPOINT"), createHttpClient(sakConfiguration));
         register(new SakResource(
             new SakRepository(database),
-            new ABACService(abacClient),
-            sakConfiguration.getBoolean("ABAC_ENABLED", false))
+            new SakPEP(abacClient, sakConfiguration))
         );
     }
 
@@ -144,8 +143,8 @@ public class SakApplication extends ResourceConfig {
 
         if (sakConfiguration.getBoolean("ABAC_ENABLED", false)) {
             Username***passord=gammelt_passord***(
-                sakConfiguration.getRequiredString("srvsak_username"),
-                sakConfiguration.getRequiredString("srvsak_password"));
+                sakConfiguration.getRequiredString("SRVSAK_USERNAME"),
+                sakConfiguration.getRequiredString("SRVSAK_PASSWORD"));
 
             CredentialsProvider provider = new BasicCredentialsProvider();
             provider.setCredentials(AuthScope.ANY, credentials);

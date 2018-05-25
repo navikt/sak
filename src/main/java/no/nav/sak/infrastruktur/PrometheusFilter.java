@@ -17,7 +17,7 @@ import static no.nav.sak.infrastruktur.authentication.AuthenticationFilter.REQUE
 
 @EnableApiFilters
 public class PrometheusFilter implements ContainerRequestFilter, ContainerResponseFilter {
-    private static final Histogram requestsHistogram = Histogram.build("requests_latency_seconds", "Request latency in seconds")
+    private static final Histogram requestsHistogram = Histogram.build("requests_duration_seconds", "Request duration in seconds")
         .labelNames("path", "queryparams", "method", "consumer")
         .register();
 
@@ -66,5 +66,7 @@ public class PrometheusFilter implements ContainerRequestFilter, ContainerRespon
         if (timer != null) {
             timer.observeDuration();
         }
+
+
     }
 }
