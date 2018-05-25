@@ -86,15 +86,14 @@ pipeline {
                 naisUpload("sak", versjon)
             }
         }
-        stage('Nais deploy (preprod - lasttest)') {
+        stage('Nais deploy (preprod - t8)') {
             steps {
                 milestone(3)
                 script {
-                    if (env.BRANCH_NAME == 'master') {
-                        naisDeployPreprod("sak", versjon, "t8", "t8")
-                    } else {
-                        echo "Last-tester kjører kun på master. Deploy ikke utført"
-                    }
+                    environment = "t8"
+                    namespace = "t8"
+                    naisDeployPreprod("sak", versjon, environment, namespace)
+                    slackSend(color: '#90ee90', message: "Deployet til preprod (environment: ${environment} - namespace: ${namespace}) ${env.BRANCH_NAME} Sak:" + versjon)
                 }
             }
         }
@@ -113,17 +112,6 @@ pipeline {
             }
         }
 
-        stage('Nais deploy (preprod - default)') {
-            steps {
-                milestone(5)
-                script {
-                    environment = "t8"
-                    namespace = "t8"
-                    naisDeployPreprod("sak", versjon, environment, namespace)
-                    slackSend(color: '#90ee90', message: "Deployet til preprod (environment: ${environment} - namespace: ${namespace}) ${env.BRANCH_NAME} Sak:" + versjon)
-                }
-            }
-        }
 
         stage('Nais Deploy (prod)') {
             steps {
