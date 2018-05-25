@@ -1,5 +1,6 @@
 package no.nav.sak.infrastruktur.sts;
 
+import no.nav.sak.SakConfiguration;
 import no.nav.sak.infrastruktur.oicd.OidcLogin;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
@@ -33,12 +34,12 @@ import static java.lang.System.getenv;
 
 public class STSSupport {
     private static final String TRUSTSTORE_PASSWORD = "truststore.password";
-    private static final String SYSTEMBRUKER_USERNAME = "systembruker.username";
-    private static final String SYSTEMBRUKER_PASSWORD = "systembruker.password";
     private static final String TRUSTSTORE = "nav_truststore_nonproduction-t.jts";
     private static final String TOKEN_TYPE = "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1#SAMLV2.0";
     private static final String KEY_TYPE = "http://docs.oasis-open.org/ws-sx/ws-trust/200512/Bearer";
     private final OidcLogin oidcLogin = new OidcLogin();
+
+    private final SakConfiguration sakConfiguration = new SakConfiguration();
 
     public STSSupport() throws IOException {
         setupTrustStore();
@@ -77,8 +78,8 @@ public class STSSupport {
         stsClient.setAllowRenewing(false);
 
         HashMap<String, Object> properties = new HashMap<>();
-        properties.put(SecurityConstants.USERNAME, getEnvVariable(SYSTEMBRUKER_USERNAME));
-        properties.put(SecurityConstants.PASSWORD, getEnvVariable(SYSTEMBRUKER_PASSWORD));
+        properties.put(SecurityConstants.USERNAME, sakConfiguration.getRequiredString("SYSTEMBRUKER_USERNAME"));
+        properties.put(SecurityConstants.PASSWORD, sakConfiguration.getRequiredString("SYSTEMBRUKER_PASSWORD"));
         stsClient.setProperties(properties);
         stsClient.setCustomContent("<wst:SecondaryParameters xmlns:wst=\"http://docs.oasis-open.org/ws-sx/ws-trust/200512\">" +
             "<wst:TokenType>" + TOKEN_TYPE + "</wst:TokenType>" +
@@ -124,8 +125,8 @@ public class STSSupport {
             stsClient.setEndpointQName(new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/wsdl", "SecurityTokenServiceSOAP"));
             stsClient.getClient().getRequestContext().put(Message.ENDPOINT_ADDRESS, "https://sts-t8.test.local/SecurityTokenServiceProvider/");
             HashMap<String, Object> properties = new HashMap<>();
-            properties.put(SecurityConstants.USERNAME, getEnvVariable(SYSTEMBRUKER_USERNAME));
-            properties.put(SecurityConstants.PASSWORD, getEnvVariable(SYSTEMBRUKER_PASSWORD));
+            properties.put(SecurityConstants.USERNAME, sakConfiguration.getRequiredString("SYSTEMBRUKER_USERNAME"));
+            properties.put(SecurityConstants.PASSWORD, sakConfiguration.getRequiredString("SYSTEMBRUKER_PASSWORD"));
             stsClient.setProperties(properties);
             stsClient.setTokenType(TOKEN_TYPE);
             stsClient.setKeyType(KEY_TYPE);

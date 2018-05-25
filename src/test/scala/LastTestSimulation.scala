@@ -10,6 +10,7 @@ class LastTestSimulation extends Simulation {
 
     private val authHeaderOidc = "Bearer " + new OidcLogin().getIdToken
     private val authHeaderSaml = "Saml " + new STSSupport().getSystemSAMLTokenFromSTS
+    private val authHeaderBasic = new BasicAuthTestHeaderProvider().getHeader
 
     private val httpProtocol = http.baseURL("https://sak-t8.nais.preprod.local/api/v1").warmUp("http://confluence.adeo.no")
 
@@ -41,6 +42,15 @@ class LastTestSimulation extends Simulation {
                     SakTests.getSak(authHeaderSaml)
                 )
         }
+        .group("BASIC") {
+            feed(temaFeeder)
+                .feed(aktoerIdFeeder)
+                .feed(applikasjonFeeder)
+                .exec(
+                    SakTests.createSak(authHeaderOidc),
+                    SakTests.getSak(authHeaderOidc)
+                )
+        }
 
     private val soekSakerScenario = scenario("Søk etter saker")
         .group("OIDC") {
@@ -50,6 +60,12 @@ class LastTestSimulation extends Simulation {
                 .exec(SakTests.searchSaker(authHeaderOidc))
         }
         .group("SAML") {
+            feed(temaFeeder)
+                .feed(aktoerIdFeeder)
+                .feed(applikasjonFeeder)
+                .exec(SakTests.searchSaker(authHeaderSaml))
+        }
+        .group("BASIC") {
             feed(temaFeeder)
                 .feed(aktoerIdFeeder)
                 .feed(applikasjonFeeder)
