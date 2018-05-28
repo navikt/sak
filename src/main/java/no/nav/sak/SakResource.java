@@ -1,8 +1,11 @@
 package no.nav.sak;
 
 import io.swagger.annotations.*;
+import no.nav.sak.infrastruktur.ContextExtractor;
 import no.nav.sak.infrastruktur.EnableApiFilters;
 import no.nav.sak.infrastruktur.ErrorResponse;
+import no.nav.sak.infrastruktur.SubjectType;
+import no.nav.sak.infrastruktur.abac.AuthorizationRequest;
 import no.nav.sak.infrastruktur.abac.SakPEP;
 import no.nav.sikkerhet.abac.ABACResult;
 import org.slf4j.Logger;
@@ -101,7 +104,7 @@ public class SakResource {
         }
 
         Sak eksisterendeSak = sak.get();
-        ABACResult abacResult = authorize(ctx, eksisterendeSak);
+        ABACResult abacResult = sakPEP.autoriser(ctx, new AuthorizationRequest(eksisterendeSak.getAktoerId(), eksisterendeSak.getTema()));
         if (!abacResult.hasAccess()) {
             String user = (String) ctx.getProperty(REQUEST_USERNAME);
             log.warn("Autorisering feilet for: {}", user);
@@ -127,13 +130,21 @@ public class SakResource {
     )
     public Response finnSaker(@Valid @BeanParam SakSearchRequest sakSearchRequest, @Context ContainerRequestContext ctx) {
         log.info("Søker etter saker for: {}", sakSearchRequest);
+        if(!sakPEP.autoriser(ctx, new AuthorizationRequest(sakSearchRequest.getAktoerId(), sakSearchRequest.getTema())).hasAccess()) {
+            return Response.ok().build();
+        }
         List<Sak> saker = sakRepository.finnSaker(sakSearchRequest.toCriteria());
         return Response.ok(
             saker.stream()
-                .filter(s -> authorize(ctx, s).hasAccess())
+                .filter(s -> harTilgangTilSakInterneRegler(ctx, s))
                 .map(SakJson::new)
                 .collect(toList()))
             .build();
+    }
+
+    private boolean harTilgangTilSakInterneRegler(ContainerRequestContext ctx, Sak sak) {
+        //TODO logge hvis false;
+        return "KTR".equals(sak.getTema()) && ContextExtractor.getSubjectType(ctx).equals(SubjectType.SUBJECT_TYPE_EKSTERNBRUKER);
     }
 
     @POST
@@ -152,7 +163,7 @@ public class SakResource {
                                @ApiParam(value = "Saken som skal opprettes", required = true) SakJson sakJson, @Context UriInfo uriInfo, @Context ContainerRequestContext ctx) throws URISyntaxException {
         String user = (String) ctx.getProperty(REQUEST_USERNAME);
         Sak innsendtSak = sakJson.toSak(user);
-        ABACResult abacResult = authorize(ctx, innsendtSak);
+        ABACResult abacResult = sakPEP.autoriser(ctx, new AuthorizationRequest(innsendtSak.getAktoerId(), innsendtSak.getTema()));
         if (!abacResult.hasAccess()) {
             log.warn("Autorisering feilet for: {}", user);
             return Response.status(Response.Status.FORBIDDEN)
@@ -175,11 +186,6 @@ public class SakResource {
                 .build();
         }
     }
-
-    private ABACResult authorize(@Context ContainerRequestContext ctx, Sak sak) {
-        return sakPEP.autoriser(ctx, sak);
-    }
-
 
     private boolean fagSakFinnesFraFoer(Sak sak) {
         SakSearchCriteria sakSearchCriteria = SakSearchCriteria.create().medOrgnr(sak.getOrgnr()).medAktoerId(sak.getAktoerId()).medFagsakNr(sak.getFagsakNr()).medApplikasjon(sak.getApplikasjon());

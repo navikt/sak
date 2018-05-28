@@ -4,11 +4,9 @@ import io.prometheus.client.Counter;
 import io.prometheus.client.Histogram;
 import no.nav.abac.xacml.NavAttributter;
 import no.nav.abac.xacml.StandardAttributter;
-import no.nav.sak.Sak;
 import no.nav.sak.SakConfiguration;
 import no.nav.sak.infrastruktur.ContextExtractor;
 import no.nav.sikkerhet.abac.*;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,7 +42,7 @@ public class SakPEP {
         this.sakConfiguration = sakConfiguration;
     }
 
-    public ABACResult autoriser(ContainerRequestContext ctx, Sak sak) {
+    public ABACResult autoriser(ContainerRequestContext ctx, AuthorizationRequest authorizationRequest) {
         if(!performAuthorization(ctx)) {
             log.info("ConsumerID: \"{}\"; User: \"{}\"; Endpoint: \"{}\"; Method: \"{}\"; Authorization disabled for {}",
                 ctx.getProperty(REQUEST_CONSUMERID),
@@ -58,15 +56,14 @@ public class SakPEP {
         ABACRequest abacRequest = ABACRequest.newRequest()
             .addEnvironment(new ABACAttribute(ENVIRONMENT_FELLES_PEP_ID ,"sak"))
             .addResource(new ABACAttribute(RESOURCE_FELLES_DOMENE, "sak"))
-            .addResource(new ABACAttribute(RESOURCE_FELLES_RESOURCE_TYPE, RESOURCE_TYPE_SAK))
-            .addResource(new ABACAttribute(RESOURCE_FELLES_TEMA, sak.getTema()));
+            .addResource(new ABACAttribute(RESOURCE_FELLES_RESOURCE_TYPE, RESOURCE_TYPE_SAK));
 
-        if(StringUtils.isNotBlank(sak.getAktoerId())) {
-            abacRequest.addResource(new ABACAttribute(RESOURCE_FELLES_PERSON_AKTOERID_RESOURCE, sak.getAktoerId()));
-        }
+        authorizationRequest.getAktoerId().ifPresent(aktoerId -> abacRequest.addResource(new ABACAttribute(RESOURCE_FELLES_PERSON_AKTOERID_RESOURCE, aktoerId)));
+        authorizationRequest.getTema().ifPresent(tema -> abacRequest.addResource(new ABACAttribute(RESOURCE_FELLES_TEMA, tema)));
 
         String authIdentifier = substringBefore(trim(ctx.getHeaderString(AUTHORIZATION)), " ");
         String token = substringAfter(trim(ctx.getHeaderString(AUTHORIZATION)), " ");
+
         if(Objects.equals(BASIC.getValue(), authIdentifier)) {
             abacRequest.addAccessSubject(new ABACAttribute(StandardAttributter.SUBJECT_ID, (String)ctx.getProperty(REQUEST_USERNAME)));
             abacRequest.addAccessSubject(new ABACAttribute(NavAttributter.SUBJECT_FELLES_SUBJECTTYPE, SUBJECT_TYPE_SYSTEMBRUKER.getValue()));
