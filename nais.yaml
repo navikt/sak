@@ -1,7 +1,7 @@
 image: "docker.adeo.no:5000/sak"
 replicas:
-  min: 2
-  max: 4
+  min: 4
+  max: 8
   cpuThresholdPercentage: 75
 port: 8080
 healthcheck:
