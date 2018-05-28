@@ -87,44 +87,13 @@ pipeline {
                 naisUpload("sak", versjon)
             }
         }
-        stage('Nais deploy (preprod - lasttest)') {
-            steps {
-                milestone(3)
-                script {
-                      if (env.BRANCH_NAME == 'master') {
-                           naisDeployPreprod("sak", versjon, "t8", "t8")
-                      } else {
-                         echo "Last-tester kjører kun på master. Deploy ikke utført"}
-                }
-            }
-        }
 
-        stage('Run Gatling Tests') {
-            steps {
-                milestone(4)
-                withCredentials([
-                    usernamePassword([credentialsId: 'systembruker', usernameVariable: 'testLoginUsername', passwordVariable: 'testLoginPassword']),
-                    usernamePassword([credentialsId: 'sak-t0', usernameVariable: 'isso-rp-issuer', passwordVariable: 'OpenIdConnectAgent.password']),
-                    usernamePassword([credentialsId: 'systembruker', usernameVariable: 'systembruker.username', passwordVariable: 'systembruker.password']),
-                    usernamePassword([credentialsId: 'sakds.lasttest', usernameVariable: 'sakds.lasttest.user', passwordVariable: 'sakds.lasttest.password']),
-                    string(credentialsId: 'truststore-password', variable: 'truststore.password')
-                ]){
-                     script {
-                         if (env.BRANCH_NAME == 'master') {
-                             sh "mvn gatling:test"
-                         } else {
-                             echo "Last-tester kjører kun på master"}
-                         }
-                }
-            }
-        }
-
-        stage('Nais deploy (preprod - default)') {
+        stage('Nais deploy (preprod)') {
             steps {
                 milestone(5)
                 script {
-                     environment = "t8"
-                     namespace = "default"
+                     environment = "t7"
+                     namespace = "t7"
                      naisDeployPreprod("sak", versjon, environment, namespace)
                      slackSend (color: '#90ee90', message: "Deployet til preprod (environment: ${environment} - namespace: ${namespace}) ${env.BRANCH_NAME} Sak:" + versjon)
                 }
