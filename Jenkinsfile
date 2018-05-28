@@ -92,8 +92,8 @@ pipeline {
             steps {
                 milestone(5)
                 script {
-                     environment = "t7"
-                     namespace = "t7"
+                     environment = "t8"
+                     namespace = "t8"
                      naisDeployPreprod("sak", versjon, environment, namespace)
                      slackSend (color: '#90ee90', message: "Deployet til preprod (environment: ${environment} - namespace: ${namespace}) ${env.BRANCH_NAME} Sak:" + versjon)
                 }
