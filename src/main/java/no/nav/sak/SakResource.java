@@ -144,7 +144,7 @@ public class SakResource {
 
     private boolean harTilgangTilSakInterneRegler(ContainerRequestContext ctx, Sak sak) {
         //TODO logge hvis false;
-        return "KTR".equals(sak.getTema()) && ContextExtractor.getSubjectType(ctx).equals(SubjectType.SUBJECT_TYPE_EKSTERNBRUKER);
+        return !("KTR".equals(sak.getTema()) && ContextExtractor.getSubjectType(ctx).equals(SubjectType.SUBJECT_TYPE_EKSTERNBRUKER));
     }
 
     @POST
