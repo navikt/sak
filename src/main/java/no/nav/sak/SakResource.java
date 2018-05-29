@@ -40,7 +40,18 @@ import static no.nav.sak.infrastruktur.authentication.AuthenticationFilter.REQUE
     @Authorization(value = "Saml"),
     @Authorization(value = "Basic")
 })
-@SwaggerDefinition(securityDefinition =
+@SwaggerDefinition(
+    info = @Info(
+        title = "Sak API",
+        version = "1",
+        description = "Tjenesten leveres kontinuerlig til produksjon. For å sikre oss mot å innføre regresjon som påvirker våre konsumenter, benytter vi " +
+            " Pact. Det er konsumentens ansvar å gi oss pact-test, men ta gjerne kontakt ved behov for bistand ifm. dette." +
+            " Vi ber nye konsumenter om å ta kontakt med teamet, dette for å få gjennomført ev. avklaringer, sikre korrekte tilganger, pact-test, og for å sikre at tjenesten støtter " +
+            " forventet volum og ev. SLA",
+        contact = @Contact(
+            name = "Team Gosys"
+        ))
+    , securityDefinition =
 @SecurityDefinition(apiKeyAuthDefinitions = {
     @ApiKeyAuthDefinition(
         name = "Authorization",
@@ -59,6 +70,7 @@ import static no.nav.sak.infrastruktur.authentication.AuthenticationFilter.REQUE
         description = "P.t støttes ikke konvertering fra SAML til OIDC-token og det er derfor implementert støtte for Saml for å propagere brukercontext fra legacy-systemer " +
             " (i.e. fra et system som kun eksponerer soap-tjenester og som skal gjøre tjenestekall videre mot Oppgave.\n" +
             " I denne konteksten er et SAML token en SAML assertion som er Base 64 enkodet. \n" +
+            " På grunn av begrensninger i header-lengde, må saml-assertion strippes for whitespaces før den encodes \n" +
             " Formatet skal være som følger: <strong>\"Saml {token}\"</strong>.\n" +
             " Eksempel på verdi i input-felt: <strong>Saml eYdmifml0ejugm</strong>\n\n" +
             " Et gyldig token kommer til å ha mange flere karakterer enn i eksempelet.")
