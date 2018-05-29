@@ -1,7 +1,7 @@
 image: "docker.adeo.no:5000/sak"
 replicas:
-  min: 6
-  max: 8
+  min: 8
+  max: 12
   cpuThresholdPercentage: 75
 port: 8080
 healthcheck:
@@ -10,7 +10,7 @@ healthcheck:
     initialDelay: 30
   readiness:
     path: internal/ready
-    initialDelay: 30
+    initialDelay: 60
 prometheus:
   enabled: true
   path: internal/metrics
