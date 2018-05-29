@@ -39,6 +39,7 @@
         <pact.version>3.5.13</pact.version>
         <ldaptive.version>1.0</ldaptive.version>
         <logback-sylog4j.version>1.0.0</logback-sylog4j.version>
+        <ehcache.version>3.5.2</ehcache.version>
         <oppgavehandtering-security.version>1.13</oppgavehandtering-security.version>
 
         <!--Managed transitive deps -->
@@ -421,6 +422,11 @@
             <groupId>org.ldaptive</groupId>
             <artifactId>ldaptive</artifactId>
             <version>${ldaptive.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.ehcache</groupId>
+            <artifactId>ehcache</artifactId>
+            <version>${ehcache.version}</version>
         </dependency>
 
         <!--NAV avhengigheter-->
