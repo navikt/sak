@@ -25,8 +25,8 @@ public class OidcLogin {
         OIDCProviderMetadata providerMetadata = getOidcProviderMetadata();
         String redirectUrl = "https://sak.nais.preprod.local/";
 
-        String username = sakConfiguration.getRequiredString("testLoginUsername");
-        String password = sakConfiguration.getRequiredString("testLoginPassword");
+        String username = sakConfiguration.getRequiredString("SRVSAK_USERNAME");
+        String password = sakConfiguration.getRequiredString("SRVSAK_PASSWORD");
 
         OidcAuthenticator oidcAuthenticator = new OidcAuthenticator(providerMetadata.getAuthorizationEndpointURI(), redirectUrl);
         String authorizationCode = oidcAuthenticator.getAuthorizationCode(username, password);

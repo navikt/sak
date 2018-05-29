@@ -3,6 +3,7 @@ import io.gatling.http.Predef._
 import no.nav.sak.infrastruktur.GatlingJDBCCleaner
 import no.nav.sak.infrastruktur.oicd.OidcLogin
 import no.nav.sak.infrastruktur.sts.STSSupport
+import no.nav.sak.infrastruktur.basic.BasicAuthTestHeaderProvider
 
 import scala.concurrent.duration._
 
@@ -10,6 +11,7 @@ class LastTestSimulation extends Simulation {
 
     private val authHeaderOidc = "Bearer " + new OidcLogin().getIdToken
     private val authHeaderSaml = "Saml " + new STSSupport().getSystemSAMLTokenFromSTS
+    private val authHeaderBasic = new BasicAuthTestHeaderProvider().getHeader
 
     private val httpProtocol = http.baseURL("https://sak-t8.nais.preprod.local/api/v1").warmUp("http://confluence.adeo.no")
 
@@ -20,7 +22,6 @@ class LastTestSimulation extends Simulation {
     before {
         new GatlingJDBCCleaner().resetState()
     }
-
 
     private val opprettOgHentSakScenario = scenario("Opprett og hent sak")
         .group("OIDC") {
@@ -41,6 +42,15 @@ class LastTestSimulation extends Simulation {
                     SakTests.getSak(authHeaderSaml)
                 )
         }
+        .group("BASIC") {
+            feed(temaFeeder)
+                .feed(aktoerIdFeeder)
+                .feed(applikasjonFeeder)
+                .exec(
+                    SakTests.createSak(authHeaderBasic),
+                    SakTests.getSak(authHeaderBasic)
+                )
+        }
 
     private val soekSakerScenario = scenario("Søk etter saker")
         .group("OIDC") {
@@ -54,6 +64,12 @@ class LastTestSimulation extends Simulation {
                 .feed(aktoerIdFeeder)
                 .feed(applikasjonFeeder)
                 .exec(SakTests.searchSaker(authHeaderSaml))
+        }
+        .group("BASIC") {
+            feed(temaFeeder)
+                .feed(aktoerIdFeeder)
+                .feed(applikasjonFeeder)
+                .exec(SakTests.searchSaker(authHeaderBasic))
         }
 
     setUp(opprettOgHentSakScenario.inject(constantUsersPerSec(2) during (2 minutes))

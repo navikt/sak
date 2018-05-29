@@ -27,11 +27,10 @@ pipeline {
             steps {
                 script {
                     withCredentials([
-                        usernamePassword([credentialsId: 'systembruker', usernameVariable: 'testLoginUsername', passwordVariable: 'testLoginPassword']),
                         usernamePassword([credentialsId: 'systembruker', usernameVariable: 'SRVSAK_USERNAME', passwordVariable: 'SRVSAK_PASSWORD']),
                         usernamePassword([credentialsId: 'sak-t0', usernameVariable: 'isso-rp-issuer', passwordVariable: 'OpenIdConnectAgent.password']),
                         usernamePassword([credentialsId: 'ldap', usernameVariable: 'LDAP_USERNAME', passwordVariable: 'LDAP_PASSWORD'])
-                    ]){
+                    ]) {
                         if (env.BRANCH_NAME == 'master') {
                             sh "mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install -Pmutation-tests,integration-tests"
                         } else {
@@ -87,14 +86,14 @@ pipeline {
                 naisUpload("sak", versjon)
             }
         }
-        stage('Nais deploy (preprod - lasttest)') {
+        stage('Nais deploy (preprod - t8)') {
             steps {
                 milestone(3)
                 script {
-                      if (env.BRANCH_NAME == 'master') {
-                           naisDeployPreprod("sak", versjon, "t8", "t8")
-                      } else {
-                         echo "Last-tester kjører kun på master. Deploy ikke utført"}
+                    environment = "t8"
+                    namespace = "t8"
+                    naisDeployPreprod("sak", versjon, environment, namespace)
+                    slackSend(color: '#90ee90', message: "Deployet til preprod (environment: ${environment} - namespace: ${namespace}) ${env.BRANCH_NAME} Sak:" + versjon)
                 }
             }
         }
@@ -103,30 +102,12 @@ pipeline {
             steps {
                 milestone(4)
                 withCredentials([
-                    usernamePassword([credentialsId: 'systembruker', usernameVariable: 'testLoginUsername', passwordVariable: 'testLoginPassword']),
+                    usernamePassword([credentialsId: 'systembruker', usernameVariable: 'SRVSAK_USERNAME', passwordVariable: 'SRVSAK_PASSWORD']),
                     usernamePassword([credentialsId: 'sak-t0', usernameVariable: 'isso-rp-issuer', passwordVariable: 'OpenIdConnectAgent.password']),
-                    usernamePassword([credentialsId: 'systembruker', usernameVariable: 'systembruker.username', passwordVariable: 'systembruker.password']),
                     usernamePassword([credentialsId: 'sakds.lasttest', usernameVariable: 'sakds.lasttest.user', passwordVariable: 'sakds.lasttest.password']),
                     string(credentialsId: 'truststore-password', variable: 'truststore.password')
-                ]){
-                     script {
-                         if (env.BRANCH_NAME == 'master') {
-                             sh "mvn gatling:test"
-                         } else {
-                             echo "Last-tester kjører kun på master"}
-                         }
-                }
-            }
-        }
-
-        stage('Nais deploy (preprod - default)') {
-            steps {
-                milestone(5)
-                script {
-                     environment = "t8"
-                     namespace = "default"
-                     naisDeployPreprod("sak", versjon, environment, namespace)
-                     slackSend (color: '#90ee90', message: "Deployet til preprod (environment: ${environment} - namespace: ${namespace}) ${env.BRANCH_NAME} Sak:" + versjon)
+                ]) {
+                    sh "mvn gatling:test"
                 }
             }
         }
@@ -137,7 +118,7 @@ pipeline {
                 script {
                     if (env.BRANCH_NAME == 'master') {
                         naisDeployProd("sak", versjon)
-                        slackSend (color: '#006400', message: "Deployet til produksjon: ${env.BRANCH_NAME} Sak:" + versjon)
+                        slackSend(color: '#006400', message: "Deployet til produksjon: ${env.BRANCH_NAME} Sak:" + versjon)
                     } else {
                         currentBuild.description = "OK - ikke deployet til prod"
                         echo "Kun master blir deployet til prod"
@@ -149,7 +130,7 @@ pipeline {
 
     post {
         failure {
-            slackSend (color: '#FF0000', message: "Bygget feilet: ${env.BRANCH_NAME} ${env.BUILD_URL}")
+            slackSend(color: '#FF0000', message: "Bygget feilet: ${env.BRANCH_NAME} ${env.BUILD_URL}")
         }
         always {
             junit 'target/surefire-reports/*.xml'

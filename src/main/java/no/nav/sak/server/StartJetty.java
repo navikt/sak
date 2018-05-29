@@ -41,7 +41,6 @@ public class StartJetty {
             server.stop();
         }
 
-
     }
 
     void registerJettyMetrics(ServletContextHandler contextHandler) {
