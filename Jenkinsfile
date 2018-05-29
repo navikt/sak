@@ -112,7 +112,6 @@ pipeline {
             }
         }
 
-
         stage('Nais Deploy (prod)') {
             steps {
                 milestone(6)
