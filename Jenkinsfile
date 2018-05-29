@@ -98,20 +98,20 @@ pipeline {
             }
         }
 
-        stage('Run Gatling Tests') {
-            steps {
-                milestone(4)
-                withCredentials([
-                    usernamePassword([credentialsId: 'systembrukerConsumer', usernameVariable: 'SRVGSAK_USERNAME', passwordVariable: 'SRVGSAK_PASSWORD']),
-                    usernamePassword([credentialsId: 'systembruker', usernameVariable: 'SRVSAK_USERNAME', passwordVariable: 'SRVSAK_PASSWORD']),
-                    usernamePassword([credentialsId: 'sak-t0', usernameVariable: 'isso-rp-issuer', passwordVariable: 'OpenIdConnectAgent.password']),
-                    usernamePassword([credentialsId: 'sakds.lasttest', usernameVariable: 'sakds.lasttest.user', passwordVariable: 'sakds.lasttest.password']),
-                    string(credentialsId: 'truststore-password', variable: 'truststore.password')
-                ]) {
-                    sh "mvn gatling:test"
-                }
-            }
-        }
+//        stage('Run Gatling Tests') {
+//            steps {
+//                milestone(4)
+//                withCredentials([
+//                    usernamePassword([credentialsId: 'systembrukerConsumer', usernameVariable: 'SRVGSAK_USERNAME', passwordVariable: 'SRVGSAK_PASSWORD']),
+//                    usernamePassword([credentialsId: 'systembruker', usernameVariable: 'SRVSAK_USERNAME', passwordVariable: 'SRVSAK_PASSWORD']),
+//                    usernamePassword([credentialsId: 'sak-t0', usernameVariable: 'isso-rp-issuer', passwordVariable: 'OpenIdConnectAgent.password']),
+//                    usernamePassword([credentialsId: 'sakds.lasttest', usernameVariable: 'sakds.lasttest.user', passwordVariable: 'sakds.lasttest.password']),
+//                    string(credentialsId: 'truststore-password', variable: 'truststore.password')
+//                ]) {
+//                    sh "mvn gatling:test"
+//                }
+//            }
+//        }
 
         stage('Nais Deploy (prod)') {
             steps {
