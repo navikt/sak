@@ -21,6 +21,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -143,7 +144,7 @@ public class SakResource {
     public Response finnSaker(@Valid @BeanParam SakSearchRequest sakSearchRequest, @Context ContainerRequestContext ctx) {
         log.info("Søker etter saker for: {}", sakSearchRequest);
         if(!sakPEP.autoriser(ctx, new AuthorizationRequest(sakSearchRequest.getAktoerId(), sakSearchRequest.getTema())).hasAccess()) {
-            return Response.ok().build();
+            return Response.ok(new ArrayList<>()).build();
         }
         List<Sak> saker = sakRepository.finnSaker(sakSearchRequest.toCriteria());
         return Response.ok(
