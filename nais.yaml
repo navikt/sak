@@ -1,6 +1,6 @@
 image: "docker.adeo.no:5000/sak"
 replicas:
-  min: 4
+  min: 8
   max: 12
   cpuThresholdPercentage: 50
 port: 8080
@@ -19,7 +19,7 @@ resources:
     cpu: 4000m
 fasitResources:
   used:
-    - alias: SAKDS
+    - alias: SAKDSj
       resourceType: datasource
     - alias: SAK_GR_DS
       resourceType: datasource
