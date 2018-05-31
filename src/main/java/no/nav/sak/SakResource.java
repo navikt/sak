@@ -1,10 +1,8 @@
 package no.nav.sak;
 
 import io.swagger.annotations.*;
-import no.nav.sak.infrastruktur.ContextExtractor;
 import no.nav.sak.infrastruktur.EnableApiFilters;
 import no.nav.sak.infrastruktur.ErrorResponse;
-import no.nav.sak.infrastruktur.SubjectType;
 import no.nav.sak.infrastruktur.abac.AuthorizationRequest;
 import no.nav.sak.infrastruktur.abac.SakPEP;
 import no.nav.sikkerhet.abac.ABACResult;
@@ -21,7 +19,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -143,22 +140,15 @@ public class SakResource {
     )
     public Response finnSaker(@Valid @BeanParam SakSearchRequest sakSearchRequest, @Context ContainerRequestContext ctx) {
         log.info("Søker etter saker for: {}", sakSearchRequest);
-        if(!sakPEP.autoriser(ctx, new AuthorizationRequest(sakSearchRequest.getAktoerId(), sakSearchRequest.getTema())).hasAccess()) {
-            return Response.ok(new ArrayList<>()).build();
-        }
         List<Sak> saker = sakRepository.finnSaker(sakSearchRequest.toCriteria());
         return Response.ok(
             saker.stream()
-                .filter(s -> harTilgangTilSakInterneRegler(ctx, s))
+                .filter(s -> sakPEP.autoriser(ctx, new AuthorizationRequest(s.getAktoerId(), s.getTema())).hasAccess())
                 .map(SakJson::new)
                 .collect(toList()))
             .build();
     }
 
-    private boolean harTilgangTilSakInterneRegler(ContainerRequestContext ctx, Sak sak) {
-        //TODO logge hvis false;
-        return !("KTR".equals(sak.getTema()) && ContextExtractor.getSubjectType(ctx).equals(SubjectType.SUBJECT_TYPE_EKSTERNBRUKER));
-    }
 
     @POST
     @ApiOperation(value = "Oppretter en ny sak", notes = "Merk at en sak enten skal tilhøre en aktør <b>eller</b> et foretak. Begge er p.t. ikke tillatt. ")
