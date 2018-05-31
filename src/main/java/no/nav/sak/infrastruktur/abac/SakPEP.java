@@ -86,18 +86,24 @@ public class SakPEP {
         ABACResult abacResult;
         try {
             abacResult = abacClient.execute(abacRequest);
+            String arcsightPreparedRequest = stripBrackets(abacRequest.getResource().getAttributes().toString());
+            String arcsightPreparedResult = stripBrackets(abacResult.toString());
             log.info("ConsumerID: \"{}\"; User: \"{}\"; Endpoint: \"{}\"; Method: \"{}\"; Authorization Request: \"{}\"; Authorization Response: \"{}\"",
                 ctx.getProperty(REQUEST_CONSUMERID),
                 ctx.getProperty(REQUEST_USERNAME),
                 ctx.getUriInfo().getAbsolutePath(),
                 ctx.getRequest().getMethod(),
-                abacRequest.getResource().getAttributes(),
-                abacResult);
+                arcsightPreparedRequest,
+                arcsightPreparedResult);
             authorizationCounter.labels(abacResult.hasAccess() ? "permit" : "deny").inc();
         } finally {
             timer.observeDuration();
         }
        return abacResult;
+    }
+
+    private String stripBrackets(String input) {
+        return remove(remove(input, "["), "]");
     }
 
     private boolean performAuthorization(ContainerRequestContext ctx) {
