@@ -6,10 +6,6 @@ public class AuthorizationRequest {
     private String aktoerId;
     private String tema;
 
-    public AuthorizationRequest(String aktoerId) {
-        this.aktoerId = aktoerId;
-    }
-
     public AuthorizationRequest(String aktoerId, String tema) {
         this.aktoerId = aktoerId;
         this.tema = tema;
@@ -22,4 +18,6 @@ public class AuthorizationRequest {
     public Optional<String> getTema() {
         return Optional.ofNullable(tema);
     }
+
+
 }
