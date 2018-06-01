@@ -44,7 +44,7 @@ public class SakPEP {
 
     public ABACResult autoriser(ContainerRequestContext ctx, AuthorizationRequest authorizationRequest) {
         if(!performAuthorization(ctx)) {
-            log.info("ConsumerID: \"{}\"; User: \"{}\"; Endpoint: \"{}\"; Method: \"{}\"; Authorization disabled for {}",
+            log.info("ConsumerID: {}; User: {}; Endpoint: {}; Method: {}; Authorization disabled for {}",
                 ctx.getProperty(REQUEST_CONSUMERID),
                 ctx.getProperty(REQUEST_USERNAME),
                 ctx.getUriInfo().getAbsolutePath(),
@@ -87,8 +87,8 @@ public class SakPEP {
         try {
             abacResult = abacClient.execute(abacRequest);
             String arcsightPreparedRequest = stripBrackets(abacRequest.getResource().getAttributes().toString());
-            String arcsightPreparedResult = stripBrackets(abacResult.toString());
-            log.info("ConsumerID: \"{}\"; User: \"{}\"; Endpoint: \"{}\"; Method: \"{}\"; Authorization Request: \"{}\"; Authorization Response: \"{}\"",
+            String arcsightPreparedResult = stripBrackets(abacResult.getAssociatedAdvice().toString());
+            log.info("ConsumerID: {}; User: {}; Endpoint: {}; Method: {}; Authorization Request: {}; Authorization Response: {}",
                 ctx.getProperty(REQUEST_CONSUMERID),
                 ctx.getProperty(REQUEST_USERNAME),
                 ctx.getUriInfo().getAbsolutePath(),
