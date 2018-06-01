@@ -24,7 +24,7 @@ import static org.apache.commons.lang3.StringUtils.*;
 public class SakPEP {
     private static final Logger log = LoggerFactory.getLogger("securitylog");
 
-    private static final String RESOURCE_TYPE_SAK = "no.nav.abac.attributter.resource.sak.sak";
+    static final String RESOURCE_TYPE_SAK = "no.nav.abac.attributter.resource.sak.sak";
 
     private final ABACClient abacClient;
     private final SakConfiguration sakConfiguration;
