@@ -42,7 +42,7 @@ import static no.nav.sak.infrastruktur.authentication.AuthenticationFilter.REQUE
     info = @Info(
         title = "Sak API",
         version = "1",
-        description = "Tjenesten leveres kontinuerlig til produksjon. For å sikre oss mot å innføre regresjon som påvirker våre konsumenter, benytter vi " +
+        description = "Her dokumenteres tjenestegrensesnittet for Sak\n\n. Tjenesten leveres kontinuerlig til produksjon. For å sikre oss mot å innføre regresjon som påvirker våre konsumenter, benytter vi " +
             " Pact. Det er konsumentens ansvar å gi oss pact-test, men ta gjerne kontakt ved behov for bistand ifm. dette." +
             " Vi ber nye konsumenter om å ta kontakt med teamet, dette for å få gjennomført ev. avklaringer, sikre korrekte tilganger, pact-test, og for å sikre at tjenesten støtter " +
             " forventet volum og ev. SLA",
