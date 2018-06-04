@@ -7,6 +7,7 @@ import no.nav.abac.xacml.StandardAttributter;
 import no.nav.sak.SakConfiguration;
 import no.nav.sak.infrastruktur.ContextExtractor;
 import no.nav.sikkerhet.abac.*;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -87,14 +88,27 @@ public class SakPEP {
         try {
             abacResult = abacClient.execute(abacRequest);
             String arcsightPreparedRequest = stripBrackets(abacRequest.getResource().getAttributes().toString());
-            String arcsightPreparedResult = stripBrackets(abacResult.getAssociatedAdvice().toString());
-            log.info("ConsumerID: {}; User: {}; Endpoint: {}; Method: {}; Authorization Request: {}; Authorization Response: {}",
-                ctx.getProperty(REQUEST_CONSUMERID),
-                ctx.getProperty(REQUEST_USERNAME),
-                ctx.getUriInfo().getAbsolutePath(),
-                ctx.getRequest().getMethod(),
-                arcsightPreparedRequest,
-                arcsightPreparedResult);
+            String arcsightPreparedResult = StringUtils.remove(stripBrackets(abacResult.toString()), "associatedAdvice=");
+            if(abacResult.getAssociatedAdvice().isEmpty()) {
+                arcsightPreparedResult = StringUtils.remove(arcsightPreparedResult, ",");
+            }
+            if(abacResult.hasAccess()) {
+                log.info("ConsumerID: {}; User: {}; Endpoint: {}; Method: {}; Authorization Request: {}; Authorization Response: {}",
+                    ctx.getProperty(REQUEST_CONSUMERID),
+                    ctx.getProperty(REQUEST_USERNAME),
+                    ctx.getUriInfo().getAbsolutePath(),
+                    ctx.getRequest().getMethod(),
+                    arcsightPreparedRequest,
+                    arcsightPreparedResult);
+            } else {
+                log.warn("ConsumerID: {}; User: {}; Endpoint: {}; Method: {}; Authorization Request: {}; Authorization Response: {}",
+                    ctx.getProperty(REQUEST_CONSUMERID),
+                    ctx.getProperty(REQUEST_USERNAME),
+                    ctx.getUriInfo().getAbsolutePath(),
+                    ctx.getRequest().getMethod(),
+                    arcsightPreparedRequest,
+                    arcsightPreparedResult);
+            }
             authorizationCounter.labels(abacResult.hasAccess() ? "permit" : "deny").inc();
         } finally {
             timer.observeDuration();
