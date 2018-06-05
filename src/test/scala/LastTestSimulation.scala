@@ -74,7 +74,7 @@ class LastTestSimulation extends Simulation {
 
     setUp(opprettOgHentSakScenario.inject(constantUsersPerSec(2) during (2 minutes))
         .protocols(httpProtocol),
-        soekSakerScenario.inject(constantUsersPerSec(40) during (5 minutes))
+        soekSakerScenario.inject(constantUsersPerSec(10) during (5 minutes))
             .protocols(httpProtocol)).assertions(
         global.successfulRequests.percent.gt(99)
     )
