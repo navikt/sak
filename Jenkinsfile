@@ -86,7 +86,7 @@ pipeline {
                 naisUpload("sak", versjon)
             }
         }
-        stage('Nais deploy (preprod - q1)') {
+        stage('Nais deploy (preprod - t8)') {
             steps {
                 milestone(3)
                 script {
