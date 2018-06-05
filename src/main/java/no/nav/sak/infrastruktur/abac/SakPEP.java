@@ -35,7 +35,7 @@ public class SakPEP {
         .register();
 
     private static final Counter authorizationCounter = Counter.build("authorization_result_count", "Authorization result count")
-        .labelNames("permission")
+        .labelNames("consumer", "tokenId", "subjecttype", "permission")
         .register();
 
     public SakPEP(ABACClient abacClient, SakConfiguration sakConfiguration) {
@@ -109,7 +109,11 @@ public class SakPEP {
                     arcsightPreparedRequest,
                     arcsightPreparedResult);
             }
-            authorizationCounter.labels(abacResult.hasAccess() ? "permit" : "deny").inc();
+            authorizationCounter.labels(
+                defaultString((String)ctx.getProperty(REQUEST_CONSUMERID), "N/A"),
+                defaultString(authIdentifier, "N/A"),
+                ContextExtractor.getSubjectType(ctx).getValue(),
+                abacResult.hasAccess() ? "permit" : "deny").inc();
         } finally {
             timer.observeDuration();
         }
