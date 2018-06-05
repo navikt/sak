@@ -4,7 +4,6 @@ import no.nav.sak.SakConfiguration;
 import no.nav.sak.infrastruktur.oicd.OidcLogin;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.Validate;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.CXFBusFactory;
 import org.apache.cxf.message.Message;
@@ -19,7 +18,6 @@ import org.w3c.dom.Element;
 
 import javax.xml.namespace.QName;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
@@ -29,8 +27,6 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.util.HashMap;
-
-import static java.lang.System.getenv;
 
 public class STSSupport {
     private static final String TRUSTSTORE_PASSWORD = "truststore.password";
@@ -62,54 +58,9 @@ public class STSSupport {
     }
 
     private String getEnvVariable(String name) {
-        return Validate.notNull(getenv(name), String.format("Env property '%s' er påkrevd", name));
+        return sakConfiguration.getRequiredString(name);
     }
 
-    /**
-     * Brukes for å hente et SAML-token basert på et OIDC token, her vil SAML-tokenet inneholde en InternBruker.
-     */
-    public String getSAMLTokenFromSTS() throws Exception {
-        CXFBusFactory c = new CXFBusFactory();
-        STSClient stsClient = new STSClient(c.createBus());
-        stsClient.setWsdlLocation("wsdl/ws-trust-1.4-service.wsdl");
-        stsClient.setServiceQName(new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/wsdl", "SecurityTokenServiceProvider"));
-        stsClient.setEndpointQName(new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/wsdl", "SecurityTokenServiceSOAP"));
-        stsClient.setEnableAppliesTo(false);
-        stsClient.setAllowRenewing(false);
-
-        HashMap<String, Object> properties = new HashMap<>();
-        properties.put(SecurityConstants.USERNAME, sakConfiguration.getRequiredString("SRVSAK_USERNAME"));
-        properties.put(SecurityConstants.PASSWORD, sakConfiguration.getRequiredString("SRVSAK_PASSWORD"));
-        stsClient.setProperties(properties);
-        stsClient.setCustomContent("<wst:SecondaryParameters xmlns:wst=\"http://docs.oasis-open.org/ws-sx/ws-trust/200512\">" +
-            "<wst:TokenType>" + TOKEN_TYPE + "</wst:TokenType>" +
-            "</wst:SecondaryParameters>");
-
-        stsClient.setTokenType(TOKEN_TYPE);
-        stsClient.setKeyType(KEY_TYPE);
-        stsClient.setPolicy("classpath:policy/untPolicy.xml");
-
-        String token = oidcLogin.getIdToken();
-        String wrapped = wrapWithBinarySecurityToken(token.getBytes(), "urn:ietf:params:oauth:token-type:jwt");
-        stsClient.setOnBehalfOf(wrapped);
-        stsClient.setAllowRenewing(false);
-        stsClient.setAddressingNamespace("http://w3.org/2005/08/addressing");
-        stsClient.getClient().getRequestContext().put(Message.ENDPOINT_ADDRESS, "https://sts-t8.test.local/SecurityTokenServiceProvider/");
-
-        SecurityToken securityToken = stsClient.requestSecurityToken();
-        Element assertion = securityToken.getToken();
-
-        StringWriter writer = new StringWriter();
-        TransformerFactory transformerFactory = TransformerFactory.newInstance();
-        try {
-            Transformer transformer = transformerFactory.newTransformer();
-            transformer.transform(new DOMSource(assertion), new StreamResult(writer));
-        } catch (TransformerException e) {
-            throw new IllegalStateException(e);
-        }
-
-        return Base64.encodeBase64String(writer.toString().getBytes(Charset.forName("UTF-8")));
-    }
 
     /**
      * Brukes for å hente et SAML-token basert på en systembruker, dette tokenet vil kun inneholde systembrukeren
@@ -125,8 +76,8 @@ public class STSSupport {
             stsClient.setEndpointQName(new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/wsdl", "SecurityTokenServiceSOAP"));
             stsClient.getClient().getRequestContext().put(Message.ENDPOINT_ADDRESS, "https://sts-t8.test.local/SecurityTokenServiceProvider/");
             HashMap<String, Object> properties = new HashMap<>();
-            properties.put(SecurityConstants.USERNAME, sakConfiguration.getRequiredString("SRVSAK_USERNAME"));
-            properties.put(SecurityConstants.PASSWORD, sakConfiguration.getRequiredString("SRVSAK_PASSWORD"));
+            properties.put(SecurityConstants.USERNAME, sakConfiguration.getRequiredString("junit.sts.user"));
+            properties.put(SecurityConstants.PASSWORD, sakConfiguration.getRequiredString("junit.sts.password"));
             stsClient.setProperties(properties);
             stsClient.setTokenType(TOKEN_TYPE);
             stsClient.setKeyType(KEY_TYPE);
