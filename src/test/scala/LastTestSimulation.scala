@@ -13,7 +13,7 @@ class LastTestSimulation extends Simulation {
     private val authHeaderSaml = "Saml " + new STSSupport().getSystemSAMLTokenFromSTS
     private val authHeaderBasic = new BasicAuthTestHeaderProvider().getHeader
 
-    private val httpProtocol = http.baseURL("https://sak-t8.nais.preprod.local/api/v1").warmUp("http://confluence.adeo.no")
+    private val httpProtocol = http.baseURL("https://sak-t8.nais.preprod.local/api/v1").warmUp("http://sak-t8.nais.preprod.local/internal/alive")
 
     private val aktoerIdFeeder = csv("data/aktoerId.csv").circular
     private val temaFeeder = csv("data/tema.csv").circular
@@ -74,7 +74,7 @@ class LastTestSimulation extends Simulation {
 
     setUp(opprettOgHentSakScenario.inject(constantUsersPerSec(2) during (2 minutes))
         .protocols(httpProtocol),
-        soekSakerScenario.inject(constantUsersPerSec(40) during (5 minutes))
+        soekSakerScenario.inject(constantUsersPerSec(10) during (5 minutes))
             .protocols(httpProtocol)).assertions(
         global.successfulRequests.percent.gt(99)
     )

@@ -4,7 +4,6 @@ import io.prometheus.client.Counter;
 import io.prometheus.client.Histogram;
 import no.nav.abac.xacml.NavAttributter;
 import no.nav.abac.xacml.StandardAttributter;
-import no.nav.sak.Sak;
 import no.nav.sak.SakConfiguration;
 import no.nav.sak.infrastruktur.ContextExtractor;
 import no.nav.sikkerhet.abac.*;
@@ -26,7 +25,7 @@ import static org.apache.commons.lang3.StringUtils.*;
 public class SakPEP {
     private static final Logger log = LoggerFactory.getLogger("securitylog");
 
-    private static final String RESOURCE_TYPE_SAK = "no.nav.abac.attributter.resource.sak.sak";
+    static final String RESOURCE_TYPE_SAK = "no.nav.abac.attributter.resource.sak.sak";
 
     private final ABACClient abacClient;
     private final SakConfiguration sakConfiguration;
@@ -36,7 +35,7 @@ public class SakPEP {
         .register();
 
     private static final Counter authorizationCounter = Counter.build("authorization_result_count", "Authorization result count")
-        .labelNames("permission")
+        .labelNames("consumer", "tokenId", "subjecttype", "permission")
         .register();
 
     public SakPEP(ABACClient abacClient, SakConfiguration sakConfiguration) {
@@ -44,9 +43,9 @@ public class SakPEP {
         this.sakConfiguration = sakConfiguration;
     }
 
-    public ABACResult autoriser(ContainerRequestContext ctx, Sak sak) {
+    public ABACResult autoriser(ContainerRequestContext ctx, AuthorizationRequest authorizationRequest) {
         if(!performAuthorization(ctx)) {
-            log.info("ConsumerID: \"{}\"; User: \"{}\"; Endpoint: \"{}\"; Method: \"{}\"; Authorization disabled for {}",
+            log.info("ConsumerID: {}; User: {}; Endpoint: {}; Method: {}; Authorization disabled for {}",
                 ctx.getProperty(REQUEST_CONSUMERID),
                 ctx.getProperty(REQUEST_USERNAME),
                 ctx.getUriInfo().getAbsolutePath(),
@@ -58,15 +57,14 @@ public class SakPEP {
         ABACRequest abacRequest = ABACRequest.newRequest()
             .addEnvironment(new ABACAttribute(ENVIRONMENT_FELLES_PEP_ID ,"sak"))
             .addResource(new ABACAttribute(RESOURCE_FELLES_DOMENE, "sak"))
-            .addResource(new ABACAttribute(RESOURCE_FELLES_RESOURCE_TYPE, RESOURCE_TYPE_SAK))
-            .addResource(new ABACAttribute(RESOURCE_FELLES_TEMA, sak.getTema()));
+            .addResource(new ABACAttribute(RESOURCE_FELLES_RESOURCE_TYPE, RESOURCE_TYPE_SAK));
 
-        if(StringUtils.isNotBlank(sak.getAktoerId())) {
-            abacRequest.addResource(new ABACAttribute(RESOURCE_FELLES_PERSON_AKTOERID_RESOURCE, sak.getAktoerId()));
-        }
+        authorizationRequest.getAktoerId().ifPresent(aktoerId -> abacRequest.addResource(new ABACAttribute(RESOURCE_FELLES_PERSON_AKTOERID_RESOURCE, aktoerId)));
+        authorizationRequest.getTema().ifPresent(tema -> abacRequest.addResource(new ABACAttribute(RESOURCE_FELLES_TEMA, tema)));
 
         String authIdentifier = substringBefore(trim(ctx.getHeaderString(AUTHORIZATION)), " ");
         String token = substringAfter(trim(ctx.getHeaderString(AUTHORIZATION)), " ");
+
         if(Objects.equals(BASIC.getValue(), authIdentifier)) {
             abacRequest.addAccessSubject(new ABACAttribute(StandardAttributter.SUBJECT_ID, (String)ctx.getProperty(REQUEST_USERNAME)));
             abacRequest.addAccessSubject(new ABACAttribute(NavAttributter.SUBJECT_FELLES_SUBJECTTYPE, SUBJECT_TYPE_SYSTEMBRUKER.getValue()));
@@ -89,18 +87,41 @@ public class SakPEP {
         ABACResult abacResult;
         try {
             abacResult = abacClient.execute(abacRequest);
-            log.info("ConsumerID: \"{}\"; User: \"{}\"; Endpoint: \"{}\"; Method: \"{}\"; Authorization Request: \"{}\"; Authorization Response: \"{}\"",
-                ctx.getProperty(REQUEST_CONSUMERID),
-                ctx.getProperty(REQUEST_USERNAME),
-                ctx.getUriInfo().getAbsolutePath(),
-                ctx.getRequest().getMethod(),
-                abacRequest.getResource().getAttributes(),
-                abacResult);
-            authorizationCounter.labels(abacResult.hasAccess() ? "permit" : "deny").inc();
+            String arcsightPreparedRequest = stripBrackets(abacRequest.getResource().getAttributes().toString());
+            String arcsightPreparedResult = StringUtils.remove(stripBrackets(abacResult.toString()), "associatedAdvice=");
+            if(abacResult.getAssociatedAdvice().isEmpty()) {
+                arcsightPreparedResult = StringUtils.remove(arcsightPreparedResult, ",");
+            }
+            if(abacResult.hasAccess()) {
+                log.info("ConsumerID: {}; User: {}; Endpoint: {}; Method: {}; Authorization Request: {}; Authorization Response: {}",
+                    ctx.getProperty(REQUEST_CONSUMERID),
+                    ctx.getProperty(REQUEST_USERNAME),
+                    ctx.getUriInfo().getAbsolutePath(),
+                    ctx.getRequest().getMethod(),
+                    arcsightPreparedRequest,
+                    arcsightPreparedResult);
+            } else {
+                log.warn("ConsumerID: {}; User: {}; Endpoint: {}; Method: {}; Authorization Request: {}; Authorization Response: {}",
+                    ctx.getProperty(REQUEST_CONSUMERID),
+                    ctx.getProperty(REQUEST_USERNAME),
+                    ctx.getUriInfo().getAbsolutePath(),
+                    ctx.getRequest().getMethod(),
+                    arcsightPreparedRequest,
+                    arcsightPreparedResult);
+            }
+            authorizationCounter.labels(
+                defaultString((String)ctx.getProperty(REQUEST_CONSUMERID), "N/A"),
+                defaultString(authIdentifier, "N/A"),
+                ContextExtractor.getSubjectType(ctx).getValue(),
+                abacResult.hasAccess() ? "permit" : "deny").inc();
         } finally {
             timer.observeDuration();
         }
        return abacResult;
+    }
+
+    private String stripBrackets(String input) {
+        return remove(remove(input, "["), "]");
     }
 
     private boolean performAuthorization(ContainerRequestContext ctx) {

@@ -39,8 +39,8 @@
         <pact.version>3.5.13</pact.version>
         <ldaptive.version>1.0</ldaptive.version>
         <logback-sylog4j.version>1.0.0</logback-sylog4j.version>
-        <oppgavehandtering-security.version>1.12</oppgavehandtering-security.version>
         <ehcache.version>3.5.2</ehcache.version>
+        <oppgavehandtering-security.version>1.14</oppgavehandtering-security.version>
 
         <!--Managed transitive deps -->
         <akka.actor.version>2.5.4</akka.actor.version>

@@ -28,7 +28,7 @@
 
     <appender name="SECURITYLOG" class="com.papertrailapp.logback.Syslog4jAppender">
         <layout class="ch.qos.logback.classic.PatternLayout">
-            <pattern>%m%n%xEx</pattern>
+            <pattern>%level %mdc{correlation-id} %m%n%xEx</pattern>
         </layout>
 
         <syslogConfig class="org.productivity.java.syslog4j.impl.net.tcp.TCPNetSyslogConfig">
@@ -61,7 +61,6 @@
     </logger>
 
     <logger name="securitylog" level="INFO" additivity="false">
-        <appender-ref ref="STDOUT_JSON"/>
         <appender-ref ref="SECURITYLOG"/>
 
     </logger>
