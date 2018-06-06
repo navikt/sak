@@ -18,13 +18,13 @@ public class SakConfiguration {
     public SakConfiguration() {
         compositeConfiguration.addConfiguration(new SystemConfiguration());
         compositeConfiguration.addConfiguration(new EnvironmentConfiguration());
-        log.info("Konfigurasjon lastet fra system- og miljøvariabler");
         try {
             compositeConfiguration.addConfiguration(new Configurations().properties(new File("sak.properties")));
             log.info("Konfigurasjon lastet fra sak.properties");
         } catch (ConfigurationException e) {
             log.info("Fant ikke sak.properties");
         }
+        log.info("Konfigurasjon lastet fra system- og miljøvariabler");
     }
 
     public boolean getBoolean(String key, boolean defaultValue) {
@@ -36,7 +36,7 @@ public class SakConfiguration {
         return compositeConfiguration.getString(key);
     }
 
-    public String getString(String key, String defaultValue) {
+    String getString(String key, String defaultValue) {
         return compositeConfiguration.getString(key, defaultValue);
     }
 
