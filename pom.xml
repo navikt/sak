@@ -579,7 +579,7 @@
                             </execution>
                         </executions>
                         <configuration>
-                            <coverageThreshold>80</coverageThreshold>
+                            <coverageThreshold>70</coverageThreshold>
                             <excludedTestClasses>no.nav.sak.SakResourceIntegrationTest,no.nav.sak.server.StartJettyTest</excludedTestClasses>
                         </configuration>
                     </plugin>
