@@ -580,6 +580,7 @@
                         </executions>
                         <configuration>
                             <coverageThreshold>80</coverageThreshold>
+                            <excludedTestClasses>no.nav.sak.SakResourceIntegrationTest,no.nav.sak.server.StartJettyTest</excludedTestClasses>
                         </configuration>
                     </plugin>
                 </plugins>
