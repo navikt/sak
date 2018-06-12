@@ -19,12 +19,16 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import static io.swagger.annotations.ApiKeyAuthDefinition.ApiKeyLocation.HEADER;
 import static java.util.stream.Collectors.toList;
 import static javax.ws.rs.core.Response.Status.NOT_FOUND;
+import static no.nav.sak.infrastruktur.ContextExtractor.getSubjectType;
+import static no.nav.sak.infrastruktur.SubjectType.SUBJECT_TYPE_EKSTERNBRUKER;
 import static no.nav.sak.infrastruktur.authentication.AuthenticationFilter.REQUEST_CONSUMERID;
 import static no.nav.sak.infrastruktur.authentication.AuthenticationFilter.REQUEST_USERNAME;
 
@@ -84,10 +88,12 @@ public class SakResource {
     private static final Logger log = LoggerFactory.getLogger(SakResource.class);
     private final SakRepository sakRepository;
     private final SakPEP sakPEP;
+    private SakConfiguration sakConfiguration;
 
-    SakResource(SakRepository sakRepository, SakPEP sakPEP) {
+    SakResource(SakRepository sakRepository, SakPEP sakPEP, SakConfiguration sakConfiguration) {
         this.sakRepository = sakRepository;
         this.sakPEP = sakPEP;
+        this.sakConfiguration = sakConfiguration;
     }
 
     @GET
@@ -140,13 +146,35 @@ public class SakResource {
     )
     public Response finnSaker(@Valid @BeanParam SakSearchRequest sakSearchRequest, @Context ContainerRequestContext ctx) {
         log.info("Søker etter saker for: {}", sakSearchRequest);
-        List<Sak> saker = sakRepository.finnSaker(sakSearchRequest.toCriteria());
-        return Response.ok(
-            saker.stream()
-                .filter(s -> sakPEP.autoriser(ctx, new AuthorizationRequest(s.getAktoerId(), s.getTema())).hasAccess())
-                .map(SakJson::new)
-                .collect(toList()))
-            .build();
+        if(sakConfiguration.getBoolean("ABAC_ENABLED_TEMA", true)) {
+            List<Sak> saker = sakRepository.finnSaker(sakSearchRequest.toCriteria());
+            return Response.ok(
+                saker.stream()
+                    .filter(s -> sakPEP.autoriser(ctx, new AuthorizationRequest(s.getAktoerId(), s.getTema())).hasAccess())
+                    .map(SakJson::new)
+                    .collect(toList()))
+                .build();
+        } else {
+            if(!sakPEP.autoriser(ctx, new AuthorizationRequest(sakSearchRequest.getAktoerId(), sakSearchRequest.getTema())).hasAccess()) {
+                return Response.ok(new ArrayList<>()).build();
+            }
+            List<Sak> saker = sakRepository.finnSaker(sakSearchRequest.toCriteria());
+            return Response.ok(
+                saker.stream()
+                    .filter(s -> harTilgangTilSakInterneRegler(ctx, s))
+                    .map(SakJson::new)
+                    .collect(toList()))
+                .build();
+        }
+    }
+
+    private boolean harTilgangTilSakInterneRegler(ContainerRequestContext ctx, Sak sak) {
+        boolean temaKontroll = Objects.equals("KTR", sak.getTema());
+        boolean harTilgang = !(temaKontroll && Objects.equals(getSubjectType(ctx), SUBJECT_TYPE_EKSTERNBRUKER));
+        if(!harTilgang) {
+            log.info("Filtrerer ut sak for ekstern bruker: {} fordi den har tema {} ", sak.getId(), sak.getTema());
+        }
+        return harTilgang;
     }
 
 
