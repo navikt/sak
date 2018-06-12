@@ -46,7 +46,7 @@ public class SakResourceExceptionHandlingTest extends JerseyTest {
         SakRepository sakRepository = mock(SakRepository.class);
         Mockito.doThrow(new IllegalStateException("Jeg feiler")).when(sakRepository).hentSak(Mockito.anyLong());
 
-        resourceConfig.registerInstances(new SakResource(sakRepository, mock(SakPEP.class)));
+        resourceConfig.registerInstances(new SakResource(sakRepository, mock(SakPEP.class), new SakConfiguration()));
         return resourceConfig;
     }
 }
