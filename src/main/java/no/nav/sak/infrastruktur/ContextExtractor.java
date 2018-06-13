@@ -23,8 +23,12 @@ public class ContextExtractor {
         return (String)ctx.getProperty(REQUEST_CONSUMERID);
     }
 
+    public static String getUserName(ContainerRequestContext ctx) {
+        return (String) ctx.getProperty(REQUEST_USERNAME);
+    }
+
     public static SubjectType getSubjectType(ContainerRequestContext ctx) {
-        String username = (String) ctx.getProperty(REQUEST_USERNAME);
+        String username = getUserName(ctx);
         if (StringUtils.startsWith(username, "srv")) {
             return SUBJECT_TYPE_SYSTEMBRUKER;
         } else if (StringUtils.isNumeric(username) && StringUtils.length(username) == 11) {
