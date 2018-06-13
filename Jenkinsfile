@@ -32,7 +32,7 @@ pipeline {
                         usernamePassword([credentialsId: 'ldap', usernameVariable: 'LDAP_USERNAME', passwordVariable: 'LDAP_PASSWORD'])
                     ]) {
                         if (env.BRANCH_NAME == 'master') {
-                            sh "mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install -Pmutation-tests,integration-tests"
+                            sh "mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install -Pintegration-tests"
                         } else {
                             sh "mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install -Pintegration-tests"
                         }
@@ -89,8 +89,8 @@ pipeline {
         stage('Nais deploy (preprod)') {
             steps {
                 script {
-                    environment = "q1"
-                    namespace = "q1"
+                    environment = "q0"
+                    namespace = "q0"
                     naisDeployPreprod("sak", versjon, environment, namespace)
                     slackSend(color: '#90ee90', message: "Deployet til preprod (environment: ${environment} - namespace: ${namespace}) ${env.BRANCH_NAME} Sak:" + versjon)
                 }
