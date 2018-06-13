@@ -172,7 +172,7 @@ public class SakResource {
         boolean temaKontroll = Objects.equals("KTR", sak.getTema());
         boolean harTilgang = !(temaKontroll && Objects.equals(getSubjectType(ctx), SUBJECT_TYPE_EKSTERNBRUKER));
         if(!harTilgang) {
-            log.info("Filtrerer ut sak for ekstern bruker: {} fordi den har tema {} ", sak.getId(), sak.getTema());
+            log.info("Filtrerer ut sak med id: {} for ekstern bruker fordi den har tema: {} ", sak.getId(), sak.getTema());
         }
         return harTilgang;
     }
