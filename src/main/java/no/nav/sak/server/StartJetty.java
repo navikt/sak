@@ -33,11 +33,9 @@ public class StartJetty {
             registerMetricsServlet(context);
             context.setBaseResource(Resource.newClassPathResource("META-INF/resources/webjars/swagger-ui/3.9.2"));
 
-            for (Connector c : server.getConnectors()) {
-                c.getConnectionFactory(HttpConnectionFactory.class).getHttpConfiguration().setRequestHeaderSize(16384);
-            }
             server.setHandler(context);
 
+            configureHeaderSize();
             registerJettyMetrics(context);
 
             server.start();
@@ -47,6 +45,12 @@ public class StartJetty {
             server.stop();
         }
 
+    }
+
+    private void configureHeaderSize() {
+        for (Connector c : server.getConnectors()) {
+            c.getConnectionFactory(HttpConnectionFactory.class).getHttpConfiguration().setRequestHeaderSize(16384);
+        }
     }
 
     void registerJettyMetrics(ServletContextHandler contextHandler) {
