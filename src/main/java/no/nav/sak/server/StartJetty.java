@@ -4,6 +4,8 @@ import io.prometheus.client.exporter.MetricsServlet;
 import io.prometheus.client.jetty.JettyStatisticsCollector;
 import no.nav.sak.infrastruktur.AliveCheckServlet;
 import no.nav.sak.infrastruktur.ReadyCheckServlet;
+import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.StatisticsHandler;
 import org.eclipse.jetty.servlet.DefaultServlet;
@@ -31,7 +33,11 @@ public class StartJetty {
             registerMetricsServlet(context);
             context.setBaseResource(Resource.newClassPathResource("META-INF/resources/webjars/swagger-ui/3.9.2"));
 
+            for (Connector c : server.getConnectors()) {
+                c.getConnectionFactory(HttpConnectionFactory.class).getHttpConfiguration().setRequestHeaderSize(16384);
+            }
             server.setHandler(context);
+
             registerJettyMetrics(context);
 
             server.start();
