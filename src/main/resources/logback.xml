@@ -63,7 +63,6 @@
     <logger name="securitylog" level="INFO" additivity="false">
         <appender-ref ref="STDOUT_JSON"/>
         <appender-ref ref="SECURITYLOG"/>
-
     </logger>
 
     <root level="INFO">
