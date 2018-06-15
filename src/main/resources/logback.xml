@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration scan="true" scanPeriod="60 seconds">
+
     <appender name="STDOUT_JSON" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
+    </appender>
+
+    <appender name="STDOUT_JSON_FILTERED" class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>warn</level>
+        </filter>
         <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
     </appender>
 
@@ -62,6 +70,7 @@
 
     <logger name="securitylog" level="INFO" additivity="false">
         <appender-ref ref="SECURITYLOG"/>
+        <appender-ref ref="STDOUT_JSON_FILTERED"/>
     </logger>
 
     <root level="INFO">
