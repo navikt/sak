@@ -34,7 +34,7 @@ public class StartJetty {
             context.setBaseResource(Resource.newClassPathResource("META-INF/resources/webjars/swagger-ui/3.9.2"));
 
             server.setHandler(context);
-            server.setStopAtShutdown(true);
+//            server.setStopAtShutdown(true);
 
             configureHeaderSize();
             registerJettyMetrics(context);
