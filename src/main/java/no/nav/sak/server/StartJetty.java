@@ -35,6 +35,7 @@ public class StartJetty {
 
             server.setHandler(context);
             server.setStopAtShutdown(true);
+            server.setStopTimeout(10000);
 
             configureHeaderSize();
             registerJettyMetrics(context);
