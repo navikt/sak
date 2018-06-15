@@ -40,6 +40,7 @@ public class StartJetty {
             registerJettyMetrics(context);
 
             server.start();
+            server.join();
             log.info("Startet jetty");
         } catch(Exception e){
             log.error("Kunne ikke starte opp server", e);
