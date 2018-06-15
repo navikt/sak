@@ -46,7 +46,7 @@ public class SakPEP {
 
     public ABACResult autoriser(ContainerRequestContext ctx, AuthorizationRequest authorizationRequest) {
         if(!performAuthorization(ctx)) {
-            log.info("ConsumerID: {}; User: {}; Endpoint: {}; Method: {}; Authorization temporarily disabled for {}",
+            log.warn("ConsumerID: {}; User: {}; Endpoint: {}; Method: {}; Authorization temporarily disabled for {}",
                 ctx.getProperty(REQUEST_CONSUMERID),
                 ctx.getProperty(REQUEST_USERNAME),
                 ctx.getUriInfo().getAbsolutePath(),
