@@ -9,13 +9,29 @@
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>warn</level>
         </filter>
-        <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <providers>
+                <timestamp/>
+                <version/>
+                <loggerName/>
+                <logLevel/>
+                <logLevelValue/>
+                <stackTrace/>
+                <pattern>
+                    <pattern>
+                        {
+                        "message": "%replace(%msg){'User:\s\d+', 'User: *******'}"
+                        }
+                    </pattern>
+                </pattern>
+                <mdc/>
+            </providers>
+        </encoder>
     </appender>
 
     <appender name="STDOUT_JSON_TJENESTEKALL" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
             <providers>
-
                 <timestamp/>
                 <version/>
                 <loggerName/>
