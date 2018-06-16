@@ -20,7 +20,7 @@
                 <pattern>
                     <pattern>
                         {
-                        "message": "%replace(%msg){'User:\s\d+', 'User: *******'}"
+                        "message": "%replace(%msg){'User:\\s\\d+', 'User: *******'}"
                         }
                     </pattern>
                 </pattern>
