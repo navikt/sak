@@ -87,7 +87,7 @@ public class StartJetty {
         context.addServlet(aliveServlet, "/internal/alive/*");
 
         ServletHolder prestopServlet = new ServletHolder(new PrestopServlet());
-        context.addServlet(aliveServlet, "/internal/prestop/*");
+        context.addServlet(prestopServlet, "/internal/prestop/*");
     }
 
     private int getPort() {
