@@ -19,7 +19,4 @@ public class DevJetty extends StartJetty {
         context.addServlet(jerseyServlet, "/api/*");
     }
 
-    @Override
-    void registerJettyMetrics(ServletContextHandler contextHandler) {
-    }
 }

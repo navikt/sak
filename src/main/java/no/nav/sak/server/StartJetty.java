@@ -3,6 +3,7 @@ package no.nav.sak.server;
 import io.prometheus.client.exporter.MetricsServlet;
 import io.prometheus.client.jetty.JettyStatisticsCollector;
 import no.nav.sak.infrastruktur.AliveCheckServlet;
+import no.nav.sak.infrastruktur.PrestopServlet;
 import no.nav.sak.infrastruktur.ReadyCheckServlet;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.HttpConnectionFactory;
@@ -34,6 +35,8 @@ public class StartJetty {
             context.setBaseResource(Resource.newClassPathResource("META-INF/resources/webjars/swagger-ui/3.9.2"));
 
             server.setHandler(context);
+            server.setStopAtShutdown(true);
+            server.setStopTimeout(10000);
 
             configureHeaderSize();
             registerJettyMetrics(context);
@@ -82,6 +85,9 @@ public class StartJetty {
 
         ServletHolder aliveServlet = new ServletHolder(new AliveCheckServlet());
         context.addServlet(aliveServlet, "/internal/alive/*");
+
+        ServletHolder prestopServlet = new ServletHolder(new PrestopServlet());
+        context.addServlet(prestopServlet, "/internal/prestop/*");
     }
 
     private int getPort() {

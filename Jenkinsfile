@@ -89,28 +89,28 @@ pipeline {
         stage('Nais deploy (preprod)') {
             steps {
                 script {
-                    environment = "q1"
-                    namespace = "q1"
+                    environment = "t8"
+                    namespace = "t8"
                     naisDeployPreprod("sak", versjon, environment, namespace)
                     slackSend(color: '#90ee90', message: "Deployet til preprod (environment: ${environment} - namespace: ${namespace}) ${env.BRANCH_NAME} Sak:" + versjon)
                 }
             }
         }
 
-//        stage('Run Gatling Tests') {
-//            steps {
-//                milestone(4)
-//                withCredentials([
-//                    usernamePassword([credentialsId: 'junit.sts', usernameVariable: 'junit.sts.user', passwordVariable: 'junit.sts.password']),
-//                    usernamePassword([credentialsId: 'sak-t0', usernameVariable: 'isso-rp-issuer', passwordVariable: 'OpenIdConnectAgent.password']),
-//                    usernamePassword([credentialsId: 'sakds.lasttest', usernameVariable: 'sakds.lasttest.user', passwordVariable: 'sakds.lasttest.password']),
-//                    usernamePassword([credentialsId: 'systembruker', usernameVariable: 'SRVSAK_USERNAME', passwordVariable: 'SRVSAK_PASSWORD']),
-//                    string(credentialsId: 'truststore-password', variable: 'truststore.password')
-//                ]) {
-//                    sh "mvn gatling:test"
-//                }
-//            }
-//        }
+        stage('Run Gatling Tests') {
+            steps {
+                milestone(4)
+                withCredentials([
+                    usernamePassword([credentialsId: 'junit.sts', usernameVariable: 'junit.sts.user', passwordVariable: 'junit.sts.password']),
+                    usernamePassword([credentialsId: 'sak-t0', usernameVariable: 'isso-rp-issuer', passwordVariable: 'OpenIdConnectAgent.password']),
+                    usernamePassword([credentialsId: 'sakds.lasttest', usernameVariable: 'sakds.lasttest.user', passwordVariable: 'sakds.lasttest.password']),
+                    usernamePassword([credentialsId: 'systembruker', usernameVariable: 'SRVSAK_USERNAME', passwordVariable: 'SRVSAK_PASSWORD']),
+                    string(credentialsId: 'truststore-password', variable: 'truststore.password')
+                ]) {
+                    sh "mvn gatling:test"
+                }
+            }
+        }
 
         stage('Nais Deploy (prod)') {
             steps {
