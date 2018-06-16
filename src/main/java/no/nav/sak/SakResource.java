@@ -122,8 +122,6 @@ public class SakResource {
         Sak eksisterendeSak = sak.get();
         ABACResult abacResult = sakPEP.autoriser(ctx, new AuthorizationRequest(eksisterendeSak.getAktoerId(), eksisterendeSak.getTema()));
         if (!abacResult.hasAccess()) {
-            String user = (String) ctx.getProperty(REQUEST_USERNAME);
-            log.warn("Autorisering feilet for: {}", user);
             return Response.status(Response.Status.FORBIDDEN)
                 .entity(new ErrorResponse(MDC.get("uuid"), "Bruker kunne ikke autoriseres for denne operasjonen"))
                 .build();
@@ -196,7 +194,6 @@ public class SakResource {
         Sak innsendtSak = sakJson.toSak(user);
         ABACResult abacResult = sakPEP.autoriser(ctx, new AuthorizationRequest(innsendtSak.getAktoerId(), innsendtSak.getTema()));
         if (!abacResult.hasAccess()) {
-            log.warn("Autorisering feilet for: {}", user);
             return Response.status(Response.Status.FORBIDDEN)
                 .entity(new ErrorResponse(MDC.get("uuid"), "Bruker kunne ikke autoriseres for denne operasjonen"))
                 .build();
