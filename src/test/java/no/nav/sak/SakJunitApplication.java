@@ -57,8 +57,7 @@ public class SakJunitApplication extends SakApplication {
     void registerApiResources(Database database, SakConfiguration sakConfiguration) {
         register(new SakResource(
             new SakRepository(database),
-            new SakPEP(ABACJunitClient.create(), sakConfiguration),
-            sakConfiguration)
+            new SakPEP(ABACJunitClient.create(), sakConfiguration))
         );
     }
 

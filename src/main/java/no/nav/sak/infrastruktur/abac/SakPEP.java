@@ -61,7 +61,6 @@ public class SakPEP {
             .addResource(new ABACAttribute(RESOURCE_FELLES_RESOURCE_TYPE, RESOURCE_TYPE_SAK));
 
         authorizationRequest.getAktoerId().ifPresent(aktoerId -> abacRequest.addResource(new ABACAttribute(RESOURCE_FELLES_PERSON_AKTOERID_RESOURCE, aktoerId)));
-        authorizationRequest.getTema().ifPresent(tema -> abacRequest.addResource(new ABACAttribute(RESOURCE_FELLES_TEMA, tema)));
 
         String authIdentifier = substringBefore(trim(ctx.getHeaderString(AUTHORIZATION)), " ");
         String token = substringAfter(trim(ctx.getHeaderString(AUTHORIZATION)), " ");

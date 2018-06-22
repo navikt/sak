@@ -39,7 +39,7 @@ class SakPEPTest {
     void autoriserer_for_basic() {
         ContainerRequestContext ctx = mockContextFor(username, "Basic 123");
 
-        ABACRequest req = authorizeReturningCaptureOfRequest(ctx, new AuthorizationRequest(null, null));
+        ABACRequest req = authorizeReturningCaptureOfRequest(ctx, new AuthorizationRequest(null));
 
         assertDefaulValuesSpecifiedCorrectly(req);
         assertThat(req.getAccessSubject().getAttributes()).containsOnly(
@@ -47,13 +47,11 @@ class SakPEPTest {
             new ABACAttribute(NavAttributter.SUBJECT_FELLES_SUBJECTTYPE, SUBJECT_TYPE_SYSTEMBRUKER.getValue()));
     }
 
-
-
     @Test
     void autoriserer_for_saml() {
         ContainerRequestContext ctx = mockContextFor(username, "Saml 123");
 
-        ABACRequest req = authorizeReturningCaptureOfRequest(ctx, new AuthorizationRequest(null, null));
+        ABACRequest req = authorizeReturningCaptureOfRequest(ctx, new AuthorizationRequest(null));
 
         assertDefaulValuesSpecifiedCorrectly(req);
         assertThat(req.getEnvironment().getAttributes()).contains(new ABACAttribute(ENVIRONMENT_FELLES_SAML_TOKEN, "123"));
@@ -63,7 +61,7 @@ class SakPEPTest {
     void autoriserer_for_oidc() {
         ContainerRequestContext ctx = mockContextFor(username, "Bearer 123.321.123");
 
-        ABACRequest req = authorizeReturningCaptureOfRequest(ctx, new AuthorizationRequest(null, null));
+        ABACRequest req = authorizeReturningCaptureOfRequest(ctx, new AuthorizationRequest(null));
 
         assertDefaulValuesSpecifiedCorrectly(req);
         assertThat(req.getEnvironment().getAttributes()).contains(new ABACAttribute(ENVIRONMENT_FELLES_OIDC_TOKEN_BODY, "321"));
@@ -74,21 +72,10 @@ class SakPEPTest {
         String aktoerId = "123123123";
         ContainerRequestContext ctx = mockContextFor(username, "Bearer 123.321.123");
 
-        ABACRequest req = authorizeReturningCaptureOfRequest(ctx, new AuthorizationRequest(aktoerId, null));
+        ABACRequest req = authorizeReturningCaptureOfRequest(ctx, new AuthorizationRequest(aktoerId));
 
         assertDefaulValuesSpecifiedCorrectly(req);
         assertThat(req.getResource().getAttributes()).contains(new ABACAttribute(RESOURCE_FELLES_PERSON_AKTOERID_RESOURCE, aktoerId));
-    }
-
-    @Test
-    void autoriserer_med_tema_om_angitt() {
-        String tema = "SYK";
-        ContainerRequestContext ctx = mockContextFor(username, "Bearer 123.321.123");
-
-        ABACRequest req = authorizeReturningCaptureOfRequest(ctx, new AuthorizationRequest(null, tema));
-
-        assertDefaulValuesSpecifiedCorrectly(req);
-        assertThat(req.getResource().getAttributes()).contains(new ABACAttribute(RESOURCE_FELLES_TEMA, tema));
     }
 
     private ContainerRequestContext mockContextFor(String username, String authHeaderContent) {
