@@ -129,6 +129,10 @@ public class SakPEP {
         boolean abacEnabled = sakConfiguration.getBoolean("ABAC_ENABLED", true);
         boolean abacEnabledServiceUsers = sakConfiguration.getBoolean("ABAC_ENABLED_SERVICEUSERS", true);
         boolean serviceUser = Objects.equals(SUBJECT_TYPE_SYSTEMBRUKER, ContextExtractor.getSubjectType(ctx));
-        return abacEnabled && (abacEnabledServiceUsers || !serviceUser);
+        if(serviceUser && Objects.equals(ContextExtractor.getUserName(ctx), "srvRay")) {
+            return false;
+        } else {
+            return abacEnabled && (abacEnabledServiceUsers  || !serviceUser);
+        }
     }
 }
