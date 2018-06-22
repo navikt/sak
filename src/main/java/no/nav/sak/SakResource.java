@@ -88,12 +88,10 @@ public class SakResource {
     private static final Logger log = LoggerFactory.getLogger(SakResource.class);
     private final SakRepository sakRepository;
     private final SakPEP sakPEP;
-    private SakConfiguration sakConfiguration;
 
-    SakResource(SakRepository sakRepository, SakPEP sakPEP, SakConfiguration sakConfiguration) {
+    SakResource(SakRepository sakRepository, SakPEP sakPEP) {
         this.sakRepository = sakRepository;
         this.sakPEP = sakPEP;
-        this.sakConfiguration = sakConfiguration;
     }
 
     @GET
@@ -120,7 +118,7 @@ public class SakResource {
         }
 
         Sak eksisterendeSak = sak.get();
-        ABACResult abacResult = sakPEP.autoriser(ctx, new AuthorizationRequest(eksisterendeSak.getAktoerId(), eksisterendeSak.getTema()));
+        ABACResult abacResult = sakPEP.autoriser(ctx, new AuthorizationRequest(eksisterendeSak.getAktoerId()));
         if (!abacResult.hasAccess()) {
             return Response.status(Response.Status.FORBIDDEN)
                 .entity(new ErrorResponse(MDC.get("uuid"), "Bruker kunne ikke autoriseres for denne operasjonen"))
@@ -144,32 +142,23 @@ public class SakResource {
     )
     public Response finnSaker(@Valid @BeanParam SakSearchRequest sakSearchRequest, @Context ContainerRequestContext ctx) {
         log.info("Søker etter saker for: {}", sakSearchRequest);
-        if(sakConfiguration.getBoolean("ABAC_ENABLED_TEMA", true)) {
-            List<Sak> saker = sakRepository.finnSaker(sakSearchRequest.toCriteria());
-            return Response.ok(
-                saker.stream()
-                    .filter(s -> sakPEP.autoriser(ctx, new AuthorizationRequest(s.getAktoerId(), s.getTema())).hasAccess())
-                    .map(SakJson::new)
-                    .collect(toList()))
-                .build();
-        } else {
-            if(!sakPEP.autoriser(ctx, new AuthorizationRequest(sakSearchRequest.getAktoerId(), sakSearchRequest.getTema())).hasAccess()) {
-                return Response.ok(new ArrayList<>()).build();
-            }
-            List<Sak> saker = sakRepository.finnSaker(sakSearchRequest.toCriteria());
-            return Response.ok(
-                saker.stream()
-                    .filter(s -> harTilgangTilSakInterneRegler(ctx, s))
-                    .map(SakJson::new)
-                    .collect(toList()))
-                .build();
+
+        if (!sakPEP.autoriser(ctx, new AuthorizationRequest(sakSearchRequest.getAktoerId())).hasAccess()) {
+            return Response.ok(new ArrayList<>()).build();
         }
+        List<Sak> saker = sakRepository.finnSaker(sakSearchRequest.toCriteria());
+        return Response.ok(
+            saker.stream()
+                .filter(s -> harTilgangTilSakInterneRegler(ctx, s))
+                .map(SakJson::new)
+                .collect(toList()))
+            .build();
     }
 
     private boolean harTilgangTilSakInterneRegler(ContainerRequestContext ctx, Sak sak) {
         boolean temaKontroll = Objects.equals("KTR", sak.getTema());
         boolean harTilgang = !(temaKontroll && Objects.equals(getSubjectType(ctx), SUBJECT_TYPE_EKSTERNBRUKER));
-        if(!harTilgang) {
+        if (!harTilgang) {
             log.info("Filtrerer ut sak med id: {} for ekstern bruker fordi den har tema: {} ", sak.getId(), sak.getTema());
         }
         return harTilgang;
@@ -192,7 +181,7 @@ public class SakResource {
                                @ApiParam(value = "Saken som skal opprettes", required = true) SakJson sakJson, @Context UriInfo uriInfo, @Context ContainerRequestContext ctx) throws URISyntaxException {
         String user = (String) ctx.getProperty(REQUEST_USERNAME);
         Sak innsendtSak = sakJson.toSak(user);
-        ABACResult abacResult = sakPEP.autoriser(ctx, new AuthorizationRequest(innsendtSak.getAktoerId(), innsendtSak.getTema()));
+        ABACResult abacResult = sakPEP.autoriser(ctx, new AuthorizationRequest(innsendtSak.getAktoerId()));
         if (!abacResult.hasAccess()) {
             return Response.status(Response.Status.FORBIDDEN)
                 .entity(new ErrorResponse(MDC.get("uuid"), "Bruker kunne ikke autoriseres for denne operasjonen"))
