@@ -4,9 +4,11 @@ import io.prometheus.client.Counter;
 import io.prometheus.client.Histogram;
 import no.nav.abac.xacml.NavAttributter;
 import no.nav.abac.xacml.StandardAttributter;
-import no.nav.sak.SakConfiguration;
 import no.nav.sak.infrastruktur.ContextExtractor;
-import no.nav.sikkerhet.abac.*;
+import no.nav.sikkerhet.abac.ABACAttribute;
+import no.nav.sikkerhet.abac.ABACClient;
+import no.nav.sikkerhet.abac.ABACRequest;
+import no.nav.sikkerhet.abac.ABACResult;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,12 +26,10 @@ import static org.apache.commons.lang3.StringUtils.*;
 
 public class SakPEP {
     private static final Logger securitylog = LoggerFactory.getLogger("securitylog");
-    private static final Logger log = LoggerFactory.getLogger(SakPEP.class.getName());
 
     static final String RESOURCE_TYPE_SAK = "no.nav.abac.attributter.resource.sak.sak";
 
     private final ABACClient abacClient;
-    private final SakConfiguration sakConfiguration;
 
     private static final Histogram authHistogram = Histogram.build("authorization_request_duration_seconds", "Authorization request duration in seconds")
         .labelNames("consumer", "tokenId", "subjecttype")
@@ -39,22 +39,11 @@ public class SakPEP {
         .labelNames("consumer", "tokenId", "subjecttype", "permission")
         .register();
 
-    public SakPEP(ABACClient abacClient, SakConfiguration sakConfiguration) {
+    public SakPEP(ABACClient abacClient) {
         this.abacClient = abacClient;
-        this.sakConfiguration = sakConfiguration;
     }
 
     public ABACResult autoriser(ContainerRequestContext ctx, AuthorizationRequest authorizationRequest) {
-        if (!performAuthorization(ctx)) {
-            log.warn("ConsumerID: {}; User: {}; Endpoint: {}; Method: {}; Authorization temporarily disabled for {}",
-                ctx.getProperty(REQUEST_CONSUMERID),
-                ctx.getProperty(REQUEST_USERNAME),
-                ctx.getUriInfo().getAbsolutePath(),
-                ctx.getRequest().getMethod(),
-                !sakConfiguration.getBoolean("ABAC_ENABLED", true) ? "ALL" : "SERVICE USERS");
-            return new ABACResult(ABACDecision.PERMIT.getValue(), null);
-        }
-
         ABACRequest abacRequest = ABACRequest.newRequest()
             .addEnvironment(new ABACAttribute(ENVIRONMENT_FELLES_PEP_ID, "sak"))
             .addResource(new ABACAttribute(RESOURCE_FELLES_DOMENE, "sak"))
@@ -124,14 +113,4 @@ public class SakPEP {
         return remove(remove(input, "["), "]");
     }
 
-    private boolean performAuthorization(ContainerRequestContext ctx) {
-        boolean abacEnabled = sakConfiguration.getBoolean("ABAC_ENABLED", true);
-        boolean abacEnabledServiceUsers = sakConfiguration.getBoolean("ABAC_ENABLED_SERVICEUSERS", true);
-        boolean serviceUser = Objects.equals(SUBJECT_TYPE_SYSTEMBRUKER, ContextExtractor.getSubjectType(ctx));
-        if(serviceUser && Objects.equals(ContextExtractor.getUserName(ctx), "srvRay")) {
-            return false;
-        } else {
-            return abacEnabled && (abacEnabledServiceUsers  || !serviceUser);
-        }
-    }
 }

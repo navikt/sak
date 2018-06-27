@@ -2,13 +2,11 @@ package no.nav.sak.infrastruktur.abac;
 
 import no.nav.abac.xacml.NavAttributter;
 import no.nav.abac.xacml.StandardAttributter;
-import no.nav.sak.SakConfiguration;
 import no.nav.sikkerhet.abac.ABACAttribute;
 import no.nav.sikkerhet.abac.ABACClient;
 import no.nav.sikkerhet.abac.ABACRequest;
 import no.nav.sikkerhet.abac.ABACResult;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
@@ -25,15 +23,9 @@ import static org.mockito.Mockito.*;
 
 class SakPEPTest {
     private ABACClient abacClient = mock(ABACClient.class);
-    private SakPEP sakPEP = new SakPEP(abacClient, new SakConfiguration());
+    private SakPEP sakPEP = new SakPEP(abacClient);
     private String username = RandomStringUtils.randomAlphabetic(5);
 
-
-    @BeforeEach
-    void setup() {
-        System.setProperty("ABAC_ENABLED", "true");
-        System.setProperty("ABAC_ENABLED_SERVICEUSERS", "true");
-    }
 
     @Test
     void autoriserer_for_basic() {
