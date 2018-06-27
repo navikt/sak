@@ -103,7 +103,7 @@ public class SakApplication extends ResourceConfig {
         ABACClient abacClient = new ABACClient(sakConfiguration.getRequiredString("ABAC_PDP_ENDPOINT"), createHttpClient(sakConfiguration));
         register(new SakResource(
             new SakRepository(database),
-            new SakPEP(abacClient, sakConfiguration))
+            new SakPEP(abacClient))
         );
     }
 
