@@ -48,7 +48,6 @@ public class RutingContractVerification {
     @BeforeClass
     public static void setup() throws Exception {
         System.setProperty("sak.port", valueOf(JETTY_PORT));
-        System.setProperty("ABAC_ENABLED", "false");
         SakConfiguration sakConfiguration = new SakConfiguration();
         SAMLSupport samlSupport = new SAMLSupport(sakConfiguration);
         authHeaderSaml = new BasicHeader("Authorization", SAML.getValue() + " " + samlSupport.createNewToken());
