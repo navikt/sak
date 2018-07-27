@@ -11,7 +11,7 @@ import au.com.dius.pact.provider.junit.target.TestTarget;
 import no.nav.sak.infrastruktur.Database;
 import no.nav.sak.infrastruktur.FlywayMigrator;
 import no.nav.sak.infrastruktur.JunitDataSource;
-import no.nav.sak.infrastruktur.authentication.saml.SAMLSupport;
+import no.nav.sak.infrastruktur.sts.STSSupport;
 import no.nav.sak.server.DevJetty;
 import org.apache.http.Header;
 import org.apache.http.HttpRequest;
@@ -48,9 +48,7 @@ public class RutingContractVerification {
     @BeforeClass
     public static void setup() throws Exception {
         System.setProperty("sak.port", valueOf(JETTY_PORT));
-        SakConfiguration sakConfiguration = new SakConfiguration();
-        SAMLSupport samlSupport = new SAMLSupport(sakConfiguration);
-        authHeaderSaml = new BasicHeader("Authorization", SAML.getValue() + " " + samlSupport.createNewToken());
+        authHeaderSaml = new BasicHeader("Authorization", SAML.getValue() + " " + new STSSupport().getSystemSAMLTokenFromSTS());
         dataSource = JunitDataSource.get();
         sakRepository = new SakRepository(new Database(dataSource));
         devJetty = new DevJetty();
