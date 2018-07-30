@@ -29,7 +29,8 @@ pipeline {
                     withCredentials([
                         usernamePassword([credentialsId: 'systembruker', usernameVariable: 'SRVSAK_USERNAME', passwordVariable: 'SRVSAK_PASSWORD']),
                         usernamePassword([credentialsId: 'sak-t0', usernameVariable: 'isso-rp-issuer', passwordVariable: 'OpenIdConnectAgent.password']),
-                        usernamePassword([credentialsId: 'ldap', usernameVariable: 'LDAP_USERNAME', passwordVariable: 'LDAP_PASSWORD'])
+                        usernamePassword([credentialsId: 'ldap', usernameVariable: 'LDAP_USERNAME', passwordVariable: 'LDAP_PASSWORD']),
+                        string(credentialsId: 'truststore-password', variable: 'truststore.password')
                     ]) {
                         if (env.BRANCH_NAME == 'master') {
                             sh "mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install -Pintegration-tests"
