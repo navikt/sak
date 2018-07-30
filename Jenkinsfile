@@ -27,6 +27,7 @@ pipeline {
             steps {
                 script {
                     withCredentials([
+                        usernamePassword([credentialsId: 'junit.sts', usernameVariable: 'junit.sts.user', passwordVariable: 'junit.sts.password']),
                         usernamePassword([credentialsId: 'systembruker', usernameVariable: 'SRVSAK_USERNAME', passwordVariable: 'SRVSAK_PASSWORD']),
                         usernamePassword([credentialsId: 'sak-t0', usernameVariable: 'isso-rp-issuer', passwordVariable: 'OpenIdConnectAgent.password']),
                         usernamePassword([credentialsId: 'ldap', usernameVariable: 'LDAP_USERNAME', passwordVariable: 'LDAP_PASSWORD']),
