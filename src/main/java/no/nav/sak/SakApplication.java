@@ -159,15 +159,13 @@ public class SakApplication extends ResourceConfig {
             .create()
             .setDefaultRequestConfig(requestConfig);
 
-        if (sakConfiguration.getBoolean("ABAC_ENABLED", false)) {
-            UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(
-                sakConfiguration.getRequiredString("SRVSAK_USERNAME"),
-                sakConfiguration.getRequiredString("SRVSAK_PASSWORD"));
+        UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(
+            sakConfiguration.getRequiredString("SRVSAK_USERNAME"),
+            sakConfiguration.getRequiredString("SRVSAK_PASSWORD"));
 
-            CredentialsProvider provider = new BasicCredentialsProvider();
-            provider.setCredentials(AuthScope.ANY, credentials);
-            httpClientBuilder.setDefaultCredentialsProvider(provider);
-        }
+        CredentialsProvider provider = new BasicCredentialsProvider();
+        provider.setCredentials(AuthScope.ANY, credentials);
+        httpClientBuilder.setDefaultCredentialsProvider(provider);
         return httpClientBuilder.build();
     }
 
