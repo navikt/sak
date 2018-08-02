@@ -103,8 +103,8 @@ pipeline {
             environment {
                 FASIT_ENV = 'p'
                 NAMESPACE = 'default'
-                APPLICATION_SERVICE = 'Sak'
-                APPLICATION_COMPONENT = 'sak'
+                APPLICATION_SERVICE = 'CMDB-268053'
+                APPLICATION_COMPONENT = 'CMDB-190570'
             }
             steps {
                 script {
