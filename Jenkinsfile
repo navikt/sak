@@ -107,9 +107,9 @@ pipeline {
             steps {
                 script {
                     tag()
-//                    def jiraIssueId = nais action: 'jiraDeployProd'
-//                    nais action: 'waitForCallback'
-//                    slack status: 'deployed', jiraIssueId: "${jiraIssueId}"
+                    def jiraIssueId = nais action: 'jiraDeployProd'
+                    nais action: 'waitForCallback'
+                    slack status: 'deployed', jiraIssueId: "${jiraIssueId}"
                 }
             }
         }
