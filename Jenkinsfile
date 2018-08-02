@@ -1,8 +1,21 @@
-@Library('nais') _
+@Library('pipeline-lib') _
 pipeline {
     agent any
+
+    parameters {
+        string(name: 'fasitEnvPreprod', defaultValue: 'q1', description: 'Fasit environment used for reading and exposing resources (preprod)')
+        string(name: 'namespacePreprod', defaultValue: 'default', description: 'Nais namespace (preprod)')
+        booleanParam(name: 'gatling', defaultValue: true, description: 'Whether to run Gatling tests as part of the build')
+    }
+
     environment {
-        versjon = "0"
+        APPLICATION_NAME = 'sak'
+        APPLICATION_VERSION = version()
+        APPLICATION_SERVICE = 'gosys'
+        APPLICATION_COMPONENT = 'sak'
+        FASIT_ENV = "${params.fasitEnvPreprod}"
+        NAMESPACE = "${params.namespacePreprod}"
+        RUN_GATLING = "${params.gatling}"
     }
     tools {
         maven "maven3"
@@ -14,16 +27,7 @@ pipeline {
     }
 
     stages {
-        stage("Checkout") {
-            steps {
-                script {
-                    def commit = env.GIT_COMMIT
-                    def gitCommitHashShort = commit.substring(0, 8)
-                    versjon = currentDate() + "." + gitCommitHashShort
-                }
-            }
-        }
-        stage('Maven build') {
+        stage('Maven Build (unit & integration)') {
             steps {
                 script {
                     withCredentials([
@@ -33,17 +37,13 @@ pipeline {
                         usernamePassword([credentialsId: 'ldap', usernameVariable: 'LDAP_USERNAME', passwordVariable: 'LDAP_PASSWORD']),
                         string(credentialsId: 'truststore-password', variable: 'truststore.password')
                     ]) {
-                        if (env.BRANCH_NAME == 'master') {
-                            sh "mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install -Pintegration-tests"
-                        } else {
-                            sh "mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install -Pintegration-tests"
-                        }
+                        sh "mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install -Pintegration-tests"
                     }
                 }
             }
         }
 
-        stage('SonarQube') {
+        stage('Transfer build results to SonarQube') {
             steps {
                 script {
                     withSonarQubeEnv('SonarQube') {
@@ -52,91 +52,89 @@ pipeline {
                 }
             }
         }
-        stage('Owasp Dependency Check') {
+
+        stage('Verify dependencies with owasp dependency-checker') {
+            steps {
+                dependencyCheck()
+            }
+        }
+
+        stage('Build and push docker image') {
+            steps {
+                dockerUtils 'buildAndPush'
+            }
+        }
+
+        stage('Validate & upload nais.yaml to nexus') {
+            steps {
+                nais action: 'validate'
+                nais action: 'upload'
+            }
+        }
+
+        stage('Deploy to nais preprod') {
             steps {
                 script {
-                    dependencyCheckAnalyzer datadir: 'dependency-check-data',
-                        isFailOnErrorDisabled: true,
-                        hintsFile: '',
-                        includeCsvReports: false,
-                        includeHtmlReports: false,
-                        includeJsonReports: false,
-                        isAutoupdateDisabled: false,
-                        outdir: '',
-                        scanpath: '',
-                        skipOnScmChange: false,
-                        skipOnUpstreamChange: false,
-                        suppressionFile: 'owasp-suppression.xml',
-                        zipExtensions: ''
-
-                    dependencyCheckPublisher canComputeNew: false, defaultEncoding: '', healthy: '', pattern: '', unHealthy: ''
-                    archiveArtifacts allowEmptyArchive: true, artifacts: '**/dependency-check-report.xml', onlyIfSuccessful: true
-                }
-
-            }
-        }
-
-        stage('Docker build') {
-            steps {
-                milestone(1)
-                dockerBuild("sak", versjon)
-            }
-        }
-        stage('Nais upload') {
-            steps {
-                milestone(2)
-                naisUpload("sak", versjon)
-            }
-        }
-        stage('Nais deploy (preprod)') {
-            steps {
-                script {
-                    environment = "t8"
-                    namespace = "t8"
-                    naisDeployPreprod("sak", versjon, environment, namespace)
-                    slackSend(color: '#90ee90', message: "Deployet til preprod (environment: ${environment} - namespace: ${namespace}) ${env.BRANCH_NAME} Sak:" + versjon)
+                    def jiraIssueId = nais action: 'jiraDeploy'
+                    nais action: 'waitForCallback'
+                    slack status: 'deployed', jiraIssueId: "${jiraIssueId}"
                 }
             }
         }
 
-        stage('Run Gatling Tests') {
+        stage('Run gatling-tests') {
+            when { environment name: 'RUN_GATLING', value: 'true' }
             steps {
-                milestone(4)
-                withCredentials([
-                    usernamePassword([credentialsId: 'junit.sts', usernameVariable: 'junit.sts.user', passwordVariable: 'junit.sts.password']),
-                    usernamePassword([credentialsId: 'sak-t0', usernameVariable: 'isso-rp-issuer', passwordVariable: 'OpenIdConnectAgent.password']),
-                    usernamePassword([credentialsId: 'sakds.lasttest', usernameVariable: 'sakds.lasttest.user', passwordVariable: 'sakds.lasttest.password']),
-                    usernamePassword([credentialsId: 'systembruker', usernameVariable: 'SRVSAK_USERNAME', passwordVariable: 'SRVSAK_PASSWORD']),
-                    string(credentialsId: 'truststore-password', variable: 'truststore.password')
-                ]) {
-                    sh "mvn gatling:test"
-                }
-            }
-        }
-
-        stage('Nais Deploy (prod)') {
-            steps {
-                milestone(6)
                 script {
-                    if (env.BRANCH_NAME == 'master') {
-                        naisDeployProd("sak", versjon)
-                        slackSend(color: '#006400', message: "Deployet til produksjon: ${env.BRANCH_NAME} Sak:" + versjon)
-                    } else {
-                        currentBuild.description = "OK - ikke deployet til prod"
-                        echo "Kun master blir deployet til prod"
+                    withCredentials([
+                        usernamePassword([credentialsId: 'junit.sts', usernameVariable: 'junit.sts.user', passwordVariable: 'junit.sts.password']),
+                        usernamePassword([credentialsId: 'sak-t0', usernameVariable: 'isso-rp-issuer', passwordVariable: 'OpenIdConnectAgent.password']),
+                        usernamePassword([credentialsId: 'sakds.lasttest', usernameVariable: 'sakds.lasttest.user', passwordVariable: 'sakds.lasttest.password']),
+                        usernamePassword([credentialsId: 'systembruker', usernameVariable: 'SRVSAK_USERNAME', passwordVariable: 'SRVSAK_PASSWORD']),
+                        string(credentialsId: 'truststore-password', variable: 'truststore.password')
+                    ]) {
+                        sh "mvn gatling:test"
                     }
+                }
+            }
+        }
+        stage('Deploy to nais prod') {
+            when { branch 'master' }
+            environment {
+                FASIT_ENV = 'p'
+                NAMESPACE = 'default'
+            }
+            steps {
+                script {
+                    tag()
+                    def jiraIssueId = nais action: 'jiraDeployProd'
+                    nais action: 'waitForCallback'
+                    slack status: 'deployed', jiraIssueId: "${jiraIssueId}"
                 }
             }
         }
     }
 
     post {
-        failure {
-            slackSend(color: '#FF0000', message: "Bygget feilet: ${env.BRANCH_NAME} ${env.BUILD_URL}")
-        }
         always {
-            junit 'target/surefire-reports/*.xml'
+            archiveArtifacts artifacts: '**/target/*.jar', allowEmptyArchive: true
+            junit testResults: '**/target/surefire-reports/*.xml', allowEmptyResults: true
+            junit testResults: '**/target/failsafe-reports/*.xml', allowEmptyResults: true
             gatlingArchive()
+            script {
+                if (currentBuild.result == 'ABORTED') {
+                    slack status: 'aborted'
+                }
+            }
+            dockerUtils 'prune'
+            deleteDir()
+        }
+        success {
+            slack status: 'success'
+        }
+        failure {
+            slack status: 'failure'
         }
     }
+
 }
