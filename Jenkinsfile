@@ -75,9 +75,9 @@ pipeline {
         stage('Deploy to nais preprod') {
             steps {
                 script {
-                    def jiraIssueId = nais action: 'jiraDeploy'
+                    def deployIssueId = nais action: 'jiraDeploy'
                     nais action: 'waitForCallback'
-                    slack status: 'deployed', jiraIssueId: "${jiraIssueId}"
+                    slack status: 'deployed', jiraIssueId: "${deployIssueId}"
                 }
             }
         }
@@ -107,9 +107,10 @@ pipeline {
             steps {
                 script {
                     tag()
-                    def jiraIssueId = nais action: 'jiraDeployProd'
+                    def deployIssueId = nais action: 'jiraDeploy'
+                    def prodchangeIssueId = nais action: 'jiraDeployProd', jiraIssueId: deployIssueId
                     nais action: 'waitForCallback'
-                    slack status: 'deployed', jiraIssueId: "${jiraIssueId}"
+                    slack status: 'deployed', jiraIssueId: "${prodchangeIssueId}"
                 }
             }
         }
