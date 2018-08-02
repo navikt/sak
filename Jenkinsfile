@@ -103,6 +103,8 @@ pipeline {
             environment {
                 FASIT_ENV = 'p'
                 NAMESPACE = 'default'
+                APPLICATION_SERVICE = 'Sak'
+                APPLICATION_COMPONENT = 'sak'
             }
             steps {
                 script {
