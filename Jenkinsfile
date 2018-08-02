@@ -118,9 +118,9 @@ pipeline {
     post {
         always {
             archiveArtifacts artifacts: '**/target/*.jar', allowEmptyArchive: true
-            junit testResults: '**/target/surefire-reports/*.xml', allowEmptyResults: true
-            junit testResults: '**/target/failsafe-reports/*.xml', allowEmptyResults: true
+            junit 'target/surefire-reports/*.xml'
             gatlingArchive()
+
             script {
                 if (currentBuild.result == 'ABORTED') {
                     slack status: 'aborted'
