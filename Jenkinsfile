@@ -6,6 +6,7 @@ pipeline {
         string(name: 'fasitEnvPreprod', defaultValue: 'q1', description: 'Fasit environment used for reading and exposing resources (preprod)')
         string(name: 'namespacePreprod', defaultValue: 'default', description: 'Nais namespace (preprod)')
         booleanParam(name: 'gatling', defaultValue: true, description: 'Whether to run Gatling tests as part of the build')
+        booleanParam(name: 'deployProd', defaultValue: false, description: 'Whether to automatically deploy master branch to prod')
     }
 
     environment {
@@ -16,6 +17,7 @@ pipeline {
         FASIT_ENV = "${params.fasitEnvPreprod}"
         NAMESPACE = "${params.namespacePreprod}"
         RUN_GATLING = "${params.gatling}"
+        DEPLOY_TO_PROD = "${params.deployProd}"
     }
     tools {
         maven "maven3"
@@ -99,7 +101,13 @@ pipeline {
             }
         }
         stage('Deploy to nais prod') {
-            when { branch 'master' }
+
+            when {
+                allOf {
+                    branch 'master'
+                    environment name: 'DEPLOY_TO_PROD', value: 'true'
+                }
+            }
             environment {
                 FASIT_ENV = 'p'
                 NAMESPACE = 'default'
