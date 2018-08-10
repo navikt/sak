@@ -47,21 +47,18 @@ Her vil også properties enten måtte tilgjengeliggjøres i jar, eller det må s
 Applikasjonen kjører på NAIS-plattformen (se https://confluence.adeo.no/pages/viewpage.action?pageId=210440645)
 
 Når en branch pushes vil Jenkins pipeline sørge for at denne automatisk deployes til preprod. Se 'Jenkinsfile' for 
-gjeldende oppsett, og http://stash.devillo.no/projects/FELL/repos/jenkins-nais-pipeline for felles-funksjonalitet som 
+gjeldende oppsett, og https://github.com/navikt/jenkins-oppgavehandtering-pipeline for felles-funksjonalitet som 
 er lagt til i jenkins og som benyttes av Jenkinsfile i Sak. 
 
 
-##Øvrige av interesse
+## Øvrige av interesse
 
-##OIDC
+## OIDC
 OIDC ID_token valideres når det mottas en Authorization-header med 'Bearer' (Se AuthenticationFilter). Siden Sak er en 
 ren tjeneste, er det ikke satt opp standard redirect->callback->hent token-mekanisme. Det er etablert integrasjonstest
 som kjører i Jenkins (der credentials er definert for clientId og clientSecret). 
 
-OpenAM-agent for OIDC er opprettet ved å utføre følgende kommando: 
-* curl -k -d '{"application": "sak", "environment": "t0", "zone": "fss", "username": "<fasit user>", "password": "*******", "contextroots": ["/"]}' https://named.nais.preprod.local/configure
-
-Fasit-ressursen **OpenIdConnectAgent** innehar standard credential for en opprettet client
+Tjenesten støtter per i dag OpenAM som issuer
 
 
 
