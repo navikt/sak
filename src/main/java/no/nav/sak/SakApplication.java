@@ -76,8 +76,12 @@ public class SakApplication extends ResourceConfig {
     }
 
     void migrateDataWarehouse(SakConfiguration sakConfiguration) {
-        DataSource sakGrDataSource = createSakGrDataSource(sakConfiguration);
-        migrateSakGr(sakGrDataSource);
+        if(sakConfiguration.getBoolean("MIGRATE_DVH", true)) {
+            DataSource sakGrDataSource = createSakGrDataSource(sakConfiguration);
+            migrateSakGr(sakGrDataSource);
+        }else {
+            log.warn("Datavarehus-migrering er skrudd av - ev. endringer i skjema vil ikke migreres");
+        }
     }
 
     private void registerFeatures() {
