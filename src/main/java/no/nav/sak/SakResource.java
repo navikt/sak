@@ -46,10 +46,15 @@ import static no.nav.sak.infrastruktur.authentication.AuthenticationFilter.REQUE
     info = @Info(
         title = "Sak API",
         version = "1",
-        description = "Her dokumenteres tjenestegrensesnittet for Sak\n\n. Tjenesten leveres kontinuerlig til produksjon. For å sikre oss mot å innføre regresjon som påvirker våre konsumenter, benytter vi " +
-            " Pact. Det er konsumentens ansvar å gi oss pact-test, men ta gjerne kontakt ved behov for bistand ifm. dette." +
-            " Vi ber nye konsumenter om å ta kontakt med teamet, dette for å få gjennomført ev. avklaringer, sikre korrekte tilganger, pact-test, og for å sikre at tjenesten støtter " +
-            " forventet volum og ev. SLA",
+        description = "Her dokumenteres tjenestegrensesnittet for Sak.\n\n" +
+            "Tjenesten leveres kontinuerlig til produksjon. For å sikre oss mot å innføre regresjon som påvirker våre konsumenter, benytter vi " +
+            "Pact. Det er konsumentens ansvar å gi oss pact-test, men ta gjerne kontakt ved behov for bistand ifm. dette. \n\n" +
+            "Vi ber nye konsumenter om å ta kontakt med teamet, dette for å få gjennomført ev. avklaringer, sikre korrekte tilganger, pact-test, og for å sikre at tjenesten støtter " +
+            "forventet volum og ev. SLA.\n\n" +
+            "Merk at vi forventer at Headeren <strong>\"X-Correlation-ID\"</strong> er angitt for alle tjenestekall. Denne logges alltid i Sak, og benyttes for å kunne sammenstille hendelser " +
+            "på tvers av kallkjeder. X-Correlation-ID skal oppgis ved forespørsel om bistand fra Team Oppgavehåntering vedr. feilsøk ifm. bruk av tjenesten\n" +
+            "Vi anbefaler at korrelasjonsID genereres så tidlig som mulig hos konsument, bindes til tråden, og logges sammen med alle hendelser som danner grunnlaget for kallet mot Sak,\n\n" +
+            "KorrelasjonsIDen skal være unik, og kan enten genereres med f.eks UUID.randomUUID() eller hvis aktuelt, hentes ut fra inngående tjenestekall (i.e. callId via modig-biblioteket)",
         contact = @Contact(
             name = "Team Gosys"
         ))
