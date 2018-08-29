@@ -6,11 +6,13 @@ import no.nav.sak.SakConfiguration;
 import no.nav.sak.infrastruktur.authentication.saml.SAMLSupport;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import static no.nav.sikkerhet.authentication.AuthenticationHeaderIdentifier.SAML;
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Tag("integration-test")
 class StartJettyTest {
 
     private static Header authHeaderSaml;

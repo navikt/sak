@@ -35,11 +35,11 @@
         <appender-ref ref="STDOUT"/>
     </logger>
 
-    <logger name="securitylog" level="INFO" additivity="false">
+    <logger name="securitylog" level="OFF" additivity="false">
         <appender-ref ref="STDOUT"/>
     </logger>
 
-    <root level="INFO">
+    <root level="OFF">
         <appender-ref ref="STDOUT"/>
         <appender-ref ref="METRICS"/>
     </root>
