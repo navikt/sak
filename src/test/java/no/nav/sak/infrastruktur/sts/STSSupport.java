@@ -74,7 +74,7 @@ public class STSSupport {
             stsClient.setWsdlLocation("wsdl/ws-trust-1.4-service.wsdl");
             stsClient.setServiceQName(new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/wsdl", "SecurityTokenServiceProvider"));
             stsClient.setEndpointQName(new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/wsdl", "SecurityTokenServiceSOAP"));
-            stsClient.getClient().getRequestContext().put(Message.ENDPOINT_ADDRESS, "https://sts-t8.test.local/SecurityTokenServiceProvider/");
+            stsClient.getClient().getRequestContext().put(Message.ENDPOINT_ADDRESS, "https://sts-t9.test.local/SecurityTokenServiceProvider/");
             HashMap<String, Object> properties = new HashMap<>();
             properties.put(SecurityConstants.USERNAME, sakConfiguration.getRequiredString("junit.sts.user"));
             properties.put(SecurityConstants.PASSWORD, sakConfiguration.getRequiredString("junit.sts.password"));
