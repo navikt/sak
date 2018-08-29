@@ -22,6 +22,8 @@ fasitResources:
   used:
     - alias: SAKDS
       resourceType: datasource
+    - alias: SAK_GR_DS
+      resourceType: datasource
     - alias: abac.pdp.endpoint
       resourceType: restservice
       propertyMap:
