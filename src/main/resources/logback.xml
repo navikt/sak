@@ -84,6 +84,10 @@
         <appender-ref ref="STDOUT_JSON_TJENESTEKALL"/>
     </logger>
 
+    <logger name="org.apache.http" level="DEBU" additivity="false">
+        <appender-ref ref="STDOUT_JSON"/>
+    </logger>
+
     <logger name="securitylog" level="INFO" additivity="false">
         <appender-ref ref="SECURITYLOG"/>
         <appender-ref ref="STDOUT_JSON_FILTERED"/>

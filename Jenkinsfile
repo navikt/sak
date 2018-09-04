@@ -5,8 +5,8 @@ pipeline {
     parameters {
         string(name: 'fasitEnvPreprod', defaultValue: 'q1', description: 'Fasit environment used for reading and exposing resources (preprod)')
         string(name: 'namespacePreprod', defaultValue: 'default', description: 'Nais namespace (preprod)')
-        booleanParam(name: 'gatling', defaultValue: true, description: 'Whether to run Gatling tests as part of the build')
-        booleanParam(name: 'deployProd', defaultValue: false, description: 'Whether to automatically deploy master branch to prod')
+        booleanParam(name: 'gatling', defaultValue: false, description: 'Whether to run Gatling tests as part of the build')
+        booleanParam(name: 'deployProd', defaultValue: true, description: 'Whether to automatically deploy master branch to prod')
     }
 
     environment {
