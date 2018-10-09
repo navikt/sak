@@ -2,6 +2,7 @@ package no.nav.sak;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
+import no.nav.sak.validering.AllOrNoneOf;
 import no.nav.sak.validering.ExactlyOneOf;
 import no.nav.sak.validering.Organisasjonsnummer;
 
@@ -13,6 +14,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 @ExactlyOneOf(fields = {"aktoerId", "orgnr"})
+@AllOrNoneOf(fields= {"fagsakNr", "applikasjon"})
 public class SakJson {
     private Long id;
 
@@ -20,7 +22,6 @@ public class SakJson {
     @Size(max = 40)
     private String tema;
 
-    @NotNull(message = "{no.nav.sak.applikasjon.NotNull}")
     @Size(max = 40)
     private String applikasjon;
 

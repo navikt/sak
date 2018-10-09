@@ -150,7 +150,6 @@ public class Sak {
             Validate.validState(!StringUtils.isNoneBlank(aktoerId, orgnr), "Kun en av aktørid eller orgnr kan være angitt");
             Validate.validState(!StringUtils.isAllBlank(aktoerId, orgnr), "Aktørid eller orgnr må være angitt");
             Validate.notBlank(tema, "Tema må være angitt");
-            Validate.notBlank(applikasjon, "Applikasjon må være angitt");
             Validate.notBlank(opprettetAv, "OpprettetAv må være angitt");
             Validate.notNull(opprettetTidspunkt, "Opprettet tidspunkt må være angitt");
             Validate.validState(OrganisasjonsnummerValidator.isValid(orgnr));

@@ -51,7 +51,7 @@ public class SakJunitApplication extends SakApplication {
     }
 
     void migrateSak(DataSource dataSource) {
-        new FlywayMigrator(dataSource, "classpath:db/migration").migrate();
+        new FlywayMigrator(dataSource, "classpath:db/migration", "classpath:db/h2/migration").migrate();
     }
 
     void registerApiResources(Database database, SakConfiguration sakConfiguration) {

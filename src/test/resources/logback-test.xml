@@ -35,6 +35,10 @@
         <appender-ref ref="STDOUT"/>
     </logger>
 
+    <logger name="org.glassfish" level="OFF" additivity="false">
+        <appender-ref ref="STDOUT"/>
+    </logger>
+
     <logger name="securitylog" level="OFF" additivity="false">
         <appender-ref ref="STDOUT"/>
     </logger>

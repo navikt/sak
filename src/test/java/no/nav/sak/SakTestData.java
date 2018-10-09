@@ -4,7 +4,6 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
 
 import java.time.LocalDateTime;
-import java.util.Random;
 
 
 public class SakTestData {
@@ -13,7 +12,7 @@ public class SakTestData {
     private String aktoerId = RandomStringUtils.randomAlphabetic(9);
     private String orgnr;
     private String fagsakNr;
-    private String applikasjon = RandomStringUtils.randomAlphabetic(3);
+    private String applikasjon;
     private String opprettetAv = RandomStringUtils.randomAlphabetic(8);
     private LocalDateTime opprettetTidspunkt = LocalDateTime.now();
 
