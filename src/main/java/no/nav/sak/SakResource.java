@@ -56,7 +56,7 @@ import static no.nav.sak.infrastruktur.authentication.AuthenticationFilter.REQUE
             "Vi anbefaler at korrelasjonsID genereres så tidlig som mulig hos konsument, bindes til tråden, og logges sammen med alle hendelser som danner grunnlaget for kallet mot Sak,\n\n" +
             "KorrelasjonsIDen skal være unik, og kan enten genereres med f.eks UUID.randomUUID() eller hvis aktuelt, hentes ut fra inngående tjenestekall (i.e. callId via modig-biblioteket)",
         contact = @Contact(
-            name = "Team Gosys"
+            name = "Team Oppgavehåndtering"
         ))
     , securityDefinition =
 @SecurityDefinition(apiKeyAuthDefinitions = {
