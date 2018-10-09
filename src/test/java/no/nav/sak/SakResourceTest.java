@@ -180,6 +180,18 @@ class SakResourceTest extends JerseyTest {
     }
 
     @Test
+    void kan_angi_applikasjon_uten_aa_angi_fagsaknr() {
+        Sak sak = new SakTestData()
+            .aktoerId("1")
+            .applikasjon("FS22")
+            .build();
+        JsonObject jsonObject = createAndRetrieveAtLocation(sak);
+        assertThat(jsonObject.get("id").getAsLong()).isNotNull();
+        assertThat(jsonObject.get("aktoerId").getAsString()).isEqualTo(sak.getAktoerId());
+        assertThat(jsonObject.get("orgnr").isJsonNull()).isTrue();
+    }
+
+    @Test
     @Disabled("Må åpne midlertidig, da legacy-systemer oppretter generell sak med FS22")
     void applikasjon_er_paakrevd_for_fagsak() {
         Sak sak = new SakTestData()
