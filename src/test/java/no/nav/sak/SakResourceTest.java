@@ -12,10 +12,7 @@ import no.nav.sak.infrastruktur.oicd.JwtTestData;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.glassfish.jersey.test.JerseyTest;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
@@ -183,6 +180,7 @@ class SakResourceTest extends JerseyTest {
     }
 
     @Test
+    @Disabled("Må åpne midlertidig, da legacy-systemer oppretter generell sak med FS22")
     void applikasjon_er_paakrevd_for_fagsak() {
         Sak sak = new SakTestData()
             .aktoerId("1")
