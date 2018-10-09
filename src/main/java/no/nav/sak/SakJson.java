@@ -2,7 +2,6 @@ package no.nav.sak;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
-import no.nav.sak.validering.AllOrNoneOf;
 import no.nav.sak.validering.ExactlyOneOf;
 import no.nav.sak.validering.Organisasjonsnummer;
 
@@ -14,7 +13,6 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 @ExactlyOneOf(fields = {"aktoerId", "orgnr"})
-@AllOrNoneOf(fields= {"fagsakNr", "applikasjon"})
 public class SakJson {
     private Long id;
 
@@ -70,7 +68,8 @@ public class SakJson {
     }
 
     @JsonProperty("applikasjon")
-    @ApiModelProperty(value = "Kode for applikasjon iht. felles kodeverk", example = "FS22")
+    @ApiModelProperty(value = "Kode for applikasjon iht. felles kodeverk", notes = "For generelle saker skal denne være blank (Legacy = FS22). For fagsaker, i.e saker der det refereres" +
+        "til et fagsaknr, så skal man benytte applikasjonskoden for fagsystemet der saken behandles", example = "IT01")
     public String getApplikasjon() {
         return applikasjon;
     }
