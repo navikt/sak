@@ -47,7 +47,7 @@ public class SakRepository {
         opprettedeSakerCounter.labels(
             sak.getTema(),
             sak.getFagsakNr() != null ? "Fagsak" : "Generell",
-            sak.getApplikasjon(),
+            defaultString(sak.getApplikasjon(), "N/A"),
             defaultString(MDC.get("consumerid"), "N/A")).inc();
         return sak;
     }

@@ -65,7 +65,6 @@ class SakResourceTest extends JerseyTest {
     @Test
     void henter_sak_for_gitt_id() {
         Sak opprettetSak = sakRepository.lagre(new SakTestData()
-            .fagsakNr("12")
             .aktoerId("123").build());
 
         Response response = executeGetRequest(sakRootTarget().path(String.valueOf(opprettetSak.getId())));
@@ -125,7 +124,7 @@ class SakResourceTest extends JerseyTest {
     }
 
     @Test
-    void beskyttede_ressurser_tilgjengelige_naar_gyldig_authheader_for_oidc() throws Exception {
+    void beskyttede_ressurser_tilgjengelige_naar_gyldig_authheader_for_oidc() {
         String authHeaderOIDC = "Bearer " + new JwtTestData().build();
         verifyBeskyttedeRessurserTilgjengelig(authHeaderOIDC);
     }
@@ -171,45 +170,30 @@ class SakResourceTest extends JerseyTest {
         assertThat(sakRepository.finnSaker(SakSearchCriteria.create())).hasSize(1);
     }
 
-    private void verifyBeskyttedeRessurserTilgjengelig(String header) {
-        Sak sak = new SakTestData().build();
-        Entity<String> json = Entity.json(
-            new SakJsonTestData(sak).buildJsonString());
-
-
-        Response opprettResponse = sakRootTarget()
-            .request()
-            .header("Authorization", header)
-            .header("X-Correlation-ID", correlationId)
-            .post(json);
-
-        assertThat(opprettResponse.getStatus()).isEqualTo(Response.Status.CREATED.getStatusCode());
-
-        Response searchResponse = sakRootTarget().queryParam("aktoerId", sak.getAktoerId())
-            .request()
-            .header("Authorization", header)
-            .header("X-Correlation-ID", correlationId)
-            .get();
-        assertThat(searchResponse.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
-
-        Sak opprettetSak = sakRepository.lagre(new SakTestData().aktoerId("123").build());
-
-        Response getResponse = sakRootTarget().path(String.valueOf(opprettetSak.getId()))
-            .request()
-            .header("Authorization", header)
-            .header("X-Correlation-ID", correlationId)
-            .get();
-
-        assertThat(getResponse.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
+    @Test
+    void oppretter_generell_sak_uten_applikasjon_angitt() {
+        Sak sak = new SakTestData()
+            .aktoerId("1")
+            .applikasjon(null)
+            .build();
+        JsonObject jsonObject = createAndRetrieveAtLocation(sak);
+        assertThat(jsonObject.get("id").getAsLong()).isNotNull();
+        assertThat(jsonObject.get("aktoerId").getAsString()).isEqualTo(sak.getAktoerId());
+        assertThat(jsonObject.get("orgnr").isJsonNull()).isTrue();
     }
 
-    private Response executePost(Entity<String> json) {
-        return sakRootTarget()
-            .request()
-            .header("Authorization", authHeaderSaml)
-            .header("X-Correlation-ID", correlationId)
-            .post(json);
+    @Test
+    void applikasjon_er_paakrevd_for_fagsak() {
+        Sak sak = new SakTestData()
+            .aktoerId("1")
+            .applikasjon(null)
+            .fagsakNr("123")
+            .build();
+        Response createdResponse = executePost(Entity.json(new SakJsonTestData(sak)
+            .buildJsonString()));
+        verify400(createdResponse);
     }
+
 
     @Test
     void soeker_opp_saker_for_aktoer_id() {
@@ -240,7 +224,9 @@ class SakResourceTest extends JerseyTest {
     void soeker_opp_saker_for_fagsaknr() {
         opprett100Tilfeldigesaker();
         String fagsaknr = RandomStringUtils.randomNumeric(9);
-        Sak sak = sakRepository.lagre(new SakTestData().fagsakNr(fagsaknr).build());
+        Sak sak = sakRepository.lagre(new SakTestData().
+            applikasjon(RandomStringUtils.randomAlphabetic(3)).
+            fagsakNr(fagsaknr).build());
 
         Response response = executeGetRequest(sakRootTarget()
             .queryParam("fagsakNr", sak.getFagsakNr()));
@@ -383,7 +369,9 @@ class SakResourceTest extends JerseyTest {
         if (StringUtils.isNotBlank(sak.getFagsakNr())) {
             assertThat(sakJson.get("fagsakNr").getAsString()).isEqualTo(sak.getFagsakNr());
         }
-        assertThat(sakJson.get("applikasjon").getAsString()).isEqualTo(sak.getApplikasjon());
+        if(StringUtils.isNotBlank(sak.getApplikasjon())) {
+            assertThat(sakJson.get("applikasjon").getAsString()).isEqualTo(sak.getApplikasjon());
+        }
     }
 
     private JsonObject createAndRetrieveAtLocation(Sak sak) {
@@ -404,6 +392,46 @@ class SakResourceTest extends JerseyTest {
 
     private Reader stream(Object entity) {
         return new InputStreamReader((ByteArrayInputStream) entity);
+    }
+
+    private void verifyBeskyttedeRessurserTilgjengelig(String header) {
+        Sak sak = new SakTestData().build();
+        Entity<String> json = Entity.json(
+            new SakJsonTestData(sak).buildJsonString());
+
+
+        Response opprettResponse = sakRootTarget()
+            .request()
+            .header("Authorization", header)
+            .header("X-Correlation-ID", correlationId)
+            .post(json);
+
+        assertThat(opprettResponse.getStatus()).isEqualTo(Response.Status.CREATED.getStatusCode());
+
+        Response searchResponse = sakRootTarget().queryParam("aktoerId", sak.getAktoerId())
+            .request()
+            .header("Authorization", header)
+            .header("X-Correlation-ID", correlationId)
+            .get();
+        assertThat(searchResponse.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
+
+        Sak opprettetSak = sakRepository.lagre(new SakTestData().aktoerId("123").build());
+
+        Response getResponse = sakRootTarget().path(String.valueOf(opprettetSak.getId()))
+            .request()
+            .header("Authorization", header)
+            .header("X-Correlation-ID", correlationId)
+            .get();
+
+        assertThat(getResponse.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
+    }
+
+    private Response executePost(Entity<String> json) {
+        return sakRootTarget()
+            .request()
+            .header("Authorization", authHeaderSaml)
+            .header("X-Correlation-ID", correlationId)
+            .post(json);
     }
 
     @AfterEach
