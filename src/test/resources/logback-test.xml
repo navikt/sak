@@ -35,7 +35,7 @@
         <appender-ref ref="STDOUT"/>
     </logger>
 
-    <logger name="org.glassfish" level="OFF" additivity="false">
+    <logger name="org.glassfish" level="INFO" additivity="false">
         <appender-ref ref="STDOUT"/>
     </logger>
 
