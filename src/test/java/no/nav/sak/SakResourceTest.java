@@ -180,7 +180,7 @@ class SakResourceTest extends JerseyTest {
     }
 
     @Test
-    void kan_angi_applikasjon_uten_aa_angi_fagsaknr() {
+    void kan_opprette_sak_med_applikasjon_uten_aa_angi_fagsaknr() {
         Sak sak = new SakTestData()
             .aktoerId("1")
             .applikasjon("FS22")
@@ -192,7 +192,6 @@ class SakResourceTest extends JerseyTest {
     }
 
     @Test
-    @Disabled("Må åpne midlertidig, da legacy-systemer oppretter generell sak med FS22")
     void applikasjon_er_paakrevd_for_fagsak() {
         Sak sak = new SakTestData()
             .aktoerId("1")

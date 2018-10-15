@@ -3,6 +3,7 @@ package no.nav.sak;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 import no.nav.sak.validering.ExactlyOneOf;
+import no.nav.sak.validering.NotNullWhenDependsOnHasValue;
 import no.nav.sak.validering.Organisasjonsnummer;
 
 import javax.validation.constraints.NotNull;
@@ -13,6 +14,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 @ExactlyOneOf(fields = {"aktoerId", "orgnr"})
+@NotNullWhenDependsOnHasValue(field = "applikasjon", dependsOnField = "fagsakNr")
 public class SakJson {
     private Long id;
 
