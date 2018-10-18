@@ -59,6 +59,3 @@ ren tjeneste, er det ikke satt opp standard redirect->callback->hent token-mekan
 som kjører i Jenkins (der credentials er definert for clientId og clientSecret). 
 
 Tjenesten støtter per i dag OpenAM som issuer
-
-
-
