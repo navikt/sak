@@ -1,68 +1,41 @@
 package no.nav.sak;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
+import static no.nav.sak.infrastruktur.authentication.basic.JunitBasicAuthenticator.PASSWORD;
+import static no.nav.sak.infrastruktur.authentication.basic.JunitBasicAuthenticator.USERNAME;
+import static org.apache.commons.lang3.RandomStringUtils.random;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import no.nav.sak.infrastruktur.Database;
-import no.nav.sak.infrastruktur.JunitDatabase;
-import no.nav.sak.infrastruktur.JunitTransactionSupport;
-import no.nav.sak.infrastruktur.authentication.saml.SAMLSupport;
-import no.nav.sak.infrastruktur.oicd.JwtTestData;
-import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.glassfish.jersey.test.JerseyTest;
-import org.junit.jupiter.api.*;
-
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.Application;
-import javax.ws.rs.core.Response;
 import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.Base64;
 import java.util.List;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.Application;
+import javax.ws.rs.core.Response;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
-import static no.nav.sak.infrastruktur.authentication.basic.JunitBasicAuthenticator.PASSWORD;
-import static no.nav.sak.infrastruktur.authentication.basic.JunitBasicAuthenticator.USERNAME;
-import static no.nav.sikkerhet.authentication.AuthenticationHeaderIdentifier.SAML;
-import static org.apache.commons.lang3.RandomStringUtils.random;
-import static org.assertj.core.api.Assertions.assertThat;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import no.nav.sak.infrastruktur.oicd.JwtTestData;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.junit.jupiter.api.*;
 
-class SakResourceTest extends JerseyTest {
-
-    private static final Database database = JunitDatabase.get();
-    private static final SakRepository sakRepository = new SakRepository(database);
-    private static String authHeaderSaml;
-    private static String correlationId = "junit";
-    private final JunitTransactionSupport junitTransactionSupport = new JunitTransactionSupport(database);
-
-    @BeforeAll
-    static void setup() {
-        SakConfiguration sakConfiguration = new SakConfiguration();
-        SAMLSupport samlSupport = new SAMLSupport(sakConfiguration);
-        String samlToken = samlSupport.createNewToken();
-        authHeaderSaml = SAML.getValue() + " " + samlToken;
-    }
-
-    @BeforeEach
-    void before() throws Exception {
-        super.setUp();
-        junitTransactionSupport.initTransaction();
-    }
-
-    @Override
-    protected Application configure() {
-        return new SakJunitApplication();
-    }
+class SakResourceTest extends AbstractSakResourceTest {
 
     @Test
     void henter_sak_for_gitt_id() {
-        Sak opprettetSak = sakRepository.lagre(new SakTestData()
-            .aktoerId("123").build());
+
+        final Sak opprettetSak =
+            sakRepository
+                .lagre(
+                    new SakTestData()
+                        .aktoerId("123")
+                        .build()
+                );
 
         Response response = executeGetRequest(sakRootTarget().path(String.valueOf(opprettetSak.getId())));
 
@@ -329,20 +302,30 @@ class SakResourceTest extends JerseyTest {
         verify400(response);
     }
 
-    private Response executeGetRequest(WebTarget target) {
-        return target.request()
-            .header("Authorization", authHeaderSaml)
-            .header("X-Correlation-ID", correlationId)
-            .get();
-
+    @Override
+    protected Application configure() {
+        return new SakJunitApplication();
     }
 
-    private void verify400(Response response) {
-        JsonObject jsonObject = new JsonParser().parse(stream(response.getEntity())).getAsJsonObject();
-        assertThat(response.getStatus()).isEqualTo(Response.Status.BAD_REQUEST.getStatusCode());
-        assertThat(response.getHeaderString("Content-Type")).isEqualTo("application/json");
-        assertThat(jsonObject.get("uuid")).isNotNull();
-        assertThat(jsonObject.get("feilmelding")).isNotNull();
+    @Override
+    protected Response createSakAndTestReponse(final Sak sak) {
+
+        final Response createdResponse =
+            executePost(
+                Entity
+                    .json(new SakJsonTestData(sak).buildJsonString())
+            );
+
+        assertThat(createdResponse.getStatus()).isEqualTo(Response.Status.CREATED.getStatusCode());
+
+        return createdResponse;
+    }
+
+    private void verifySearchResponseMatching(Response response, List<Sak> skalMatche) {
+        JsonArray jsonArray = verifySearchResponse(response, skalMatche.size());
+        for (int i = 0; i < skalMatche.size(); i++) {
+            verifyEqual(jsonArray.get(i).getAsJsonObject(), skalMatche.get(i));
+        }
     }
 
     private JsonArray verifySearchResponse(Response response, int expectedSize) {
@@ -353,18 +336,16 @@ class SakResourceTest extends JerseyTest {
         return jsonArray;
     }
 
-    private void verifySearchResponseMatching(Response response, List<Sak> skalMatche) {
-        JsonArray jsonArray = verifySearchResponse(response, skalMatche.size());
-        for (int i = 0; i < skalMatche.size(); i++) {
-            verifyEqual(jsonArray.get(i).getAsJsonObject(), skalMatche.get(i));
-        }
+    private void verify400(Response response) {
+        JsonObject jsonObject = new JsonParser().parse(stream(response.getEntity())).getAsJsonObject();
+        assertThat(response.getStatus()).isEqualTo(Response.Status.BAD_REQUEST.getStatusCode());
+        assertThat(response.getHeaderString("Content-Type")).isEqualTo("application/json");
+        assertThat(jsonObject.get("uuid")).isNotNull();
+        assertThat(jsonObject.get("feilmelding")).isNotNull();
     }
 
-    private void opprett100Tilfeldigesaker() {
-        for (int i = 0; i < 50; i++) {
-            sakRepository.lagre(new SakTestData().aktoerId(RandomStringUtils.randomNumeric(5)).build());
-            sakRepository.lagre(new SakTestData().orgnr(SakTestData.generateValidOrgnr()).build());
-        }
+    private Reader stream(Object entity) {
+        return new InputStreamReader((ByteArrayInputStream) entity);
     }
 
     private void verifyEqual(JsonObject sakJson, Sak sak) {
@@ -383,24 +364,19 @@ class SakResourceTest extends JerseyTest {
         }
     }
 
-    private JsonObject createAndRetrieveAtLocation(Sak sak) {
-        Response createdResponse = executePost(Entity.json(new SakJsonTestData(sak).buildJsonString()));
+    private JsonObject createAndRetrieveAtLocation(final Sak sak) {
 
-        assertThat(createdResponse.getStatus()).isEqualTo(Response.Status.CREATED.getStatusCode());
+        final Response createdResponse = createSakAndTestReponse(sak);
 
-        Response getResponse = executeGetRequest(client()
-            .target(createdResponse.getHeaderString("location")));
+        final Response getResponse =
+            executeGetRequest(
+                client()
+                    .target(createdResponse.getHeaderString("location"))
+            );
 
         assertThat(getResponse.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
+
         return new JsonParser().parse(stream(getResponse.getEntity())).getAsJsonObject();
-    }
-
-    private WebTarget sakRootTarget() {
-        return target("/v1/saker");
-    }
-
-    private Reader stream(Object entity) {
-        return new InputStreamReader((ByteArrayInputStream) entity);
     }
 
     private void verifyBeskyttedeRessurserTilgjengelig(String header) {
@@ -433,19 +409,5 @@ class SakResourceTest extends JerseyTest {
             .get();
 
         assertThat(getResponse.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
-    }
-
-    private Response executePost(Entity<String> json) {
-        return sakRootTarget()
-            .request()
-            .header("Authorization", authHeaderSaml)
-            .header("X-Correlation-ID", correlationId)
-            .post(json);
-    }
-
-    @AfterEach
-    void after() throws Exception {
-        super.tearDown();
-        junitTransactionSupport.rollback();
     }
 }

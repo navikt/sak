@@ -43,22 +43,25 @@ public class SakPEP {
         this.abacClient = abacClient;
     }
 
-    public ABACResult autoriser(ContainerRequestContext ctx, AuthorizationRequest authorizationRequest) {
-        ABACRequest abacRequest = ABACRequest.newRequest()
+    public ABACResult autoriser(
+          final ContainerRequestContext ctx
+        , final AuthorizationRequest authorizationRequest) {
+
+        final ABACRequest abacRequest = ABACRequest.newRequest()
             .addEnvironment(new ABACAttribute(ENVIRONMENT_FELLES_PEP_ID, "sak"))
             .addResource(new ABACAttribute(RESOURCE_FELLES_DOMENE, "sak"))
             .addResource(new ABACAttribute(RESOURCE_FELLES_RESOURCE_TYPE, RESOURCE_TYPE_SAK));
 
         authorizationRequest.getAktoerId().ifPresent(aktoerId -> abacRequest.addResource(new ABACAttribute(RESOURCE_FELLES_PERSON_AKTOERID_RESOURCE, aktoerId)));
 
-        String authIdentifier = substringBefore(trim(ctx.getHeaderString(AUTHORIZATION)), " ");
-        String token = substringAfter(trim(ctx.getHeaderString(AUTHORIZATION)), " ");
+        final String authIdentifier = substringBefore(trim(ctx.getHeaderString(AUTHORIZATION)), " ");
+        final String token = substringAfter(trim(ctx.getHeaderString(AUTHORIZATION)), " ");
 
         if (Objects.equals(BASIC.getValue(), authIdentifier)) {
             abacRequest.addAccessSubject(new ABACAttribute(StandardAttributter.SUBJECT_ID, (String) ctx.getProperty(REQUEST_USERNAME)));
             abacRequest.addAccessSubject(new ABACAttribute(NavAttributter.SUBJECT_FELLES_SUBJECTTYPE, SUBJECT_TYPE_SYSTEMBRUKER.getValue()));
         } else if (Objects.equals(OIDC.getValue(), authIdentifier)) {
-            String tokenBody = substringBetween(token, ".");
+            final String tokenBody = substringBetween(token, ".");
             abacRequest.addEnvironment(new ABACAttribute(ENVIRONMENT_FELLES_OIDC_TOKEN_BODY, tokenBody));
         } else if (Objects.equals(SAML.getValue(), authIdentifier)) {
             abacRequest.addEnvironment(new ABACAttribute(ENVIRONMENT_FELLES_SAML_TOKEN, token));
@@ -66,43 +69,45 @@ public class SakPEP {
             throw new IllegalStateException("Fant ingen gyldig authenticationHeader");
         }
 
-
-        Histogram.Timer timer = authHistogram.labels(
+        final Histogram.Timer timer = authHistogram.labels(
             defaultString((String) ctx.getProperty(REQUEST_CONSUMERID), "N/A"),
             defaultString(authIdentifier, "N/A"),
             ContextExtractor.getSubjectType(ctx).getValue()
         ).startTimer();
 
-        ABACResult abacResult;
+        final ABACResult abacResult;
         try {
             abacResult = abacClient.execute(abacRequest);
-            String arcsightPreparedRequest = stripBrackets(abacRequest.getResource().getAttributes().toString());
-            String arcsightPreparedResult = StringUtils.remove(stripBrackets(abacResult.toString()), "associatedAdvice=");
-            if (abacResult.getAssociatedAdvice().isEmpty()) {
-                arcsightPreparedResult = StringUtils.remove(arcsightPreparedResult, ",");
+            if (ABACResult.Code.OK.equals(abacResult.getCode())) {
+
+                final String arcsightPreparedRequest = stripBrackets(abacRequest.getResource().getAttributes().toString());
+                String arcsightPreparedResult = StringUtils.remove(stripBrackets(abacResult.toString()), "associatedAdvice=");
+                if (abacResult.getAssociatedAdvice().isEmpty()) {
+                    arcsightPreparedResult = StringUtils.remove(arcsightPreparedResult, ",");
+                }
+                if (abacResult.hasAccess()) {
+                    securitylog.info("ConsumerID: {}; User: {}; Endpoint: {}; Method: {}; Authorization Request: {}; Authorization Response: {}",
+                        ctx.getProperty(REQUEST_CONSUMERID),
+                        ctx.getProperty(REQUEST_USERNAME),
+                        ctx.getUriInfo().getAbsolutePath(),
+                        ctx.getRequest().getMethod(),
+                        arcsightPreparedRequest,
+                        arcsightPreparedResult);
+                } else {
+                    securitylog.warn("ConsumerID: {}; User: {}; Endpoint: {}; Method: {}; Authorization Request: {}; Authorization Response: {}",
+                        ctx.getProperty(REQUEST_CONSUMERID),
+                        ctx.getProperty(REQUEST_USERNAME),
+                        ctx.getUriInfo().getAbsolutePath(),
+                        ctx.getRequest().getMethod(),
+                        arcsightPreparedRequest,
+                        arcsightPreparedResult);
+                }
+                authorizationCounter.labels(
+                    defaultString((String) ctx.getProperty(REQUEST_CONSUMERID), "N/A"),
+                    defaultString(authIdentifier, "N/A"),
+                    ContextExtractor.getSubjectType(ctx).getValue(),
+                    abacResult.hasAccess() ? "permit" : "deny").inc();
             }
-            if (abacResult.hasAccess()) {
-                securitylog.info("ConsumerID: {}; User: {}; Endpoint: {}; Method: {}; Authorization Request: {}; Authorization Response: {}",
-                    ctx.getProperty(REQUEST_CONSUMERID),
-                    ctx.getProperty(REQUEST_USERNAME),
-                    ctx.getUriInfo().getAbsolutePath(),
-                    ctx.getRequest().getMethod(),
-                    arcsightPreparedRequest,
-                    arcsightPreparedResult);
-            } else {
-                securitylog.warn("ConsumerID: {}; User: {}; Endpoint: {}; Method: {}; Authorization Request: {}; Authorization Response: {}",
-                    ctx.getProperty(REQUEST_CONSUMERID),
-                    ctx.getProperty(REQUEST_USERNAME),
-                    ctx.getUriInfo().getAbsolutePath(),
-                    ctx.getRequest().getMethod(),
-                    arcsightPreparedRequest,
-                    arcsightPreparedResult);
-            }
-            authorizationCounter.labels(
-                defaultString((String) ctx.getProperty(REQUEST_CONSUMERID), "N/A"),
-                defaultString(authIdentifier, "N/A"),
-                ContextExtractor.getSubjectType(ctx).getValue(),
-                abacResult.hasAccess() ? "permit" : "deny").inc();
         } finally {
             timer.observeDuration();
         }
