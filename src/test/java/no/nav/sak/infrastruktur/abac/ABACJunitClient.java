@@ -9,11 +9,15 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class ABACJunitClient {
+
     public static ABACClient create() {
-        ABACClient abacClient = mock(ABACClient.class);
-        ABACResult abacResult = mock(ABACResult.class);
+
+        final ABACClient abacClient = mock(ABACClient.class);
+        final ABACResult abacResult = mock(ABACResult.class);
+        when(abacResult.getCode()).thenReturn(ABACResult.Code.OK);
         when(abacClient.execute(Mockito.any(ABACRequest.class))).thenReturn(abacResult);
         when(abacResult.hasAccess()).thenReturn(true);
+
         return abacClient;
     }
 }
