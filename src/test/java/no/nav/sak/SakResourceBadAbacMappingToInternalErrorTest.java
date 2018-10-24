@@ -1,21 +1,18 @@
 package no.nav.sak;
 
-import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Response;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
 
-public class SakResourceBadAbacTest extends AbstractSakResourceTest {
+public class SakResourceBadAbacMappingToInternalErrorTest extends AbstractSakResourceTest {
 
     @Test
-    void testHentSakGivingBadAbac() {
+    void hent_sak_giving_bad_abac_result_mapping_to_internal_error() {
 
         final Sak opprettetSak =
             sakRepository
@@ -31,7 +28,7 @@ public class SakResourceBadAbacTest extends AbstractSakResourceTest {
     }
 
     @Test
-    void testOpprettSakGivingBadAbac() {
+    void opprett_sak_giving_bad_abac_result_mapping_to_internal_error() {
 
         final Sak sak =
             new SakTestData()
@@ -43,7 +40,7 @@ public class SakResourceBadAbacTest extends AbstractSakResourceTest {
     }
 
     @Test
-    void testFinnSakerGivingBadAbac() {
+    void finn_saker_giving_bad_abac_result_mapping_to_internal_error() {
 
         opprett100Tilfeldigesaker();
         final String tema = RandomStringUtils.randomAlphabetic(4);
@@ -58,7 +55,7 @@ public class SakResourceBadAbacTest extends AbstractSakResourceTest {
 
     @Override
     protected Application configure() {
-        return new SakJunitApplicationAlwaysGivingBadAbac();
+        return new SakJunitApplicationAlwaysGivingBadAbacMappingToInternalError();
     }
 
     @Override
