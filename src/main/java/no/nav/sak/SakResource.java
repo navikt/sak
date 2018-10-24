@@ -107,13 +107,15 @@ public class SakResource {
     @Path("/{id}")
     @ApiOperation(value = "Henter sak for en gitt id", response = SakJson.class)
     @ApiImplicitParams({@ApiImplicitParam(name = "X-Correlation-ID", required = true, dataType = "string", paramType = "header")})
-    @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK"),
-        @ApiResponse(code = 401, message = "Konsument mangler gyldig token"),
-        @ApiResponse(code = 403, message = "Konsument har ikke tilgang til å gjennomføre handlingen"),
-        @ApiResponse(code = 404, message = "Det finnes ingen sak for angitt id"),
-        @ApiResponse(code = 500, message = "Ukjent feilsituasjon har oppstått i Sak")
-    }
+    @ApiResponses(
+        value = {
+            @ApiResponse(code = 200, message = "OK"),
+            @ApiResponse(code = 401, message = "Konsument mangler gyldig token"),
+            @ApiResponse(code = 403, message = "Konsument har ikke tilgang til å gjennomføre handlingen"),
+            @ApiResponse(code = 404, message = "Det finnes ingen sak for angitt id"),
+            @ApiResponse(code = 500, message = "Ukjent feilsituasjon har oppstått i Sak"),
+            @ApiResponse(code = 503, message = "En eller flere tjenester som sak er avhengig av er ikke tilgjengelige eller svarer ikke.")
+        }
     )
     public Response hentSak(
           @PathParam("id") final Long id
@@ -123,29 +125,23 @@ public class SakResource {
         final Optional<Sak> sak = sakRepository.hentSak(id);
 
         final Response response;
-        if (!sak.isPresent()) {
-            log.warn("Mottatt oppslag på sak som ikke eksisterer, id: {}, consumer: {}", id, ctx.getProperty(REQUEST_CONSUMERID));
-            response = Response.status(NOT_FOUND).entity(
-                new ErrorResponse(MDC.get("uuid"), String.format("Fant ingen sak med id: %s", id))
-            ).build();
-        }
-        else {
+        if (sak.isPresent()) {
+
             final Sak eksisterendeSak = sak.get();
-            final ABACResult abacResult = sakPEP.autoriser(ctx, new AuthorizationRequest(eksisterendeSak.getAktoerId()));
-            final ABACResult.Code abacResultCode = abacResult.getCode();
-            if (ABACResult.Code.OK.equals(abacResultCode)) {
-                if (!abacResult.hasAccess()) {
-                    response = Response.status(Response.Status.FORBIDDEN)
-                        .entity(new ErrorResponse(MDC.get("uuid"), "Bruker kunne ikke autoriseres for denne operasjonen"))
-                        .build();
-                } else {
-                    response = Response.ok(new SakJson(eksisterendeSak)).build();
-                }
-            } else {
-                response = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(
-                    new ErrorResponse(MDC.get("uuid"), abacResultCode.getDescription())
-                ).build();
-            }
+            response = checkUsersAccessToSak(ctx, eksisterendeSak);
+        } else {
+
+            log.warn("Mottatt oppslag på sak som ikke eksisterer, id: {}, consumer: {}", id, ctx.getProperty(REQUEST_CONSUMERID));
+            response =
+                Response
+                    .status(NOT_FOUND)
+                    .entity(
+                        new ErrorResponse(
+                            MDC.get("uuid"),
+                            String.format("Fant ingen sak med id: %s", id)
+                        )
+                    )
+                    .build();
         }
 
         return response;
@@ -155,12 +151,14 @@ public class SakResource {
     @ApiOperation(value = "Finner saker for angitte søkekriterier",
         response = SakJson.class, responseContainer = "List")
     @ApiImplicitParams({@ApiImplicitParam(name = "X-Correlation-ID", required = true, dataType = "string", paramType = "header")})
-    @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK"),
-        @ApiResponse(code = 400, message = "Ugyldig input"),
-        @ApiResponse(code = 401, message = "Konsument mangler gyldig token"),
-        @ApiResponse(code = 500, message = "Ukjent feilsituasjon har oppstått i Sak")
-    }
+    @ApiResponses(
+        value = {
+            @ApiResponse(code = 200, message = "OK"),
+            @ApiResponse(code = 400, message = "Ugyldig input"),
+            @ApiResponse(code = 401, message = "Konsument mangler gyldig token"),
+            @ApiResponse(code = 500, message = "Ukjent feilsituasjon har oppstått i Sak"),
+            @ApiResponse(code = 503, message = "En eller flere tjenester som sak er avhengig av er ikke tilgjengelige eller svarer ikke.")
+        }
     )
     public Response finnSaker(
           @Valid @BeanParam final SakSearchRequest sakSearchRequest
@@ -168,25 +166,33 @@ public class SakResource {
 
         log.info("Søker etter saker for: {}", sakSearchRequest);
 
-        final ABACResult abacResult = sakPEP.autoriser(ctx, new AuthorizationRequest(sakSearchRequest.getAktoerId()));
+        final ABACResult abacResult =
+            sakPEP.autoriser(ctx, new AuthorizationRequest(sakSearchRequest.getAktoerId()));
         final ABACResult.Code abacResultCode = abacResult.getCode();
         final Response response;
         if (ABACResult.Code.OK.equals(abacResultCode)) {
-            if (!abacResult.hasAccess()) {
-                response = Response.ok(new ArrayList<>()).build();
+
+            if (abacResult.hasAccess()) {
+
+                final List<Sak> saker =
+                    sakRepository.finnSaker(sakSearchRequest.toCriteria());
+                response =
+                    Response
+                        .ok(
+                            saker
+                                .stream()
+                                .filter(s -> harTilgangTilSakInterneRegler(ctx, s))
+                                .map(SakJson::new)
+                                .collect(toList())
+                        )
+                        .build();
             } else {
-                final List<Sak> saker = sakRepository.finnSaker(sakSearchRequest.toCriteria());
-                response = Response.ok(
-                    saker.stream()
-                        .filter(s -> harTilgangTilSakInterneRegler(ctx, s))
-                        .map(SakJson::new)
-                        .collect(toList()))
-                    .build();
+
+                response = Response.ok(new ArrayList<>()).build();
             }
         } else {
-            response = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(
-                new ErrorResponse(MDC.get("uuid"), abacResultCode.getDescription())
-            ).build();
+
+            response = makeResponseUponAbacFaliure(abacResultCode);
         }
 
         return response;
@@ -195,14 +201,16 @@ public class SakResource {
     @POST
     @ApiOperation(value = "Oppretter en ny sak", notes = "Merk at en sak enten skal tilhøre en aktør <b>eller</b> et foretak. Begge er p.t. ikke tillatt. ")
     @ApiImplicitParams({@ApiImplicitParam(name = "X-Correlation-ID", required = true, dataType = "string", paramType = "header")})
-    @ApiResponses(value = {
-        @ApiResponse(code = 201, message = "Saken er opprettet", responseHeaders = @ResponseHeader(name = "location", description = "Angir URI til den opprettede saken")),
-        @ApiResponse(code = 400, message = "Ugyldig input"),
-        @ApiResponse(code = 401, message = "Konsument mangler gyldig token"),
-        @ApiResponse(code = 403, message = "Konsument har ikke tilgang til å gjennomføre handlingen"),
-        @ApiResponse(code = 409, message = "Det finnes allerede en sak for angitt kombinasjon av fagsaknr og applikasjon for aktør eller orgnr"),
-        @ApiResponse(code = 500, message = "Ukjent feilsituasjon har oppstått i Sak")
-    }
+    @ApiResponses(
+        value = {
+            @ApiResponse(code = 201, message = "Saken er opprettet", responseHeaders = @ResponseHeader(name = "location", description = "Angir URI til den opprettede saken")),
+            @ApiResponse(code = 400, message = "Ugyldig input"),
+            @ApiResponse(code = 401, message = "Konsument mangler gyldig token"),
+            @ApiResponse(code = 403, message = "Konsument har ikke tilgang til å gjennomføre handlingen"),
+            @ApiResponse(code = 409, message = "Det finnes allerede en sak for angitt kombinasjon av fagsaknr og applikasjon for aktør eller orgnr"),
+            @ApiResponse(code = 500, message = "Ukjent feilsituasjon har oppstått i Sak"),
+            @ApiResponse(code = 503, message = "En eller flere tjenester som sak er avhengig av er ikke tilgjengelige eller svarer ikke.")
+        }
     )
     public Response opprettSak(
           @Valid @ApiParam(value = "Saken som skal opprettes", required = true) final SakJson sakJson
@@ -217,35 +225,63 @@ public class SakResource {
         log.info("Oppretter sak for {}", aktoerId);
 
         final ABACResult abacResult = sakPEP.autoriser(ctx, new AuthorizationRequest(aktoerId));
-
         final ABACResult.Code abacResultCode = abacResult.getCode();
         final Response response;
         if (ABACResult.Code.OK.equals(abacResultCode)) {
-            if (!abacResult.hasAccess()) {
-                response = Response.status(Response.Status.FORBIDDEN)
-                    .entity(new ErrorResponse(MDC.get("uuid"), "Bruker kunne ikke autoriseres for denne operasjonen"))
-                    .build();
+
+            if (abacResult.hasAccess()) {
+
+                response = doOpprettSak(innsendtSak, uriInfo);
             } else {
-                if (fagSakFinnesFraFoer(innsendtSak)) {
-                    response = Response.status(Response.Status.CONFLICT).entity(
-                        new ErrorResponse(MDC.get("uuid"), String.format("Det finnes allerede en sak for fagsaksnr: %s, applikasjon: %s, aktør: %s orgnr: %s",
-                            innsendtSak.getFagsakNr(),
-                            innsendtSak.getApplikasjon(),
-                            innsendtSak.getAktoerId(),
-                            innsendtSak.getOrgnr())))
+
+                response =
+                    Response
+                        .status(Response.Status.FORBIDDEN)
+                        .entity(new ErrorResponse(MDC.get("uuid"), "Bruker kunne ikke autoriseres for denne operasjonen"))
                         .build();
-                } else {
-                    final Sak opprettetSak = sakRepository.lagre(innsendtSak);
-                    log.info("Opprettet: {}", opprettetSak);
-                    response = Response.created(new URI(uriInfo.getAbsolutePathBuilder().path(String.valueOf(opprettetSak.getId())).build().getPath()))
-                        .entity(new SakJson(opprettetSak))
-                        .build();
-                }
             }
         } else {
-            response = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(
-                new ErrorResponse(MDC.get("uuid"), abacResultCode.getDescription())
-            ).build();
+
+            response = makeResponseUponAbacFaliure(abacResultCode);
+        }
+
+        return response;
+    }
+
+    private Response doOpprettSak(final Sak sak, final UriInfo uriInfo) throws URISyntaxException {
+
+        final Response response;
+        if (fagSakFinnesFraFoer(sak)) {
+
+            response =
+                Response
+                    .status(Response.Status.CONFLICT)
+                    .entity(
+                        new ErrorResponse(
+                            MDC.get("uuid"),
+                            String.format(
+                                "Det finnes allerede en sak for fagsaksnr: %s, applikasjon: %s, aktør: %s orgnr: %s",
+                                sak.getFagsakNr(),
+                                sak.getApplikasjon(),
+                                sak.getAktoerId(),
+                                sak.getOrgnr())
+                        )
+                    )
+                    .build();
+        } else {
+
+            final Sak opprettetSak = sakRepository.lagre(sak);
+            log.info("Opprettet: {}", opprettetSak);
+            response =
+                Response
+                    .created(
+                        new URI(uriInfo.getAbsolutePathBuilder()
+                            .path(String.valueOf(opprettetSak.getId()))
+                            .build()
+                            .getPath())
+                    )
+                    .entity(new SakJson(opprettetSak))
+                    .build();
         }
 
         return response;
@@ -265,8 +301,93 @@ public class SakResource {
     }
 
     private boolean fagSakFinnesFraFoer(Sak sak) {
-        final SakSearchCriteria sakSearchCriteria = SakSearchCriteria.create().medOrgnr(sak.getOrgnr()).medAktoerId(sak.getAktoerId()).medFagsakNr(sak.getFagsakNr()).medApplikasjon(sak.getApplikasjon());
+
+        final SakSearchCriteria sakSearchCriteria =
+            SakSearchCriteria
+                .create()
+                .medOrgnr(sak.getOrgnr())
+                .medAktoerId(sak.getAktoerId())
+                .medFagsakNr(sak.getFagsakNr())
+                .medApplikasjon(sak.getApplikasjon());
+
         return sak.getFagsakNr() != null &&
             !sakRepository.finnSaker(sakSearchCriteria).isEmpty();
+    }
+
+    private Response checkUsersAccessToSak(
+          final ContainerRequestContext ctx
+        , final Sak sak
+    ) {
+
+        final ABACResult abacResult =
+            sakPEP.autoriser(ctx, new AuthorizationRequest(sak.getAktoerId()));
+        final ABACResult.Code abacResultCode = abacResult.getCode();
+
+        final Response response;
+        if (ABACResult.Code.OK.equals(abacResultCode)) {
+
+            if (abacResult.hasAccess()) {
+
+                response =
+                    Response
+                        .ok(new SakJson(sak))
+                        .build();
+            } else {
+
+                response =
+                    Response
+                        .status(Response.Status.FORBIDDEN)
+                        .entity(
+                            new ErrorResponse(
+                                MDC.get("uuid"),
+                                "Bruker kunne ikke autoriseres for denne operasjonen"
+                            )
+                        )
+                        .build();
+            }
+        } else {
+
+            response = makeResponseUponAbacFaliure(abacResultCode);
+        }
+
+        return response;
+    }
+
+    private Response makeResponseUponAbacFaliure(final ABACResult.Code abacResultCode) {
+
+        final Response.Status responseStatus =
+            mapABACResultCodeToResponseStatus(abacResultCode);
+        final Response response =
+            Response
+                .status(responseStatus)
+                .entity(
+                    new ErrorResponse(
+                        MDC.get("uuid"),
+                        abacResultCode.getDescription()
+                    )
+                )
+                .build();
+
+        return response;
+    }
+
+    private Response.Status mapABACResultCodeToResponseStatus(final ABACResult.Code abacResultCode) {
+
+        final Response.Status responseStatus;
+        if (ABACResult.Code.OK.equals(abacResultCode)) {
+            responseStatus = Response.Status.OK;
+        } else if (
+            ABACResult.Code.CIRCUIT_BREAKER_OPEN.equals(abacResultCode)
+            ||
+            ABACResult.Code.DOWNSTREAMS_HANG.equals(abacResultCode)
+            ||
+            ABACResult.Code.DOWNSTREAMS_SOCKET_TIMEOUT_EXCEPTION.equals(abacResultCode)
+            ) {
+            responseStatus = Response.Status.SERVICE_UNAVAILABLE;
+        } else {
+            responseStatus = Response.Status.INTERNAL_SERVER_ERROR;
+        }
+
+        return responseStatus;
     }
 }
