@@ -6,7 +6,7 @@
 
     <groupId>no.nav</groupId>
     <artifactId>sak</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.1</version>
 
     <properties>
         <jetty.version>9.4.11.v20180605</jetty.version>
@@ -36,7 +36,7 @@
         <ldaptive.version>1.0</ldaptive.version>
         <logback-sylog4j.version>1.0.0</logback-sylog4j.version>
         <ehcache.version>3.5.2</ehcache.version>
-        <oppgavehandtering-security.version>1.19</oppgavehandtering-security.version>
+        <oppgavehandtering-security.version>1.21</oppgavehandtering-security.version>
 
         <!--Managed transitive deps -->
         <akka.actor.version>2.5.4</akka.actor.version>
