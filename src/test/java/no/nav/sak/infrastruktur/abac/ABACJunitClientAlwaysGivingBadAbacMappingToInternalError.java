@@ -5,13 +5,7 @@ import no.nav.sikkerhet.abac.ABACRequest;
 import no.nav.sikkerhet.abac.ABACResult;
 import org.mockito.Mockito;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -23,7 +17,6 @@ public class ABACJunitClientAlwaysGivingBadAbacMappingToInternalError {
         final List<ABACResult.Code> tempAbacResultCodeList = Arrays.asList(ABACResult.Code.values());
         Collections.shuffle(tempAbacResultCodeList, new Random(197));
         final Set<ABACResult.Code> tempAbacResultCodeSet = new HashSet<ABACResult.Code>(tempAbacResultCodeList);
-
         tempAbacResultCodeSet.remove(ABACResult.Code.OK);
         tempAbacResultCodeSet.remove(ABACResult.Code.CIRCUIT_BREAKER_OPEN);
         tempAbacResultCodeSet.remove(ABACResult.Code.DOWNSTREAMS_HANG);
