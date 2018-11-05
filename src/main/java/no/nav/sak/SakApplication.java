@@ -11,6 +11,7 @@ import no.nav.sak.infrastruktur.abac.SakPEP;
 import no.nav.sak.infrastruktur.authentication.AuthenticationFilter;
 import no.nav.sak.validering.ConstraintValidationExceptionMapper;
 import no.nav.sikkerhet.abac.ABACClient;
+import no.nav.sikkerhet.abac.ResilienceConfig;
 import no.nav.sikkerhet.authentication.AuthenticationResult;
 import no.nav.sikkerhet.authentication.Authenticator;
 import no.nav.sikkerhet.authentication.basic.BasicAuthenticator;
@@ -48,22 +49,33 @@ import java.util.logging.Level;
 import static java.util.logging.Logger.getLogger;
 
 public class SakApplication extends ResourceConfig {
+
     private static final Logger log = LoggerFactory.getLogger(SakApplication.class);
+
+    private static final long RESIL_CFG_DOWNSTREAMS_CALL_TIMEOUT_IN_MILLISECONDS =
+        ResilienceConfig.DEFAULT_RESIL_CFG_DOWNSTREAMS_CALL_TIMEOUT_IN_MILLISECONDS;
+    private static final int RESIL_CFG_NUMBER_OF_RETRIES_UPON_EXCEPTION =
+        ResilienceConfig.DEFAULT_RESIL_CFG_NUMBER_OF_RETRIES_UPON_EXCEPTION;
+    private static final long RESIL_CFG_WAIT_DURATION_IN_MILLISECONDS_BETWEEEN_RETRIES =
+        ResilienceConfig.DEFAULT_RESIL_CFG_WAIT_DURATION_IN_MILLISECONDS_BETWEEEN_RETRIES;
+    private static final int RESIL_CFG_RING_BUFFER_SIZE_IN_CLOSED_STATE = 13;
+    private static final int RESIL_CFG_RING_BUFFER_SIZE_IN_HALF_OPEN_STATE = 5;
+    private static final float RESIL_CFG_FAILURE_RATE_THRESHOLD_PERCENTAGE = 50.F;
+    private static final long RESIL_CFG_WAIT_DURATIONIN_IN_MILLISECONDS_IN_OPEN_STATE = 30000L;
 
     @SuppressWarnings("WeakerAccess") //Påkrevd public
     public SakApplication() {
+
         DefaultExports.initialize();
 
-        SakConfiguration sakConfiguration = new SakConfiguration();
-        DataSource sakDataSource = createSakDataSource(sakConfiguration);
-
+        final SakConfiguration sakConfiguration = new SakConfiguration();
+        final DataSource sakDataSource = createSakDataSource(sakConfiguration);
 
         migrateDataWarehouse(sakConfiguration);
 
         migrateSak(sakDataSource);
 
-
-        Database database = createDatabase(sakDataSource);
+        final Database database = createDatabase(sakDataSource);
 
         registerApiResources(database, sakConfiguration);
         registerFilters(sakConfiguration);
@@ -75,13 +87,69 @@ public class SakApplication extends ResourceConfig {
         log.info("Jersey-Application ferdig initialisert");
     }
 
-    void migrateDataWarehouse(SakConfiguration sakConfiguration) {
+    void migrateDataWarehouse(final SakConfiguration sakConfiguration) {
+
         if(sakConfiguration.getBoolean("MIGRATE_DVH", true)) {
             DataSource sakGrDataSource = createSakGrDataSource(sakConfiguration);
             migrateSakGr(sakGrDataSource);
-        }else {
+        } else {
             log.warn("Datavarehus-migrering er skrudd av - ev. endringer i skjema vil ikke migreres");
         }
+    }
+
+    void registerApiResources(final Database database, final SakConfiguration sakConfiguration) {
+
+        final ResilienceConfig resilienceConfig = createResilienceConfig();
+
+        final ABACClient abacClient =
+            new ABACClient(
+                sakConfiguration.getRequiredString("ABAC_PDP_ENDPOINT"),
+                createHttpClient(sakConfiguration),
+                resilienceConfig);
+
+        register(new SakResource(
+            new SakRepository(database),
+            new SakPEP(abacClient))
+        );
+    }
+
+    void registerAuthenticationFilter(final SakConfiguration sakConfiguration) {
+
+        final HttpsJwks httpsJwks = new HttpsJwks(sakConfiguration.getRequiredString("OPENIDCONNECT_ISSO_JWKS"));
+        final OidcTokenValidator oidcTokenValidator = new OidcTokenValidator(new HttpsJwksVerificationKeyResolver(httpsJwks),
+            sakConfiguration.getRequiredString("OPENIDCONNECT_ISSO_ISSUER"));
+
+        final SAMLValidator samlValidator = new SAMLValidator(
+            sakConfiguration.getRequiredString("javax.net.ssl.trustStore"),
+            sakConfiguration.getRequiredString("javax.net.ssl.trustStorePassword"));
+
+        final LdapConfiguration ldapConfiguration = new LdapConfiguration(
+            sakConfiguration.getRequiredString("LDAP_SERVICEUSER_BASEDN"),
+            sakConfiguration.getRequiredString("LDAP_URL"),
+            sakConfiguration.getRequiredString("LDAP_USERNAME"),
+            sakConfiguration.getString("LDAP_PASSWORD", null));
+
+        final CacheManager cacheManager = CacheManagerBuilder.newCacheManagerBuilder()
+            .withCache("basicAuth",
+                CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, AuthenticationResult.class, ResourcePoolsBuilder.heap(100))
+                    .withExpiry(ExpiryPolicyBuilder.timeToLiveExpiration(Duration.ofMinutes(5))))
+            .build();
+        cacheManager.init();
+
+        final Cache<String, AuthenticationResult> cache =
+            cacheManager.getCache("basicAuth", String.class, AuthenticationResult.class);
+
+        final BasicAuthenticator basicAuthenticator = new BasicAuthenticator(ldapConfiguration, cache);
+        final Authenticator authenticator = new Authenticator(oidcTokenValidator, samlValidator, basicAuthenticator);
+        register(new AuthenticationFilter(authenticator));
+    }
+
+    void migrateSak(final DataSource dataSource) {
+        new FlywayMigrator(dataSource, "classpath:db/migration", "classpath:db/oracle/migration").migrate();
+    }
+
+    protected Database createDatabase(final DataSource dataSource) {
+        return new Database(dataSource);
     }
 
     private void registerFeatures() {
@@ -97,48 +165,26 @@ public class SakApplication extends ResourceConfig {
         register(new ParamExceptionMapper());
     }
 
-    private void registerFilters(SakConfiguration sakConfiguration) {
+    private void registerFilters(final SakConfiguration sakConfiguration) {
         register(new CorrelationFilter());
         register(new PrometheusFilter());
         registerAuthenticationFilter(sakConfiguration);
     }
 
-    void registerApiResources(Database database, SakConfiguration sakConfiguration) {
-        ABACClient abacClient = new ABACClient(sakConfiguration.getRequiredString("ABAC_PDP_ENDPOINT"), createHttpClient(sakConfiguration));
-        register(new SakResource(
-            new SakRepository(database),
-            new SakPEP(abacClient))
-        );
-    }
+    private ResilienceConfig createResilienceConfig() {
 
-    void registerAuthenticationFilter(SakConfiguration sakConfiguration) {
-        HttpsJwks httpsJwks = new HttpsJwks(sakConfiguration.getRequiredString("OPENIDCONNECT_ISSO_JWKS"));
-        OidcTokenValidator oidcTokenValidator = new OidcTokenValidator(new HttpsJwksVerificationKeyResolver(httpsJwks),
-            sakConfiguration.getRequiredString("OPENIDCONNECT_ISSO_ISSUER"));
+        final ResilienceConfig resilienceConfig =
+            new ResilienceConfig.Builder()
+                .withDownstreamsCallTimeoutInMilliseconds(RESIL_CFG_DOWNSTREAMS_CALL_TIMEOUT_IN_MILLISECONDS)
+                .withNumberOfRetriesUponException(RESIL_CFG_NUMBER_OF_RETRIES_UPON_EXCEPTION)
+                .withWaitDurationInMillisecondsBetweeenRetries(RESIL_CFG_WAIT_DURATION_IN_MILLISECONDS_BETWEEEN_RETRIES)
+                .withRingBufferSizeInClosedState(RESIL_CFG_RING_BUFFER_SIZE_IN_CLOSED_STATE)
+                .withRingBufferSizeInHalfOpenState(RESIL_CFG_RING_BUFFER_SIZE_IN_HALF_OPEN_STATE)
+                .withExceptionRateBeforeOpeningTheCircuitBreaker(RESIL_CFG_FAILURE_RATE_THRESHOLD_PERCENTAGE)
+                .withWaitDurationInMillisecondsInOpenState(RESIL_CFG_WAIT_DURATIONIN_IN_MILLISECONDS_IN_OPEN_STATE)
+                .build();
 
-        SAMLValidator samlValidator = new SAMLValidator(
-            sakConfiguration.getRequiredString("javax.net.ssl.trustStore"),
-            sakConfiguration.getRequiredString("javax.net.ssl.trustStorePassword"));
-
-        LdapConfiguration ldapConfiguration = new LdapConfiguration(
-            sakConfiguration.getRequiredString("LDAP_SERVICEUSER_BASEDN"),
-            sakConfiguration.getRequiredString("LDAP_URL"),
-            sakConfiguration.getRequiredString("LDAP_USERNAME"),
-            sakConfiguration.getString("LDAP_PASSWORD", null));
-
-        CacheManager cacheManager = CacheManagerBuilder.newCacheManagerBuilder()
-            .withCache("basicAuth",
-                CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, AuthenticationResult.class, ResourcePoolsBuilder.heap(100))
-                    .withExpiry(ExpiryPolicyBuilder.timeToLiveExpiration(Duration.ofMinutes(5))))
-            .build();
-        cacheManager.init();
-
-        Cache<String, AuthenticationResult> cache =
-            cacheManager.getCache("basicAuth", String.class, AuthenticationResult.class);
-
-        BasicAuthenticator basicAuthenticator = new BasicAuthenticator(ldapConfiguration, cache);
-        Authenticator authenticator = new Authenticator(oidcTokenValidator, samlValidator, basicAuthenticator);
-        register(new AuthenticationFilter(authenticator));
+        return resilienceConfig;
     }
 
     private void initSAML() {
@@ -149,9 +195,10 @@ public class SakApplication extends ResourceConfig {
         }
     }
 
-    private HttpClient createHttpClient(SakConfiguration sakConfiguration) {
-        int timeout = Integer.parseInt(sakConfiguration.getString("ABAC_READ_TIMEOUT", "5000"));
-        RequestConfig requestConfig = RequestConfig
+    private HttpClient createHttpClient(final SakConfiguration sakConfiguration) {
+
+        final int timeout = Integer.parseInt(sakConfiguration.getString("ABAC_READ_TIMEOUT", "5000"));
+        final RequestConfig requestConfig = RequestConfig
             .custom()
             .setConnectionRequestTimeout(timeout)
             .setSocketTimeout(timeout)
@@ -159,17 +206,18 @@ public class SakApplication extends ResourceConfig {
             .build();
 
 
-        HttpClientBuilder httpClientBuilder = HttpClientBuilder
+        final HttpClientBuilder httpClientBuilder = HttpClientBuilder
             .create()
             .setDefaultRequestConfig(requestConfig);
 
-        UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(
+        final UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(
             sakConfiguration.getRequiredString("SRVSAK_USERNAME"),
             sakConfiguration.getRequiredString("SRVSAK_PASSWORD"));
 
-        CredentialsProvider provider = new BasicCredentialsProvider();
+        final CredentialsProvider provider = new BasicCredentialsProvider();
         provider.setCredentials(AuthScope.ANY, credentials);
         httpClientBuilder.setDefaultCredentialsProvider(provider);
+
         return httpClientBuilder.build();
     }
 
@@ -182,18 +230,9 @@ public class SakApplication extends ResourceConfig {
         beanConfig.setScan();
         register(ApiListingResource.class);
         register(SwaggerSerializers.class);
-
     }
 
-    protected Database createDatabase(DataSource dataSource) {
-        return new Database(dataSource);
-    }
-
-    void migrateSak(DataSource dataSource) {
-        new FlywayMigrator(dataSource, "classpath:db/migration", "classpath:db/oracle/migration").migrate();
-    }
-
-    private void migrateSakGr(DataSource sakGrDataSource) {
+    private void migrateSakGr(final DataSource sakGrDataSource) {
         new FlywayMigrator(sakGrDataSource, "classpath:db/dvh/migration").migrate();
     }
 
@@ -204,8 +243,9 @@ public class SakApplication extends ResourceConfig {
     }
 
 
-    protected DataSource createSakDataSource(SakConfiguration sakConfiguration) {
-        HikariDataSource dataSource = new HikariDataSource();
+    protected DataSource createSakDataSource(final SakConfiguration sakConfiguration) {
+
+        final HikariDataSource dataSource = new HikariDataSource();
         dataSource.setMetricsTrackerFactory(new PrometheusMetricsTrackerFactory());
 
         dataSource.setUsername(sakConfiguration.getRequiredString("SAKDS_USERNAME"));
@@ -216,14 +256,16 @@ public class SakApplication extends ResourceConfig {
         return dataSource;
     }
 
-    private DataSource createSakGrDataSource(SakConfiguration sakConfiguration) {
-        HikariDataSource dataSource = new HikariDataSource();
+    private DataSource createSakGrDataSource(final SakConfiguration sakConfiguration) {
+
+        final HikariDataSource dataSource = new HikariDataSource();
 
         dataSource.setUsername(sakConfiguration.getRequiredString("SAK_GR_DS_USERNAME"));
         dataSource.setPassword(sakConfiguration.getRequiredString("SAK_GR_DS_PASSWORD"));
         dataSource.setJdbcUrl(sakConfiguration.getRequiredString("SAK_GR_DS_URL"));
 
         log.info("Opprettet datasource for dvh: {}", dataSource.getJdbcUrl());
+
         return dataSource;
     }
 }
