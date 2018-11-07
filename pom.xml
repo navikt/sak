@@ -301,6 +301,12 @@
 
             <dependency>
                 <groupId>io.netty</groupId>
+                <artifactId>netty-common</artifactId>
+                <version>${netty.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.netty</groupId>
                 <artifactId>netty-codec</artifactId>
                 <version>${netty.version}</version>
             </dependency>
@@ -320,12 +326,6 @@
             <dependency>
                 <groupId>io.netty</groupId>
                 <artifactId>netty-resolver-dns</artifactId>
-                <version>${netty.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>io.netty</groupId>
-                <artifactId>netty-common</artifactId>
                 <version>${netty.version}</version>
             </dependency>
 
@@ -559,18 +559,27 @@
             <version>${gatling.version}</version>
             <scope>test</scope>
             <exclusions>
+
                 <exclusion>
                     <groupId>org.reactivestreams</groupId>
                     <artifactId>reactive-streams</artifactId>
                 </exclusion>
+
+                <exclusion>
+                    <groupId>io.netty</groupId>
+                    <artifactId>netty-common</artifactId>
+                </exclusion>
+
                 <exclusion>
                     <groupId>io.netty</groupId>
                     <artifactId>netty-codec</artifactId>
                 </exclusion>
+
                 <exclusion>
                     <groupId>io.netty</groupId>
                     <artifactId>netty-transport</artifactId>
                 </exclusion>
+
                 <exclusion>
                     <groupId>io.netty</groupId>
                     <artifactId>netty-buffer</artifactId>
@@ -581,12 +590,13 @@
                     <artifactId>netty-resolver-dns</artifactId>
                 </exclusion>
 
-                <exclusion>
-                    <groupId>io.netty</groupId>
-                    <artifactId>netty-common</artifactId>
-                </exclusion>
-
             </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-common</artifactId>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
@@ -610,12 +620,6 @@
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-resolver-dns</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>io.netty</groupId>
-            <artifactId>netty-common</artifactId>
             <scope>test</scope>
         </dependency>
 
