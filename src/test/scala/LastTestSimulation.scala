@@ -16,7 +16,7 @@ class LastTestSimulation extends Simulation {
         http
             .baseURL("https://sak-t8.nais.preprod.local/api/v1")
             .warmUp("https://sak-t8.nais.preprod.local/internal/alive")
-            .proxy(Proxy("webproxy-utvikler.nav.no", 8088))
+            // .proxy(Proxy("webproxy-utvikler.nav.no", 8088))
 
     private val aktoerIdFeeder = csv("data/aktoerId.csv").circular
     private val temaFeeder = csv("data/tema.csv").circular
