@@ -12,7 +12,12 @@ class LastTestSimulation extends Simulation {
     private val authHeaderOidc = "Bearer " + new OidcLogin().getIdToken
     private val authHeaderSaml = "Saml " + new STSSupport().getSystemSAMLTokenFromSTS
     private val authHeaderBasic = new BasicAuthTestHeaderProvider().getHeader
-    private val httpProtocol = http.baseURL("https://sak-t8.nais.preprod.local/api/v1").warmUp("https://sak-t8.nais.preprod.local/internal/alive")
+    private val httpProtocol =
+        http
+            .baseURL("https://sak-t8.nais.preprod.local/api/v1")
+            .warmUp("https://sak-t8.nais.preprod.local/internal/alive")
+            .proxy(Proxy("http://webproxy-utvikler.nav.no", 8088))
+
     private val aktoerIdFeeder = csv("data/aktoerId.csv").circular
     private val temaFeeder = csv("data/tema.csv").circular
     private val applikasjonFeeder = csv("data/applikasjon.csv").circular
