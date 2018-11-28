@@ -47,7 +47,17 @@
         <scala.library.version>2.12.3</scala.library.version>
         <scala.parser.combinators.version>1.0.6</scala.parser.combinators.version>
         <javax.servlet.version>3.1.0</javax.servlet.version>
+
+
+        <!--
         <netty.version>4.1.31.Final</netty.version>
+        <netty.version>4.0.51.Final</netty.version>
+        -->
+        <netty.version>4.1.0.Final</netty.version>
+
+
+
+
         <bouncycastle.version>1.58</bouncycastle.version>
         <commons.codec.version>1.10</commons.codec.version>
         <commons.collections.version>3.2.2</commons.collections.version>
