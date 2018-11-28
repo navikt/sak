@@ -38,7 +38,6 @@
         <ldaptive.version>1.0</ldaptive.version>
         <logback-sylog4j.version>1.0.0</logback-sylog4j.version>
         <ehcache.version>3.5.2</ehcache.version>
-        <netty.version>4.1.31.Final</netty.version>
         <reactive-streams.version>1.0.2</reactive-streams.version>
 
         <!--Managed transitive deps -->
@@ -48,7 +47,7 @@
         <scala.library.version>2.12.3</scala.library.version>
         <scala.parser.combinators.version>1.0.6</scala.parser.combinators.version>
         <javax.servlet.version>3.1.0</javax.servlet.version>
-        <netty.handler.version>4.0.51.Final</netty.handler.version>
+        <netty.version>4.1.31.Final</netty.version>
         <bouncycastle.version>1.58</bouncycastle.version>
         <commons.codec.version>1.10</commons.codec.version>
         <commons.collections.version>3.2.2</commons.collections.version>
@@ -210,7 +209,7 @@
             <dependency>
                 <groupId>io.netty</groupId>
                 <artifactId>netty-handler</artifactId>
-                <version>${netty.handler.version}</version>
+                <version>${netty.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.scala-lang.modules</groupId>
