@@ -19,17 +19,25 @@
         <appender-ref ref="METRICS"/>
     </logger>
 
-    <logger name="io.gatling" level="OFF" additivity="false">
+    <!-- |
+         | GATLING BEGIN
+         | -->
+
+    <logger name="io.gatling" level="DEBUG" additivity="false">
         <appender-ref ref="STDOUT"/>
     </logger>
 
-    <logger name="io.gatling.http.ahc" level="OFF" additivity="false">
+    <logger name="io.gatling.http.ahc" level="DEBUG" additivity="false">
         <appender-ref ref="STDOUT"/>
     </logger>
 
-    <logger name="io.gatling.http.response" level="OFF" additivity="false">
+    <logger name="io.gatling.http.response" level="DEBUG" additivity="false">
         <appender-ref ref="STDOUT"/>
     </logger>
+
+    <!-- |
+         | GATLING END
+         | -->
 
     <logger name="org.ldaptive" level="OFF" additivity="false">
         <appender-ref ref="STDOUT"/>
