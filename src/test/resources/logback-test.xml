@@ -19,6 +19,8 @@
         <appender-ref ref="METRICS"/>
     </logger>
 
+
+
     <!-- |
          | GATLING BEGIN
          | -->
@@ -35,9 +37,16 @@
         <appender-ref ref="STDOUT"/>
     </logger>
 
+    <logger name="io.gatling.http" level="DEBUG" >
+        <appender-ref ref="STDOUT"/>
+    </logger>
+
     <!-- |
          | GATLING END
          | -->
+
+
+
 
     <logger name="org.ldaptive" level="OFF" additivity="false">
         <appender-ref ref="STDOUT"/>
