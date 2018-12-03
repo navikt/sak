@@ -91,13 +91,13 @@
         <pitest-junit5-plugin.version>0.7</pitest-junit5-plugin.version>
         <pitest-maven.version>1.4.3</pitest-maven.version>
         <mockito.version>1.9.5</mockito.version>
-        <!--
+
         <gatling.version>2.3.1</gatling.version>
         <gatling-maven-plugin.version>2.2.4</gatling-maven-plugin.version>
-        -->
-        <gatling.version>3.0.1.1</gatling.version>
-        <gatling-maven-plugin.version>3.0.1</gatling-maven-plugin.version>
-
+        <!--
+           <gatling.version>3.0.1.1</gatling.version>
+           <gatling-maven-plugin.version>3.0.1</gatling-maven-plugin.version>
+   -->
         <maven-enforcer-plugin.version>3.0.0-M1</maven-enforcer-plugin.version>
 
     </properties>
