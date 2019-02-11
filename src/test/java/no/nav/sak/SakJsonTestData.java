@@ -2,12 +2,12 @@ package no.nav.sak;
 
 import com.google.gson.JsonObject;
 
-class SakJsonTestData {
+public class SakJsonTestData {
     private Sak sak;
     private String applikasjon;
     private String tema;
 
-    SakJsonTestData(Sak sak) {
+    public SakJsonTestData(Sak sak) {
         this.sak = sak;
     }
 
@@ -24,7 +24,7 @@ class SakJsonTestData {
         return this;
     }
 
-    String buildJsonString() {
+    public String buildJsonString() {
         JsonObject jsonObject = new JsonObject();
         if (sak != null) {
             jsonObject.addProperty("tema", sak.getTema());

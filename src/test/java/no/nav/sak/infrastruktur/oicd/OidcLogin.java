@@ -21,28 +21,37 @@ import java.net.URL;
 public class OidcLogin {
     private SakConfiguration sakConfiguration = new SakConfiguration();
 
-    public String getIdToken() throws Exception {
-        OIDCProviderMetadata providerMetadata = getOidcProviderMetadata();
-        String redirectUrl = "https://sak.nais.preprod.local/";
-
+    public String getIdToken()  {
         String username = sakConfiguration.getRequiredString("junit.sts.user");
         String password = sakConfiguration.getRequiredString("junit.sts.password");
-
-        OidcAuthenticator oidcAuthenticator = new OidcAuthenticator(providerMetadata.getAuthorizationEndpointURI(), redirectUrl);
-        String authorizationCode = oidcAuthenticator.getAuthorizationCode(username, password);
-
-        String clientId = sakConfiguration.getRequiredString("isso-rp-issuer");
-        String clientSecret = sakConfiguration.getRequiredString("OpenIdConnectAgent.password");
-
-        TokenRequest tokenRequest = new TokenRequest(
-            providerMetadata.getTokenEndpointURI(),
-            new ClientSecretBasic(new ClientID(clientId), new Secret(clientSecret)),
-            new AuthorizationCodeGrant(new AuthorizationCode(authorizationCode), new URI(redirectUrl))
-        );
-        HTTPResponse httpTokenResponse = tokenRequest.toHTTPRequest().send();
-        OIDCTokenResponse tokenResponse = (OIDCTokenResponse) OIDCTokenResponseParser.parse(httpTokenResponse);
-        return tokenResponse.getOIDCTokens().getIDTokenString();
+        return getIdToken(username, password);
     }
+
+    public String getIdToken(String username, String password) {
+        try {
+            OIDCProviderMetadata providerMetadata = getOidcProviderMetadata();
+            String redirectUrl = "https://sak.nais.preprod.local/";
+
+            OidcAuthenticator oidcAuthenticator = new OidcAuthenticator(providerMetadata.getAuthorizationEndpointURI(), redirectUrl);
+            String authorizationCode = oidcAuthenticator.getAuthorizationCode(username, password);
+
+            String clientId = sakConfiguration.getRequiredString("isso-rp-issuer");
+            String clientSecret = sakConfiguration.getRequiredString("OpenIdConnectAgent.password");
+
+            TokenRequest tokenRequest = new TokenRequest(
+                providerMetadata.getTokenEndpointURI(),
+                new ClientSecretBasic(new ClientID(clientId), new Secret(clientSecret)),
+                new AuthorizationCodeGrant(new AuthorizationCode(authorizationCode), new URI(redirectUrl))
+            );
+            HTTPResponse httpTokenResponse = tokenRequest.toHTTPRequest().send();
+            OIDCTokenResponse tokenResponse = (OIDCTokenResponse) OIDCTokenResponseParser.parse(httpTokenResponse);
+            return tokenResponse.getOIDCTokens().getIDTokenString();
+        } catch(Exception e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
+
+
 
     private OIDCProviderMetadata getOidcProviderMetadata() throws IOException, ParseException {
         URL providerConfigurationURI = new URL("https://isso-t.adeo.no/isso/oauth2/.well-known/openid-configuration");
