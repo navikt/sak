@@ -13,7 +13,7 @@ public class SakH2Application extends SakApplication {
     void migrateDataWarehouse(SakConfiguration sakConfiguration){}
 
     void migrateSak(DataSource dataSource) {
-        new FlywayMigrator(dataSource, "classpath:db/migration").migrate();
+        new FlywayMigrator(dataSource, "classpath:db/migration", "classpath:/db/h2/migration").migrate();
     }
 
 }

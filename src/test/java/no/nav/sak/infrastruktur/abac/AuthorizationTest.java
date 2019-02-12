@@ -30,7 +30,7 @@ class AuthorizationTest {
     private static final String NAVRESSURS_TILGANG_REGIONAL = "Z990266";
     private static final String NAVRESSURS_TILGANG_KODE7 = "Z990743";
     private static final String NAVRESSURS_IKKE_TILGANG_KODE7 = "Z990266";
-    private static final String SYSTEMBRUKER_UTEN_TILGANG = "srvgosys";
+    private static final String SYSTEMBRUKER_UTEN_TILGANG = "srvsak";
     private static final String SYSTEMBRUKER_MED_TILGANG = "srvgsak";
 
 
@@ -39,6 +39,7 @@ class AuthorizationTest {
 
     @BeforeAll
     static void setup() throws Exception {
+        System.setProperty("sak.port", "8099");
         devJetty = new DevJetty();
         devJetty.start();
     }
@@ -92,6 +93,17 @@ class AuthorizationTest {
         verifiserIngenTilgang(NAVRESSURS_IKKE_TILGANG_EGEN_ANSATT_USERNAME, navressursPassord, id, aktoerId);
     }
 
+    @Test
+    void navressurs_med_tilgang_kode_7_gir_tilgang_til_saker_koblet_mot_kode_7_bruker() {
+        verifiserSakTilgang(NAVRESSURS_TILGANG_KODE7, navressursPassord, sakConfiguration.getRequiredString("AKTOERID_KODE7"));
+    }
+
+    @Test
+    void navressurs_uten_tilgang_kode_7_gir_ikke_tilgang_til_saker_koblet_mot_kode_7_bruker() {
+        String aktoerId = sakConfiguration.getRequiredString("AKTOERID_KODE7");
+        Long id = opprettSak(NAVRESSURS_TILGANG_KODE7, navressursPassord, aktoerId);
+        verifiserIngenTilgang(NAVRESSURS_IKKE_TILGANG_KODE7, navressursPassord, id, aktoerId);
+    }
 
     @Test
     void systembruker_uten_tilgangsrolle_har_ikke_tilgang_til_saker() {
@@ -103,19 +115,6 @@ class AuthorizationTest {
     @Test
     void systembruker_med_tilgangsrolle_gir_tilgang_til_alle_saker() {
         verifiserSakTilgang(SYSTEMBRUKER_MED_TILGANG, sakConfiguration.getRequiredString("SYSTEMBRUKER_MED_TILGANG_PASSWORD"), sakConfiguration.getRequiredString("AKTOERID_EGEN_ANSATT"));
-    }
-
-
-    @Test
-    void nav_ressurs_med_tilgang_kode_7_gir_tilgang_til_saker_koblet_mot_kode_7_bruker() {
-        verifiserSakTilgang(NAVRESSURS_TILGANG_KODE7, navressursPassord, sakConfiguration.getRequiredString("AKTOERID_KODE7"));
-    }
-
-    @Test
-    void nav_ressurs_uten_tilgang_kode_7_gir_ikke_tilgang_til_saker_koblet_mot_kode_7_bruker() {
-        String aktoerId = sakConfiguration.getRequiredString("AKTOERID_KODE7");
-        Long id = opprettSak(NAVRESSURS_TILGANG_KODE7, navressursPassord, aktoerId);
-        verifiserIngenTilgang(NAVRESSURS_IKKE_TILGANG_KODE7, navressursPassord, id, aktoerId);
     }
 
     @Test
@@ -136,7 +135,7 @@ class AuthorizationTest {
             .extract().jsonPath().getLong("id");
 
         Object aktoerID = oidc(username, password).pathParam("id", id).get("api/v1/saker/{id}").then().statusCode(200).extract().path("aktoerId");
-        oidc(username, password).queryParam("aktoerId", aktoerID).get("api/v1/saker").then().statusCode(200).body("saker.aktoerId", hasItem(aktoerId));
+        oidc(username, password).queryParam("aktoerId", aktoerID).get("api/v1/saker").then().statusCode(200).body("aktoerId", hasItem(aktoerId));
     }
 
     private void verifiserIngenTilgang(String usernameIkkeTilgang, String passwordIkkeTilgang, Long oppgaveId, String aktoerid) {
@@ -144,10 +143,10 @@ class AuthorizationTest {
             .aktoerId(aktoerid)
             .build();
         oidc(usernameIkkeTilgang, passwordIkkeTilgang).body(new SakJsonTestData(sak).buildJsonString())
-            .post("api/v1/oppgaver").then().statusCode(403);
+            .post("api/v1/saker").then().statusCode(403);
 
-        oidc(usernameIkkeTilgang, passwordIkkeTilgang).pathParam("id", oppgaveId).get("api/v1/oppgaver/{id}").then().statusCode(403);
-        oidc(usernameIkkeTilgang, passwordIkkeTilgang).queryParam("aktoerId", aktoerid).get("api/v1/oppgaver").then().statusCode(200).body("oppgaver.aktoerId", not(hasItem(aktoerid)));
+        oidc(usernameIkkeTilgang, passwordIkkeTilgang).pathParam("id", oppgaveId).get("api/v1/saker/{id}").then().statusCode(403);
+        oidc(usernameIkkeTilgang, passwordIkkeTilgang).queryParam("aktoerId", aktoerid).get("api/v1/saker").then().statusCode(200).body("aktoerId", not(hasItem(aktoerid)));
     }
 
     private Long opprettSak(String username, String password, String aktoerId) {
@@ -158,7 +157,7 @@ class AuthorizationTest {
 
     private Long opprettSak(String username, String password, SakTestData sakTestData) {
         return oidc(username, password)
-            .body(new SakJsonTestData(sakTestData.build()).buildJsonString()).post("api/v1/oppgaver").then()
+            .body(new SakJsonTestData(sakTestData.build()).buildJsonString()).post("api/v1/saker").then()
             .extract().jsonPath().getLong("id");
     }
 
@@ -168,7 +167,7 @@ class AuthorizationTest {
     }
 
     private RequestSpecification baseSpec() {
-        return given().basePath(basePath)
+        return given().port(8099)
             .header("X-Correlation-ID", "Junit")
             .accept(ContentType.JSON)
             .contentType(ContentType.JSON);
