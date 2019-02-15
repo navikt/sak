@@ -14,7 +14,7 @@ public class ABACJunitClient {
 
         final ABACClient abacClient = mock(ABACClient.class);
         final ABACResult abacResult = mock(ABACResult.class);
-        when(abacResult.getCode()).thenReturn(ABACResult.Code.OK);
+        when(abacResult.getResultCode()).thenReturn(ABACResult.Code.OK);
         when(abacClient.execute(Mockito.any(ABACRequest.class))).thenReturn(abacResult);
         when(abacResult.hasAccess()).thenReturn(true);
 

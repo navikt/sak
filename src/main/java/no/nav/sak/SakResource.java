@@ -1,27 +1,5 @@
 package no.nav.sak;
 
-import static io.swagger.annotations.ApiKeyAuthDefinition.ApiKeyLocation.HEADER;
-import static java.util.stream.Collectors.toList;
-import static javax.ws.rs.core.Response.Status.NOT_FOUND;
-import static no.nav.sak.infrastruktur.ContextExtractor.getSubjectType;
-import static no.nav.sak.infrastruktur.SubjectType.SUBJECT_TYPE_EKSTERNBRUKER;
-import static no.nav.sak.infrastruktur.authentication.AuthenticationFilter.REQUEST_CONSUMERID;
-import static no.nav.sak.infrastruktur.authentication.AuthenticationFilter.REQUEST_USERNAME;
-
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import javax.validation.Valid;
-import javax.ws.rs.*;
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
-
 import io.swagger.annotations.*;
 import no.nav.sak.infrastruktur.EnableApiFilters;
 import no.nav.sak.infrastruktur.ErrorResponse;
@@ -31,6 +9,28 @@ import no.nav.sikkerhet.abac.ABACResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
+
+import javax.validation.Valid;
+import javax.ws.rs.*;
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+
+import static io.swagger.annotations.ApiKeyAuthDefinition.ApiKeyLocation.HEADER;
+import static java.util.stream.Collectors.toList;
+import static javax.ws.rs.core.Response.Status.NOT_FOUND;
+import static no.nav.sak.infrastruktur.ContextExtractor.getSubjectType;
+import static no.nav.sak.infrastruktur.SubjectType.SUBJECT_TYPE_EKSTERNBRUKER;
+import static no.nav.sak.infrastruktur.authentication.AuthenticationFilter.REQUEST_CONSUMERID;
+import static no.nav.sak.infrastruktur.authentication.AuthenticationFilter.REQUEST_USERNAME;
 
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
@@ -168,7 +168,7 @@ public class SakResource {
 
         final ABACResult abacResult =
             sakPEP.autoriser(ctx, new AuthorizationRequest(sakSearchRequest.getAktoerId()));
-        final ABACResult.Code abacResultCode = abacResult.getCode();
+        final ABACResult.Code abacResultCode = abacResult.getResultCode();
         final Response response;
         if (ABACResult.Code.OK.equals(abacResultCode)) {
 
@@ -225,7 +225,7 @@ public class SakResource {
         log.info("Oppretter sak for {}", aktoerId);
 
         final ABACResult abacResult = sakPEP.autoriser(ctx, new AuthorizationRequest(aktoerId));
-        final ABACResult.Code abacResultCode = abacResult.getCode();
+        final ABACResult.Code abacResultCode = abacResult.getResultCode();
         final Response response;
         if (ABACResult.Code.OK.equals(abacResultCode)) {
 
@@ -321,7 +321,7 @@ public class SakResource {
 
         final ABACResult abacResult =
             sakPEP.autoriser(ctx, new AuthorizationRequest(sak.getAktoerId()));
-        final ABACResult.Code abacResultCode = abacResult.getCode();
+        final ABACResult.Code abacResultCode = abacResult.getResultCode();
 
         final Response response;
         if (ABACResult.Code.OK.equals(abacResultCode)) {
@@ -357,7 +357,7 @@ public class SakResource {
 
         final Response.Status responseStatus =
             mapABACResultCodeToResponseStatus(abacResultCode);
-        final Response response =
+        return
             Response
                 .status(responseStatus)
                 .entity(
@@ -367,8 +367,6 @@ public class SakResource {
                     )
                 )
                 .build();
-
-        return response;
     }
 
     private Response.Status mapABACResultCodeToResponseStatus(final ABACResult.Code abacResultCode) {

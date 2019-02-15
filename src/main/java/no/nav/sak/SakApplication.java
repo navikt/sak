@@ -11,13 +11,15 @@ import no.nav.sak.infrastruktur.abac.SakPEP;
 import no.nav.sak.infrastruktur.authentication.AuthenticationFilter;
 import no.nav.sak.validering.ConstraintValidationExceptionMapper;
 import no.nav.sikkerhet.abac.ABACClient;
-import no.nav.sikkerhet.abac.ResilienceConfig;
 import no.nav.sikkerhet.authentication.AuthenticationResult;
 import no.nav.sikkerhet.authentication.Authenticator;
 import no.nav.sikkerhet.authentication.basic.BasicAuthenticator;
 import no.nav.sikkerhet.authentication.basic.LdapConfiguration;
 import no.nav.sikkerhet.authentication.oidc.OidcTokenValidator;
 import no.nav.sikkerhet.authentication.saml.SAMLValidator;
+import no.nav.sikkerhet.resilience.ResilienceConfig;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
@@ -36,6 +38,7 @@ import org.glassfish.jersey.logging.LoggingFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.jose4j.jwk.HttpsJwks;
 import org.jose4j.keys.resolvers.HttpsJwksVerificationKeyResolver;
+import org.jose4j.keys.resolvers.VerificationKeyResolver;
 import org.opensaml.core.config.InitializationException;
 import org.opensaml.core.config.InitializationService;
 import org.slf4j.Logger;
@@ -44,6 +47,7 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import javax.sql.DataSource;
 import java.time.Duration;
+import java.util.*;
 import java.util.logging.Level;
 
 import static java.util.logging.Logger.getLogger;
@@ -100,12 +104,18 @@ public class SakApplication extends ResourceConfig {
     void registerApiResources(final Database database, final SakConfiguration sakConfiguration) {
 
         final ResilienceConfig resilienceConfig = createResilienceConfig();
-
-        final ABACClient abacClient =
-            new ABACClient(
+        ABACClient abacClient;
+        if(sakConfiguration.getBoolean("RESILIENCE_ENABLED", false)) {
+            abacClient =  new ABACClient(
+                    sakConfiguration.getRequiredString("ABAC_PDP_ENDPOINT"),
+                    createHttpClient(sakConfiguration),
+                    resilienceConfig);
+        } else {
+            abacClient =  new ABACClient(
                 sakConfiguration.getRequiredString("ABAC_PDP_ENDPOINT"),
-                createHttpClient(sakConfiguration),
-                resilienceConfig);
+                createHttpClient(sakConfiguration));
+        }
+
 
         register(new SakResource(
             new SakRepository(database),
@@ -114,10 +124,17 @@ public class SakApplication extends ResourceConfig {
     }
 
     void registerAuthenticationFilter(final SakConfiguration sakConfiguration) {
+        Map<String, VerificationKeyResolver> resolvers = new HashMap<>();
+        List<OIDCIssuer> supportedIssuers = Collections.singletonList(
+            new OIDCIssuer(sakConfiguration.getRequiredString("OPENIDCONNECT_ISSO_ISSUER"), sakConfiguration.getRequiredString("OPENIDCONNECT_ISSO_JWKS"))
+        );
 
-        final HttpsJwks httpsJwks = new HttpsJwks(sakConfiguration.getRequiredString("OPENIDCONNECT_ISSO_JWKS"));
-        final OidcTokenValidator oidcTokenValidator = new OidcTokenValidator(new HttpsJwksVerificationKeyResolver(httpsJwks),
-            sakConfiguration.getRequiredString("OPENIDCONNECT_ISSO_ISSUER"));
+        for(OIDCIssuer issuer: supportedIssuers) {
+            resolvers.put(issuer.issuer, new HttpsJwksVerificationKeyResolver(new HttpsJwks(issuer.jwks)));
+        }
+
+
+        final OidcTokenValidator oidcTokenValidator = new OidcTokenValidator(resolvers);
 
         final SAMLValidator samlValidator = new SAMLValidator(
             sakConfiguration.getRequiredString("javax.net.ssl.trustStore"),
@@ -172,8 +189,7 @@ public class SakApplication extends ResourceConfig {
     }
 
     private ResilienceConfig createResilienceConfig() {
-
-        final ResilienceConfig resilienceConfig =
+        return
             new ResilienceConfig.Builder()
                 .withDownstreamsCallTimeoutInMilliseconds(RESIL_CFG_DOWNSTREAMS_CALL_TIMEOUT_IN_MILLISECONDS)
                 .withNumberOfRetriesUponException(RESIL_CFG_NUMBER_OF_RETRIES_UPON_EXCEPTION)
@@ -183,8 +199,6 @@ public class SakApplication extends ResourceConfig {
                 .withExceptionRateBeforeOpeningTheCircuitBreaker(RESIL_CFG_FAILURE_RATE_THRESHOLD_PERCENTAGE)
                 .withWaitDurationInMillisecondsInOpenState(RESIL_CFG_WAIT_DURATIONIN_IN_MILLISECONDS_IN_OPEN_STATE)
                 .build();
-
-        return resilienceConfig;
     }
 
     private void initSAML() {
@@ -267,5 +281,23 @@ public class SakApplication extends ResourceConfig {
         log.info("Opprettet datasource for dvh: {}", dataSource.getJdbcUrl());
 
         return dataSource;
+    }
+
+    static class OIDCIssuer {
+        private String issuer;
+        private String jwks;
+
+        OIDCIssuer(String issuer, String jwksUri) {
+            this.issuer = issuer;
+            this.jwks = jwksUri;
+        }
+
+        @Override
+        public String toString() {
+            return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
+                .append("issuer", issuer)
+                .append("jwks", jwks)
+                .toString();
+        }
     }
 }

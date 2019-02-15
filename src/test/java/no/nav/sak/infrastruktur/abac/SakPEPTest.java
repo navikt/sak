@@ -67,7 +67,7 @@ class SakPEPTest {
         ABACRequest req = authorizeReturningCaptureOfRequest(ctx, new AuthorizationRequest(aktoerId));
 
         assertDefaulValuesSpecifiedCorrectly(req);
-        assertThat(req.getResource().getAttributes()).contains(new ABACAttribute(RESOURCE_FELLES_PERSON_AKTOERID_RESOURCE, aktoerId));
+        assertThat(req.getResources().get(0).getAttributes()).contains(new ABACAttribute(RESOURCE_FELLES_PERSON_AKTOERID_RESOURCE, aktoerId));
     }
 
     private ContainerRequestContext mockContextFor(String username, String authHeaderContent) {
@@ -91,7 +91,7 @@ class SakPEPTest {
 
     private void assertDefaulValuesSpecifiedCorrectly(ABACRequest req) {
         assertThat(req.getEnvironment().getAttributes()).contains(new ABACAttribute(ENVIRONMENT_FELLES_PEP_ID ,"sak"));
-        assertThat(req.getResource().getAttributes()).contains(
+        assertThat(req.getResources().get(0).getAttributes()).contains(
             new ABACAttribute(RESOURCE_FELLES_DOMENE, "sak"),
             new ABACAttribute(RESOURCE_FELLES_RESOURCE_TYPE, RESOURCE_TYPE_SAK));
     }

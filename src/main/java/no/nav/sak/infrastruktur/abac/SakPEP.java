@@ -5,10 +5,7 @@ import io.prometheus.client.Histogram;
 import no.nav.abac.xacml.NavAttributter;
 import no.nav.abac.xacml.StandardAttributter;
 import no.nav.sak.infrastruktur.ContextExtractor;
-import no.nav.sikkerhet.abac.ABACAttribute;
-import no.nav.sikkerhet.abac.ABACClient;
-import no.nav.sikkerhet.abac.ABACRequest;
-import no.nav.sikkerhet.abac.ABACResult;
+import no.nav.sikkerhet.abac.*;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,12 +44,15 @@ public class SakPEP {
           final ContainerRequestContext ctx
         , final AuthorizationRequest authorizationRequest) {
 
+        ABACCategory category = new ABACCategory()
+            .addAttribute(new ABACAttribute(RESOURCE_FELLES_DOMENE, "sak"))
+            .addAttribute(new ABACAttribute(RESOURCE_FELLES_RESOURCE_TYPE, RESOURCE_TYPE_SAK));
+
         final ABACRequest abacRequest = ABACRequest.newRequest()
             .addEnvironment(new ABACAttribute(ENVIRONMENT_FELLES_PEP_ID, "sak"))
-            .addResource(new ABACAttribute(RESOURCE_FELLES_DOMENE, "sak"))
-            .addResource(new ABACAttribute(RESOURCE_FELLES_RESOURCE_TYPE, RESOURCE_TYPE_SAK));
+            .addResource(category);
 
-        authorizationRequest.getAktoerId().ifPresent(aktoerId -> abacRequest.addResource(new ABACAttribute(RESOURCE_FELLES_PERSON_AKTOERID_RESOURCE, aktoerId)));
+        authorizationRequest.getAktoerId().ifPresent(aktoerId -> category.addAttribute(new ABACAttribute(RESOURCE_FELLES_PERSON_AKTOERID_RESOURCE, aktoerId)));
 
         final String authIdentifier = substringBefore(trim(ctx.getHeaderString(AUTHORIZATION)), " ");
         final String token = substringAfter(trim(ctx.getHeaderString(AUTHORIZATION)), " ");
@@ -78,9 +78,8 @@ public class SakPEP {
         final ABACResult abacResult;
         try {
             abacResult = abacClient.execute(abacRequest);
-            if (ABACResult.Code.OK.equals(abacResult.getCode())) {
-
-                final String arcsightPreparedRequest = stripBrackets(abacRequest.getResource().getAttributes().toString());
+            if (ABACResult.Code.OK.equals(abacResult.getResultCode())) {
+                final String arcsightPreparedRequest = stripBrackets(abacRequest.getResources().get(0).getAttributes().toString()); //TODO Dette bør gjøres mer elegant, og robus + test av loggingen.
                 String arcsightPreparedResult = StringUtils.remove(stripBrackets(abacResult.toString()), "associatedAdvice=");
                 if (abacResult.getAssociatedAdvice().isEmpty()) {
                     arcsightPreparedResult = StringUtils.remove(arcsightPreparedResult, ",");
