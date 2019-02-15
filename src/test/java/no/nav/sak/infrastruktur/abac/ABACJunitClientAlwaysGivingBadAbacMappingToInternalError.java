@@ -35,7 +35,7 @@ public class ABACJunitClientAlwaysGivingBadAbacMappingToInternalError {
         for (int i = 0; i < abacResultCodesMappingToInternalError.size(); i++) {
             arrayOfAbacResultCodesExcludedOk[i++] = it.next();
         }
-        when(abacResult.getCode()).thenReturn(arrayOfAbacResultCodesExcludedOk[0], arrayOfAbacResultCodesExcludedOk);
+        when(abacResult.getResultCode()).thenReturn(arrayOfAbacResultCodesExcludedOk[0], arrayOfAbacResultCodesExcludedOk);
         when(abacClient.execute(Mockito.any(ABACRequest.class))).thenReturn(abacResult);
         when(abacResult.hasAccess()).thenReturn(false);
 
