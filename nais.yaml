@@ -1,4 +1,4 @@
-image: "docker.adeo.no:5000/sak"
+image: "repo.adeo.no:5443/sak"
 replicas:
   min: 2
   max: 12
