@@ -41,7 +41,7 @@ fasitResources:
       propertyMap:
          url: STS_ISSUER
     - alias: security-token-service-jwks
-      resourceType: baseUrl
+      resourceType: restservice
       propertyMap:
         url: STS_JWKS
     - alias: LDAP
