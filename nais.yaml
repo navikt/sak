@@ -36,6 +36,14 @@ fasitResources:
       resourceType: baseurl
       propertyMap:
          url: OPENIDCONNECT_ISSO_ISSUER
+    - alias: security-token-service-issuer
+      resourceType: baseUrl
+      propertyMap:
+         url: STS_ISSUER
+    - alias: security-token-service-jwks
+      resourceType: baseUrl
+      propertyMap:
+        url: STS_JWKS
     - alias: LDAP
       resourceType: ldap
       propertyMap:
