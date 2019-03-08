@@ -61,11 +61,11 @@ abstract class AbstractSakJunitApplication extends SakApplication {
     void registerApiResources(Database database, SakConfiguration sakConfiguration) {
         register(new SakResource(
             new SakRepository(database),
-            new SakPEP(getABACClient()))
+            new SakPEP(createAbacClient(sakConfiguration)))
         );
     }
 
     void migrateDataWarehouse(SakConfiguration sakConfiguration){}
 
-    protected abstract ABACClient getABACClient();
+    protected abstract ABACClient createAbacClient(SakConfiguration sakConfiguration);
 }

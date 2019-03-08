@@ -1,0 +1,70 @@
+{
+    "provider": {
+        "name": "SakResource"
+    },
+    "consumer": {
+        "name": "pleiepenger-sak"
+    },
+    "interactions": [
+        {
+            "description": "Request for aa opprette ny sak",
+            "request": {
+                "method": "POST",
+                "path": "/api/v1/saker",
+                "headers": {
+                    "Authorization": "Bearer dummy",
+                    "Accept": "application/json",
+                    "X-Correlation-ID": "b8c764acfb-0a04-fd3b-c1db-bc3782890ea1cb",
+                    "Content-Type": "application/json"
+                },
+                "body": {
+                    "tema": "OMS",
+                    "applikasjon": "FS22",
+                    "aktoerId": "***gammelt_fnr***88",
+                    "orgnr": null,
+                    "fagsakNr": null
+                },
+                "matchingRules": {
+                    "header": {
+                        "X-Correlation-ID": {
+                            "matchers": [
+                                {
+                                    "match": "regex",
+                                    "regex": "\\b[0-9a-f]{8}\\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\\b[0-9a-f]{12}\\b"
+                                }
+                            ],
+                            "combine": "AND"
+                        }
+                    }
+                }
+            },
+            "response": {
+                "status": 201,
+                "headers": {
+                    "Content-Type": "application/json"
+                },
+                "body": {
+                    "id": "?"
+                },
+                "matchingRules": {
+                    "$.body.id": {
+                        "regex": "[0-9]"
+                    }
+                }
+            },
+            "providerStates": [
+                {
+                    "name": "Klar for aa opprette nye saker"
+                }
+            ]
+        }
+    ],
+    "metadata": {
+        "pactSpecification": {
+            "version": "3.0.0"
+        },
+        "pact-jvm": {
+            "version": "3.6.2"
+        }
+    }
+}

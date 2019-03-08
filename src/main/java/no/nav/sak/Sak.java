@@ -102,7 +102,7 @@ public class Sak {
         Builder() {
         }
 
-        static Builder enSak() {
+        public static Builder enSak() {
             return new Builder();
         }
 
@@ -126,22 +126,22 @@ public class Sak {
             return this;
         }
 
-        Builder medAktoerId(String aktoerId) {
+        public Builder medAktoerId(String aktoerId) {
             this.aktoerId = aktoerId;
             return this;
         }
 
-        Builder medOrgnr(String orgnr) {
+        public Builder medOrgnr(String orgnr) {
             this.orgnr = orgnr;
             return this;
         }
 
-        Builder medOpprettetAv(String opprettetAv) {
+        public Builder medOpprettetAv(String opprettetAv) {
             this.opprettetAv = opprettetAv;
             return this;
         }
 
-        Builder medOpprettetTidspunkt(LocalDateTime opprettetTidspunkt) {
+        public Builder medOpprettetTidspunkt(LocalDateTime opprettetTidspunkt) {
             this.opprettetTidspunkt = opprettetTidspunkt;
             return this;
         }

@@ -19,12 +19,6 @@
         <appender-ref ref="METRICS"/>
     </logger>
 
-
-
-    <!-- |
-         | GATLING BEGIN
-         | -->
-
     <logger name="io.gatling" level="DEBUG" additivity="false">
         <appender-ref ref="STDOUT"/>
     </logger>
@@ -41,18 +35,11 @@
         <appender-ref ref="STDOUT"/>
     </logger>
 
-    <!-- |
-         | GATLING END
-         | -->
-
-
-
-
     <logger name="org.ldaptive" level="OFF" additivity="false">
         <appender-ref ref="STDOUT"/>
     </logger>
 
-    <logger name="org.glassfish" level="INFO" additivity="false">
+    <logger name="org.glassfish" level="OFF" additivity="false">
         <appender-ref ref="STDOUT"/>
     </logger>
 
