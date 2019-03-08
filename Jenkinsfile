@@ -45,15 +45,15 @@ pipeline {
             }
         }
 
-        stage('Transfer build results to SonarQube') {
-            steps {
-                script {
-                    withSonarQubeEnv('SonarQube') {
-                        sh "mvn sonar:sonar"
-                    }
-                }
-            }
-        }
+//        stage('Transfer build results to SonarQube') {
+//            steps {
+//                script {
+//                    withSonarQubeEnv('SonarQube') {
+//                        sh "mvn sonar:sonar"
+//                    }
+//                }
+//            }
+//        }
 
         stage('Verify dependencies with owasp dependency-checker') {
             steps {
