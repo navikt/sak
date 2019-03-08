@@ -47,7 +47,10 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import javax.sql.DataSource;
 import java.time.Duration;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 
 import static java.util.logging.Logger.getLogger;
@@ -102,21 +105,7 @@ public class SakApplication extends ResourceConfig {
     }
 
     void registerApiResources(final Database database, final SakConfiguration sakConfiguration) {
-
-        final ResilienceConfig resilienceConfig = createResilienceConfig();
-        ABACClient abacClient;
-        if(sakConfiguration.getBoolean("RESILIENCE_ENABLED", false)) {
-            abacClient =  new ABACClient(
-                    sakConfiguration.getRequiredString("ABAC_PDP_ENDPOINT"),
-                    createHttpClient(sakConfiguration),
-                    resilienceConfig);
-        } else {
-            abacClient =  new ABACClient(
-                sakConfiguration.getRequiredString("ABAC_PDP_ENDPOINT"),
-                createHttpClient(sakConfiguration));
-        }
-
-
+        ABACClient abacClient = createAbacClient(sakConfiguration);
         register(new SakResource(
             new SakRepository(database),
             new SakPEP(abacClient))
@@ -207,6 +196,20 @@ public class SakApplication extends ResourceConfig {
             InitializationService.initialize();
         } catch (InitializationException e) {
             throw new IllegalStateException("Feilet under initialisering av SAML", e);
+        }
+    }
+
+    protected ABACClient createAbacClient(SakConfiguration sakConfiguration) {
+        if(sakConfiguration.getBoolean("RESILIENCE_ENABLED", false)) {
+            final ResilienceConfig resilienceConfig = createResilienceConfig();
+            return new ABACClient(
+                sakConfiguration.getRequiredString("ABAC_PDP_ENDPOINT"),
+                createHttpClient(sakConfiguration),
+                resilienceConfig);
+        } else {
+            return  new ABACClient(
+                sakConfiguration.getRequiredString("ABAC_PDP_ENDPOINT"),
+                createHttpClient(sakConfiguration));
         }
     }
 

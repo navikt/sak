@@ -6,7 +6,7 @@ import no.nav.sikkerhet.abac.ABACClient;
 public class SakJunitApplication extends AbstractSakJunitApplication {
 
     @Override
-    protected ABACClient getABACClient() {
+    protected ABACClient createAbacClient(SakConfiguration sakConfiguration) {
         return ABACJunitClient.create();
     }
 }
