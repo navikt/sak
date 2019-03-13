@@ -20,6 +20,8 @@ resources:
     cpu: 4000m
 fasitResources:
   used:
+    - alias: appdynamics
+      resourceType: applicationproperties
     - alias: SAKDS
       resourceType: datasource
     - alias: SAK_GR_DS
