@@ -11,6 +11,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.StringUtils.defaultString;
 
@@ -68,7 +69,11 @@ public class SakRepository {
         sakSearchCriteria.getAktoerId().ifPresent(aktoerId -> query.and("aktoerId = ?", aktoerId));
         sakSearchCriteria.getOrgnr().ifPresent(orgnr -> query.and("orgnr = ?", orgnr));
         sakSearchCriteria.getApplikasjon().ifPresent(applikasjon -> query.and("applikasjon = ?", applikasjon));
-        sakSearchCriteria.getTema().ifPresent(tema -> query.and("tema = ?", tema));
+
+        if(!sakSearchCriteria.getTema().isEmpty()) {
+            String parameters = sakSearchCriteria.getTema().stream().map(t -> "?").collect(Collectors.joining(","));
+            query.in("tema in (" + parameters + ")", sakSearchCriteria.getTema());
+        }
         sakSearchCriteria.getFagsakNr().ifPresent(fagsaknr -> query.and("fagsaknr = ?", fagsaknr));
         Histogram.Timer timer = startTimer("search");
         List<Sak> result;
@@ -109,15 +114,25 @@ public class SakRepository {
         }
 
         void and(String criteria, Object value) {
+            addWhereOrAndToSql();
+            sql.append(" ").append(criteria);
+            for (int i = 0; i < StringUtils.countMatches(criteria, "?"); i++) {
+                params.add(value);
+            }
+        }
+
+        void in(String criteria, List<?> values) {
+            addWhereOrAndToSql();
+            sql.append(" ").append(criteria);
+            params.addAll(values);
+        }
+
+        private void addWhereOrAndToSql() {
             sql.append(" ");
             if (params.isEmpty()) {
                 sql.append("where");
             } else {
                 sql.append("and");
-            }
-            sql.append(" ").append(criteria);
-            for (int i = 0; i < StringUtils.countMatches(criteria, "?"); i++) {
-                params.add(value);
             }
         }
     }

@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,7 +27,7 @@ class SakRepositoryTest {
 
     @BeforeAll
     static void migrate() {
-        new FlywayMigrator(dataSource).migrate();
+        new FlywayMigrator(dataSource, "classpath:db/migration", "classpath:db/h2/migration").migrate();
     }
 
     @BeforeEach
@@ -72,7 +73,7 @@ class SakRepositoryTest {
         sakRepository.lagre(new SakTestData().aktoerId(randomNumeric(5)).build());
         Sak sak2 = sakRepository.lagre(new SakTestData().orgnr(orgnr).tema(tema).build());
 
-        List<Sak> saker = sakRepository.finnSaker(SakSearchCriteria.create().medTema(tema).medOrgnr(orgnr));
+        List<Sak> saker = sakRepository.finnSaker(SakSearchCriteria.create().medTema(Collections.singletonList(tema)).medOrgnr(orgnr));
         assertThat(saker).containsOnly(sak1, sak2);
     }
 

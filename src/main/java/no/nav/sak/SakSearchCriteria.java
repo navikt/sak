@@ -4,12 +4,14 @@ package no.nav.sak;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class SakSearchCriteria {
     private String aktoerId;
     private String orgnr;
-    private String tema;
+    private List<String> tema = new ArrayList<>();
     private String fagsakNr;
     private String applikasjon;
 
@@ -30,7 +32,7 @@ public class SakSearchCriteria {
         return this;
     }
 
-    SakSearchCriteria medTema(String tema) {
+    SakSearchCriteria medTema(List<String> tema) {
         this.tema = tema;
         return this;
     }
@@ -54,8 +56,8 @@ public class SakSearchCriteria {
         return Optional.ofNullable(orgnr);
     }
 
-    Optional<String> getTema() {
-        return Optional.ofNullable(tema);
+    List<String> getTema() {
+        return tema;
     }
 
     Optional<String> getFagsakNr() {
