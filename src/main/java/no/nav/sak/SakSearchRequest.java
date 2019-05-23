@@ -5,6 +5,7 @@ import no.nav.sak.validering.AtLeastOneOf;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import javax.ws.rs.QueryParam;
+import java.util.List;
 
 import static org.apache.commons.lang3.builder.ToStringStyle.SHORT_PREFIX_STYLE;
 
@@ -21,13 +22,13 @@ public class SakSearchRequest {
     private String applikasjon;
     @QueryParam("tema")
     @ApiParam("Filtrering på tema (iht felles kodeverk)")
-    private String tema;
+    private List<String> tema;
     @QueryParam("fagsakNr")
     @ApiParam("Filtrering på fagsakNr")
     private String fagsakNr;
 
     public SakSearchRequest() {
-        //JaxRS
+        //JaxRSActionDelAct
     }
 
     public String getAktoerId() {
@@ -54,11 +55,11 @@ public class SakSearchRequest {
         this.applikasjon = applikasjon;
     }
 
-    public String getTema() {
+    public List<String> getTema() {
         return tema;
     }
 
-    public void setTema(String tema) {
+    public void setTema(List<String> tema) {
         this.tema = tema;
     }
 

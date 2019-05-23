@@ -1,28 +1,29 @@
 package no.nav.sak;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
-import static no.nav.sak.infrastruktur.authentication.basic.JunitBasicAuthenticator.PASSWORD;
-import static no.nav.sak.infrastruktur.authentication.basic.JunitBasicAuthenticator.USERNAME;
-import static org.apache.commons.lang3.RandomStringUtils.random;
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.io.ByteArrayInputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.util.Base64;
-import java.util.List;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.Application;
-import javax.ws.rs.core.Response;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import no.nav.sak.infrastruktur.oicd.JwtTestData;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Test;
+
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.Application;
+import javax.ws.rs.core.Response;
+import java.io.ByteArrayInputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+import java.util.List;
+
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
+import static no.nav.sak.infrastruktur.authentication.basic.JunitBasicAuthenticator.PASSWORD;
+import static no.nav.sak.infrastruktur.authentication.basic.JunitBasicAuthenticator.USERNAME;
+import static org.apache.commons.lang3.RandomStringUtils.random;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class SakResourceTest extends AbstractSakResourceTest {
 
@@ -100,9 +101,9 @@ class SakResourceTest extends AbstractSakResourceTest {
     }
 
     @Test
-    void beskyttede_ressurser_tilgjengelig_naar_gyldig_basic_auth_header() throws Exception {
+    void beskyttede_ressurser_tilgjengelig_naar_gyldig_basic_auth_header() {
         String unencoded = USERNAME + ":" + PASSWORD;
-        String authHeaderBasic = "Basic " + Base64.getEncoder().encodeToString(unencoded.getBytes("utf-8"));
+        String authHeaderBasic = "Basic " + Base64.getEncoder().encodeToString(unencoded.getBytes(StandardCharsets.UTF_8));
         verifyBeskyttedeRessurserTilgjengelig(authHeaderBasic);
     }
 
@@ -200,6 +201,24 @@ class SakResourceTest extends AbstractSakResourceTest {
             .queryParam("aktoerId", sak.getAktoerId()));
 
         verifySearchResponseMatching(response, singletonList(sak));
+    }
+
+    @Test
+    void soeker_opp_saker_for_flere_tema() {
+        opprett100Tilfeldigesaker();
+        String tema1 = RandomStringUtils.randomAlphabetic(4);
+        String tema2 = RandomStringUtils.randomAlphabetic(4);
+        Sak sak1 = sakRepository.lagre(new SakTestData().tema(tema1).build());
+        Sak sak2 = sakRepository.lagre(new SakTestData().tema(tema2)
+            .aktoerId(sak1.getAktoerId())
+            .build());
+
+        Response response = executeGetRequest(sakRootTarget()
+            .queryParam("tema", sak1.getTema())
+            .queryParam("tema", sak2.getTema())
+            .queryParam("aktoerId", sak1.getAktoerId()));
+
+        verifySearchResponseMatching(response, asList(sak1, sak2));
     }
 
     @Test
