@@ -20,7 +20,7 @@ spec:
         max: 12
     preStopHookPath: internal/prestop
     ingresses:
-        - "https://sakv1-rest-adapter.nais.preprod.local"
+        - "https://sak.nais.preprod.local"
     vault:
         enabled: true
     env:
