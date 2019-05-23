@@ -1,0 +1,42 @@
+apiVersion: "nais.io/v1alpha1"
+kind: "Application"
+metadata:
+    name: sak
+    namespace: default
+    labels:
+        team: oppgavehandtering
+spec:
+    image: repo.adeo.no:5443/sak:@@version@@
+    port: 8080
+    liveness:
+        path: internal/alive
+    readiness:
+        path: internal/ready
+    prometheus:
+        enabled: true
+        path: internal/metrics
+    replicas:
+        min: 2
+        max: 12
+    preStopHookPath: internal/prestop
+    ingresses:
+        - "https://sakv1-rest-adapter.nais.preprod.local"
+    vault:
+        enabled: true
+    env:
+        - name: SAKDS_URL
+          value: jdbc:oracle:thin:@a01dbfl033.adeo.no:1521/sak_q1
+        - name: ABAC_PDP_ENDPOINT
+          value: https://wasapp-q1.adeo.no/asm-pdp/authorize
+        - name: OPENIDCONNECT_ISSO_ISSUER
+          value: https://isso-q.adeo.no:443/isso/oauth2
+        - name: OPENIDCONNECT_ISSO_JWKS
+          value: https://isso-q.adeo.no/isso/oauth2/connect/jwk_uri
+        - name: STS_ISSUER
+          value: https://security-token-service.nais.preprod.local
+        - name: STS_JWKS
+          value: https://security-token-service.nais.preprod.local/rest/v1/sts/jwks
+        - name: LDAP_URL
+          value: ldaps://ldapgw.preprod.local
+        - name: LDAP_SERVICEUSER_BASEDN
+          value: ou=ServiceAccounts,dc=preprod,dc=local
