@@ -18,16 +18,22 @@ public class SakConfiguration {
     public SakConfiguration() {
         compositeConfiguration.addConfiguration(new SystemConfiguration());
         compositeConfiguration.addConfiguration(new EnvironmentConfiguration());
-        try {
-            compositeConfiguration.addConfiguration(new Configurations().properties(new File("sak.properties")));
-            log.info("Konfigurasjon lastet fra sak.properties");
-        } catch (ConfigurationException e) {
-            log.info("Fant ikke sak.properties");
-        }
         log.info("Konfigurasjon lastet fra system- og miljøvariabler");
+        addProperties("sak.properties");
+        addProperties("/var/run/secrets/nais.io/vault/secrets.properties");
     }
 
-    public boolean getBoolean(String key, boolean defaultValue) {
+    private void addProperties(String path) {
+        try {
+            compositeConfiguration.addConfiguration(new Configurations().properties(new File(path)));
+            log.info("Konfigurasjon lastet fra {}", path);
+        } catch (ConfigurationException e) {
+            log.info("Fant ikke {}", path);
+        }
+    }
+
+
+    boolean getBoolean(String key, boolean defaultValue) {
         return compositeConfiguration.getBoolean(key, defaultValue);
     }
 
