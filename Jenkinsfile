@@ -2,6 +2,11 @@
 pipeline {
     agent any
 
+    parameters {
+        string(name: 'yamlFile', defaultValue: 'app-preprod', description: 'Yaml fil som applies')
+    }
+
+
     environment {
         APPLICATION_NAME = 'sak'
         APPLICATION_VERSION = version()
@@ -33,11 +38,10 @@ pipeline {
         stage('Update yaml file') {
             steps {
                 script {
-                    echo "klar for å lese yamlfile"
-                    def yamlFile1 = readFile('app-preprod.yaml')
-                    echo yamlFile1
-                    def yamlFile = readFile('app-preprod.yaml').replaceAll("@@version@@", "${env.APPLICATION_VERSION}")
-                    writeFile file: "app-preprod.yaml", text: yamlFile
+                    def yaml = ${params.fasitEnvPreprod};
+                    echo "klar for å lese yamlfile $yaml"
+                    def yamlFile = readFile($yaml).replaceAll("@@version@@", "${env.APPLICATION_VERSION}")
+                    writeFile file: $yaml, text: yamlFile
                 }
             }
         }
