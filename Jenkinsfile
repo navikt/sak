@@ -38,7 +38,7 @@ pipeline {
         stage('Update yaml file') {
             steps {
                 script {
-                    def yaml = ${params.fasitEnvPreprod};
+                    def yaml = "${params.fasitEnvPreprod}";
                     echo "klar for å lese yamlfile $yaml"
                     def yamlFile = readFile($yaml).replaceAll("@@version@@", "${env.APPLICATION_VERSION}")
                     writeFile file: $yaml, text: yamlFile
