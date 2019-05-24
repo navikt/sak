@@ -17,23 +17,23 @@ pipeline {
     }
 
     stages {
-        stage('Maven Build') {
-            steps {
-                script {
-                    sh "mvn clean install -Drevision=${env.APPLICATION_VERSION}"
-                }
-            }
-        }
+//        stage('Maven Build') {
+//            steps {
+//                script {
+//                    sh "mvn clean install -Drevision=${env.APPLICATION_VERSION}"
+//                }
+//            }
+//        }
 
-        stage('Build and push docker image') {
-            steps {
-                script {
-                    sh "docker build -t repo.adeo.no:5443/${env.APPLICATION_NAME}:${env.APPLICATION_VERSION} --pull ."
-                    sh "docker push repo.adeo.no:5443/${env.APPLICATION_NAME}:${env.APPLICATION_VERSION}"
-                }
-
-            }
-        }
+//        stage('Build and push docker image') {
+//            steps {
+//                script {
+//                    sh "docker build -t repo.adeo.no:5443/${env.APPLICATION_NAME}:${env.APPLICATION_VERSION} --pull ."
+//                    sh "docker push repo.adeo.no:5443/${env.APPLICATION_NAME}:${env.APPLICATION_VERSION}"
+//                }
+//
+//            }
+//        }
 
         stage('Update yaml file') {
             steps {
@@ -46,12 +46,12 @@ pipeline {
             }
         }
 
-        stage('Deploy to preprod') {
-            steps {
-                script {
-                    sh "kubectl --context preprod-fss apply -f app-preprod.yaml"
-                }
-            }
-        }
+//        stage('Deploy to preprod') {
+//            steps {
+//                script {
+//                    sh "kubectl --context preprod-fss apply -f app-preprod.yaml"
+//                }
+//            }
+//        }
     }
 }
