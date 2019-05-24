@@ -76,6 +76,7 @@ public class SakRepository {
         }
         sakSearchCriteria.getFagsakNr().ifPresent(fagsaknr -> query.and("fagsaknr = ?", fagsaknr));
         Histogram.Timer timer = startTimer("search");
+        query.sql.append(" order by opprettet_tidspunkt desc");
         List<Sak> result;
         try {
             result = database.queryForList(query.sql.toString(), query.params, this::toSak);
