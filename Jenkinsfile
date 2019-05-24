@@ -41,6 +41,7 @@ pipeline {
                     def yaml = "${params.yamlFile}"
                     echo "klar for å lese yamlfile $yaml"
                     def yamlFile = readFile($yaml).replaceAll("@@version@@", "${env.APPLICATION_VERSION}")
+                    echo "Klar for å skrive til fil"
                     writeFile file: $yaml, text: yamlFile
                 }
             }
