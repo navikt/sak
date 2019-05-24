@@ -17,13 +17,13 @@ pipeline {
     }
 
     stages {
-//        stage('Maven Build') {
-//            steps {
-//                script {
-//                    sh "mvn clean install -Drevision=${env.APPLICATION_VERSION}"
-//                }
-//            }
-//        }
+        stage('Maven Build') {
+            steps {
+                script {
+                    sh "mvn clean install -Drevision=${env.APPLICATION_VERSION}"
+                }
+            }
+        }
 
         stage('Build and push docker image') {
             steps {
@@ -47,12 +47,12 @@ pipeline {
             }
         }
 
-//        stage('Deploy to preprod') {
-//            steps {
-//                script {
-//                    sh "kubectl --context preprod-fss apply -f app-preprod.yaml"
-//                }
-//            }
-//        }
+        stage('Deploy to preprod') {
+            steps {
+                script {
+                    sh "kubectl --context preprod-fss apply -f ${params.yamlFile}"
+                }
+            }
+        }
     }
 }
