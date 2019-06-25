@@ -374,14 +374,6 @@ public class SakResource {
         final Response.Status responseStatus;
         if (ABACResult.Code.OK.equals(abacResultCode)) {
             responseStatus = Response.Status.OK;
-        } else if (
-            ABACResult.Code.CIRCUIT_BREAKER_OPEN.equals(abacResultCode)
-            ||
-            ABACResult.Code.DOWNSTREAMS_HANG.equals(abacResultCode)
-            ||
-            ABACResult.Code.DOWNSTREAMS_SOCKET_TIMEOUT_EXCEPTION.equals(abacResultCode)
-            ) {
-            responseStatus = Response.Status.SERVICE_UNAVAILABLE;
         } else {
             responseStatus = Response.Status.INTERNAL_SERVER_ERROR;
         }

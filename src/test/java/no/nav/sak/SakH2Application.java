@@ -1,5 +1,7 @@
 package no.nav.sak;
 
+import com.sun.org.apache.regexp.internal.RE;
+import no.nav.resilience.ResilienceConfig;
 import no.nav.sak.infrastruktur.FlywayMigrator;
 import no.nav.sak.infrastruktur.JunitDataSource;
 import no.nav.sak.infrastruktur.abac.ABACJunitClient;
@@ -56,7 +58,7 @@ public class SakH2Application extends SakApplication {
         JunitBasicAuthenticator junitBasicAuthenticator = new JunitBasicAuthenticator(ldapConfiguration);
 
         Authenticator authenticator = new Authenticator(oidcTokenValidator, samlValidator, junitBasicAuthenticator);
-        register(new AuthenticationFilter(authenticator));
+        register(new AuthenticationFilter(authenticator, ResilienceConfig.ofDefaults()));
     }
 
 }
