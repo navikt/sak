@@ -106,7 +106,7 @@ public class AuthenticationFilterTest extends JerseyTest {
         Entity<String> json = Entity.json(
             new SakJsonTestData(sak).buildJsonString());
         JwtClaims jwtClaims = new JwtClaimsTestData().build();
-        jwtClaims.unsetClaim("azp");
+        jwtClaims.unsetClaim("aud");
         String authHeader = "Bearer " + new JwtTestData()
             .claims(jwtClaims)
             .build();
