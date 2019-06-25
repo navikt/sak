@@ -1,10 +1,13 @@
 package no.nav.sak.infrastruktur.abac;
 
+import akka.pattern.CircuitBreakerOpenException;
+import no.nav.resilience.ResilienceExecutor;
 import no.nav.sikkerhet.abac.ABACClient;
 import no.nav.sikkerhet.abac.ABACRequest;
 import no.nav.sikkerhet.abac.ABACResult;
 import org.mockito.Mockito;
 
+import java.net.SocketTimeoutException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -25,16 +28,14 @@ public class ABACJunitClientAlwaysGivingBadAbacMappingToServiceUnavailable {
         final Set<ABACResult.Code> tempAbacResultCodeSet = new HashSet<ABACResult.Code>(tempAbacResultCodeList);
 
         tempAbacResultCodeSet.remove(ABACResult.Code.OK);
-        tempAbacResultCodeSet.remove(ABACResult.Code.DOWNSTREAMS_SOCKET_TIMEOUT_EXCEPTION);
-        tempAbacResultCodeSet.remove(ABACResult.Code.ABAC_RESPONSE_FAILURE);
-        tempAbacResultCodeSet.remove(ABACResult.Code.ABAC_UNFORESEEN_FAILURE);
-        tempAbacResultCodeSet.remove(ABACResult.Code.DOWNSTREAMS_EXCEPTION);
-        tempAbacResultCodeSet.remove(ABACResult.Code.FAILURE_CREATING_ABAC_REQUEST);
+        //tempAbacResultCodeSet.remove(ABACResult.Code.INVALID);
 
         abacResultCodesMappingToServiceUnavailable = Collections.unmodifiableSet(tempAbacResultCodeSet);
     }
 
     public static ABACClient create() {
+
+        final ResilienceExecutor resilienceExecutor= mock(ResilienceExecutor.class);
 
         final ABACClient abacClient = mock(ABACClient.class);
         final ABACResult abacResult = mock(ABACResult.class);
@@ -45,8 +46,10 @@ public class ABACJunitClientAlwaysGivingBadAbacMappingToServiceUnavailable {
             arrayOfAbacResultCodesExcludedOk[i++] = it.next();
         }
         when(abacResult.getResultCode()).thenReturn(arrayOfAbacResultCodesExcludedOk[0], arrayOfAbacResultCodesExcludedOk);
-        when(abacClient.execute(Mockito.any(ABACRequest.class))).thenReturn(abacResult);
+        when(abacClient.execute(Mockito.any(ABACRequest.class))).thenThrow(SocketTimeoutException.class);
         when(abacResult.hasAccess()).thenReturn(false);
+
+        when(resilienceExecutor.execute(Mockito.any(ABACRequest.class))).thenThrow(CircuitBreakerOpenException.class);
 
         return abacClient;
     }

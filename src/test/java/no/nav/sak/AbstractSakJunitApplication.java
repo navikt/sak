@@ -1,5 +1,6 @@
 package no.nav.sak;
 
+import no.nav.resilience.ResilienceConfig;
 import no.nav.sak.infrastruktur.Database;
 import no.nav.sak.infrastruktur.FlywayMigrator;
 import no.nav.sak.infrastruktur.JunitDataSource;
@@ -51,7 +52,7 @@ abstract class AbstractSakJunitApplication extends SakApplication {
         JunitBasicAuthenticator junitBasicAuthenticator = new JunitBasicAuthenticator(ldapConfiguration);
 
         Authenticator authenticator = new Authenticator(oidcTokenValidator, samlValidator, junitBasicAuthenticator);
-        register(new AuthenticationFilter(authenticator));
+        register(new AuthenticationFilter(authenticator, ResilienceConfig.ofDefaults()));
     }
 
     void migrateSak(DataSource dataSource) {
@@ -61,7 +62,7 @@ abstract class AbstractSakJunitApplication extends SakApplication {
     void registerApiResources(Database database, SakConfiguration sakConfiguration) {
         register(new SakResource(
             new SakRepository(database),
-            new SakPEP(createAbacClient(sakConfiguration)))
+            new SakPEP(createAbacClient(sakConfiguration),ResilienceConfig.ofDefaults()))
         );
     }
 
