@@ -3,6 +3,9 @@ package no.nav.sak.infrastruktur.authentication;
 
 import io.prometheus.client.Counter;
 import io.prometheus.client.Histogram;
+import io.vavr.CheckedFunction1;
+import no.nav.resilience.ResilienceConfig;
+import no.nav.resilience.ResilienceExecutor;
 import no.nav.sak.infrastruktur.EnableApiFilters;
 import no.nav.sak.infrastruktur.ErrorResponse;
 import no.nav.sikkerhet.authentication.AuthenticationResult;
@@ -46,9 +49,12 @@ public class AuthenticationFilter implements ContainerRequestFilter, ContainerRe
     private static final Logger log = LoggerFactory.getLogger(AuthenticationFilter.class);
 
     private final Authenticator authenticator;
+    private final ResilienceExecutor<String, AuthenticationResult> resilienceExecutor;
 
-    public AuthenticationFilter(Authenticator authenticator) {
+    public AuthenticationFilter(Authenticator authenticator, ResilienceConfig resilienceConfig) {
         this.authenticator = authenticator;
+        final CheckedFunction1<String, AuthenticationResult> filterFunction = authenticator::authenticate;
+        this.resilienceExecutor = new ResilienceExecutor<>(filterFunction, resilienceConfig);
     }
 
     @Override
@@ -64,7 +70,7 @@ public class AuthenticationFilter implements ContainerRequestFilter, ContainerRe
             .startTimer();
 
         try {
-            AuthenticationResult result = authenticator.authenticate(authHeader);
+            AuthenticationResult result=resilienceExecutor.execute(authHeader);
             if (!result.isValid()) {
                 log.warn("Autentisering feilet: {}", result.getErrorMessage());
                 abortAsUnauthorized(ctx);

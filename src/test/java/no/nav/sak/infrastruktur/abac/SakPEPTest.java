@@ -2,6 +2,7 @@ package no.nav.sak.infrastruktur.abac;
 
 import no.nav.abac.xacml.NavAttributter;
 import no.nav.abac.xacml.StandardAttributter;
+import no.nav.resilience.ResilienceConfig;
 import no.nav.sikkerhet.abac.ABACAttribute;
 import no.nav.sikkerhet.abac.ABACClient;
 import no.nav.sikkerhet.abac.ABACRequest;
@@ -23,7 +24,7 @@ import static org.mockito.Mockito.*;
 
 class SakPEPTest {
     private ABACClient abacClient = mock(ABACClient.class);
-    private SakPEP sakPEP = new SakPEP(abacClient);
+    private SakPEP sakPEP = new SakPEP(abacClient, ResilienceConfig.ofDefaults());
     private String username = RandomStringUtils.randomAlphabetic(5);
 
 

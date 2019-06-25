@@ -2,9 +2,13 @@ package no.nav.sak.infrastruktur.abac;
 
 import io.prometheus.client.Counter;
 import io.prometheus.client.Histogram;
+import io.vavr.CheckedFunction1;
 import no.nav.abac.xacml.NavAttributter;
 import no.nav.abac.xacml.StandardAttributter;
+import no.nav.resilience.ResilienceConfig;
+import no.nav.resilience.ResilienceExecutor;
 import no.nav.sak.infrastruktur.ContextExtractor;
+import no.nav.sak.infrastruktur.rest.ExternalApiException;
 import no.nav.sikkerhet.abac.*;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -16,6 +20,7 @@ import java.util.Objects;
 import static javax.ws.rs.core.HttpHeaders.AUTHORIZATION;
 import static no.nav.abac.xacml.NavAttributter.*;
 import static no.nav.sak.infrastruktur.SubjectType.SUBJECT_TYPE_SYSTEMBRUKER;
+import static no.nav.sak.infrastruktur.abac.AbacExceptionTranslator.identifyException;
 import static no.nav.sak.infrastruktur.authentication.AuthenticationFilter.REQUEST_CONSUMERID;
 import static no.nav.sak.infrastruktur.authentication.AuthenticationFilter.REQUEST_USERNAME;
 import static no.nav.sikkerhet.authentication.AuthenticationHeaderIdentifier.*;
@@ -27,6 +32,7 @@ public class SakPEP {
     static final String RESOURCE_TYPE_SAK = "no.nav.abac.attributter.resource.sak.sak";
 
     private final ABACClient abacClient;
+    private final ResilienceExecutor<ABACRequest,ABACResult> resilienceExecutor;
 
     private static final Histogram authHistogram = Histogram.build("authorization_request_duration_seconds", "Authorization request duration in seconds")
         .labelNames("consumer", "tokenId", "subjecttype")
@@ -36,8 +42,10 @@ public class SakPEP {
         .labelNames("consumer", "tokenId", "subjecttype", "permission")
         .register();
 
-    public SakPEP(ABACClient abacClient) {
+    public SakPEP(ABACClient abacClient, ResilienceConfig resilienceConfig) {
         this.abacClient = abacClient;
+        final CheckedFunction1<ABACRequest,ABACResult> abacClientFucntion=abacClient::execute;
+        this.resilienceExecutor=new ResilienceExecutor<>(abacClientFucntion,resilienceConfig);
     }
 
     public ABACResult autoriser(
@@ -77,7 +85,7 @@ public class SakPEP {
 
         final ABACResult abacResult;
         try {
-            abacResult = abacClient.execute(abacRequest);
+            abacResult=resilienceExecutor.execute(abacRequest);
             if (ABACResult.Code.OK.equals(abacResult.getResultCode())) {
                 final String arcsightPreparedRequest = stripBrackets(abacRequest.getResources().get(0).getAttributes().toString()); //TODO Dette bør gjøres mer elegant, og robus + test av loggingen.
                 String arcsightPreparedResult = StringUtils.remove(stripBrackets(abacResult.toString()), "associatedAdvice=");
@@ -106,7 +114,13 @@ public class SakPEP {
                     defaultString(authIdentifier, "N/A"),
                     ContextExtractor.getSubjectType(ctx).getValue(),
                     abacResult.hasAccess() ? "permit" : "deny").inc();
+            } else {
+                securitylog.warn("Feil i kall mot ABAC: {}", abacResult.getResultCode());
+//                throw new ExternalApiException(abacResult.getResultCode().getDescription());
             }
+        } catch (Throwable t) {
+            securitylog.warn("Feil i kall mot ABAC: {}", t.getMessage());
+            throw identifyException(t);
         } finally {
             timer.observeDuration();
         }

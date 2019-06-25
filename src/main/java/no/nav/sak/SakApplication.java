@@ -6,9 +6,13 @@ import io.prometheus.client.hotspot.DefaultExports;
 import io.swagger.jaxrs.config.BeanConfig;
 import io.swagger.jaxrs.listing.ApiListingResource;
 import io.swagger.jaxrs.listing.SwaggerSerializers;
+import no.nav.resilience.ResilienceConfig;
 import no.nav.sak.infrastruktur.*;
 import no.nav.sak.infrastruktur.abac.SakPEP;
 import no.nav.sak.infrastruktur.authentication.AuthenticationFilter;
+import no.nav.sak.infrastruktur.rest.ExternalApiExceptionMapper;
+import no.nav.sak.infrastruktur.rest.ServiceUnavailableException;
+import no.nav.sak.infrastruktur.rest.ServiceUnavailableExceptionMapper;
 import no.nav.sak.validering.ConstraintValidationExceptionMapper;
 import no.nav.sikkerhet.abac.ABACClient;
 import no.nav.sikkerhet.authentication.AuthenticationResult;
@@ -17,7 +21,6 @@ import no.nav.sikkerhet.authentication.basic.BasicAuthenticator;
 import no.nav.sikkerhet.authentication.basic.LdapConfiguration;
 import no.nav.sikkerhet.authentication.oidc.OidcTokenValidator;
 import no.nav.sikkerhet.authentication.saml.SAMLValidator;
-import no.nav.sikkerhet.resilience.ResilienceConfig;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.apache.http.auth.AuthScope;
@@ -59,17 +62,6 @@ public class SakApplication extends ResourceConfig {
 
     private static final Logger log = LoggerFactory.getLogger(SakApplication.class);
 
-    private static final long RESIL_CFG_DOWNSTREAMS_CALL_TIMEOUT_IN_MILLISECONDS =
-        ResilienceConfig.DEFAULT_RESIL_CFG_DOWNSTREAMS_CALL_TIMEOUT_IN_MILLISECONDS;
-    private static final int RESIL_CFG_NUMBER_OF_RETRIES_UPON_EXCEPTION =
-        ResilienceConfig.DEFAULT_RESIL_CFG_NUMBER_OF_RETRIES_UPON_EXCEPTION;
-    private static final long RESIL_CFG_WAIT_DURATION_IN_MILLISECONDS_BETWEEEN_RETRIES =
-        ResilienceConfig.DEFAULT_RESIL_CFG_WAIT_DURATION_IN_MILLISECONDS_BETWEEEN_RETRIES;
-    private static final int RESIL_CFG_RING_BUFFER_SIZE_IN_CLOSED_STATE = 13;
-    private static final int RESIL_CFG_RING_BUFFER_SIZE_IN_HALF_OPEN_STATE = 5;
-    private static final float RESIL_CFG_FAILURE_RATE_THRESHOLD_PERCENTAGE = 50.F;
-    private static final long RESIL_CFG_WAIT_DURATIONIN_IN_MILLISECONDS_IN_OPEN_STATE = 30000L;
-
     @SuppressWarnings("WeakerAccess") //Påkrevd public
     public SakApplication() {
 
@@ -108,7 +100,7 @@ public class SakApplication extends ResourceConfig {
         ABACClient abacClient = createAbacClient(sakConfiguration);
         register(new SakResource(
             new SakRepository(database),
-            new SakPEP(abacClient))
+            new SakPEP(abacClient, ResilienceConfig.ofDefaults()))
         );
     }
 
@@ -148,7 +140,7 @@ public class SakApplication extends ResourceConfig {
 
         final BasicAuthenticator basicAuthenticator = new BasicAuthenticator(ldapConfiguration, cache);
         final Authenticator authenticator = new Authenticator(oidcTokenValidator, samlValidator, basicAuthenticator);
-        register(new AuthenticationFilter(authenticator));
+        register(new AuthenticationFilter(authenticator,ResilienceConfig.ofDefaults()));
     }
 
     void migrateSak(final DataSource dataSource) {
@@ -170,25 +162,14 @@ public class SakApplication extends ResourceConfig {
         register(new NotFoundExceptionMapper());
         register(new MethodNotAllowedExceptionMapper());
         register(new ParamExceptionMapper());
+        register(new ExternalApiExceptionMapper());
+        register(new ServiceUnavailableExceptionMapper());
     }
 
     private void registerFilters(final SakConfiguration sakConfiguration) {
         register(new CorrelationFilter());
         register(new PrometheusFilter());
         registerAuthenticationFilter(sakConfiguration);
-    }
-
-    private ResilienceConfig createResilienceConfig() {
-        return
-            new ResilienceConfig.Builder()
-                .withDownstreamsCallTimeoutInMilliseconds(RESIL_CFG_DOWNSTREAMS_CALL_TIMEOUT_IN_MILLISECONDS)
-                .withNumberOfRetriesUponException(RESIL_CFG_NUMBER_OF_RETRIES_UPON_EXCEPTION)
-                .withWaitDurationInMillisecondsBetweeenRetries(RESIL_CFG_WAIT_DURATION_IN_MILLISECONDS_BETWEEEN_RETRIES)
-                .withRingBufferSizeInClosedState(RESIL_CFG_RING_BUFFER_SIZE_IN_CLOSED_STATE)
-                .withRingBufferSizeInHalfOpenState(RESIL_CFG_RING_BUFFER_SIZE_IN_HALF_OPEN_STATE)
-                .withExceptionRateBeforeOpeningTheCircuitBreaker(RESIL_CFG_FAILURE_RATE_THRESHOLD_PERCENTAGE)
-                .withWaitDurationInMillisecondsInOpenState(RESIL_CFG_WAIT_DURATIONIN_IN_MILLISECONDS_IN_OPEN_STATE)
-                .build();
     }
 
     private void initSAML() {
@@ -200,17 +181,9 @@ public class SakApplication extends ResourceConfig {
     }
 
     protected ABACClient createAbacClient(SakConfiguration sakConfiguration) {
-        if(sakConfiguration.getBoolean("RESILIENCE_ENABLED", false)) {
-            final ResilienceConfig resilienceConfig = createResilienceConfig();
             return new ABACClient(
                 sakConfiguration.getRequiredString("ABAC_PDP_ENDPOINT"),
-                createHttpClient(sakConfiguration),
-                resilienceConfig);
-        } else {
-            return  new ABACClient(
-                sakConfiguration.getRequiredString("ABAC_PDP_ENDPOINT"),
                 createHttpClient(sakConfiguration));
-        }
     }
 
     private HttpClient createHttpClient(final SakConfiguration sakConfiguration) {
