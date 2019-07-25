@@ -2,7 +2,7 @@ apiVersion: "nais.io/v1alpha1"
 kind: "Application"
 metadata:
     name: sak
-    namespace: t4
+    namespace: t5
     labels:
         team: oppgavehandtering
 spec:
@@ -20,14 +20,14 @@ spec:
         max: 12
     preStopHookPath: internal/prestop
     ingresses:
-        - "https://sak-t4.nais.preprod.local"
+        - "https://sak-t5.nais.preprod.local"
     vault:
         enabled: true
     env:
         - name: SAKDS_URL
-          value: jdbc:oracle:thin:@d26dbfl020.test.local:1521/sak_t4
+          value: jdbc:oracle:thin:@d26dbfl021.test.local:1521/sak_t5
         - name: ABAC_PDP_ENDPOINT
-          value: https://wasapp-t4.adeo.no/asm-pdp/authorize
+          value: https://wasapp-t5.adeo.no/asm-pdp/authorize
         - name: OPENIDCONNECT_ISSO_ISSUER
           value: https://isso-t.adeo.no:443/isso/oauth2
         - name: OPENIDCONNECT_ISSO_JWKS
