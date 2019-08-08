@@ -1,8 +1,15 @@
 package no.nav.sak;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
+import com.google.gson.reflect.TypeToken;
 import no.nav.sak.infrastruktur.oicd.JwtTestData;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -14,8 +21,13 @@ import javax.ws.rs.core.Response;
 import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Base64;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import static java.util.Arrays.asList;
@@ -43,8 +55,10 @@ class SakResourceTest extends AbstractSakResourceTest {
         assertThat(response.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
         assertThat(response.getHeaderString("Content-Type")).isEqualTo("application/json");
 
-        JsonObject jsonObject = new JsonParser().parse(stream(response.getEntity())).getAsJsonObject();
-        verifyEqual(jsonObject, opprettetSak);
+        SakJson sakJson =  new GsonBuilder()
+            .registerTypeAdapter(LocalDateTime.class, (JsonDeserializer<LocalDateTime>) (jsonElement, type, jsonDeserializationContext) -> ZonedDateTime.parse(jsonElement.getAsJsonPrimitive().getAsString()).toLocalDateTime())
+            .create().fromJson(stream(response.getEntity()), SakJson.class);
+        verifyEqual(sakJson, opprettetSak);
     }
 
     @Test
@@ -341,18 +355,22 @@ class SakResourceTest extends AbstractSakResourceTest {
     }
 
     private void verifySearchResponseMatching(Response response, List<Sak> skalMatche) {
-        JsonArray jsonArray = verifySearchResponse(response, skalMatche.size());
+        skalMatche.sort(Comparator.comparingLong(Sak::getId));
+        List<SakJson> sakJsons = verifySearchResponse(response, skalMatche.size());
+        sakJsons.sort(Comparator.comparingLong(SakJson::getId));
         for (int i = 0; i < skalMatche.size(); i++) {
-            verifyEqual(jsonArray.get(i).getAsJsonObject(), skalMatche.get(i));
+            verifyEqual(sakJsons.get(i), skalMatche.get(i));
         }
     }
 
-    private JsonArray verifySearchResponse(Response response, int expectedSize) {
+    private List<SakJson> verifySearchResponse(Response response, int expectedSize) {
         assertThat(response.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
         assertThat(response.getHeaderString("Content-Type")).isEqualTo("application/json");
-        JsonArray jsonArray = new JsonParser().parse(stream(response.getEntity())).getAsJsonArray();
-        assertThat(jsonArray.size()).isEqualTo(expectedSize);
-        return jsonArray;
+        List<SakJson> sakJsons = new GsonBuilder()
+            .registerTypeAdapter(LocalDateTime.class, (JsonDeserializer<LocalDateTime>) (jsonElement, type, jsonDeserializationContext) -> ZonedDateTime.parse(jsonElement.getAsJsonPrimitive().getAsString()).toLocalDateTime())
+            .create().fromJson(stream(response.getEntity()), new TypeToken<List<SakJson>>() {}.getType());
+        assertThat(sakJsons.size()).isEqualTo(expectedSize);
+        return sakJsons;
     }
 
     private void verify400(Response response) {
@@ -367,19 +385,19 @@ class SakResourceTest extends AbstractSakResourceTest {
         return new InputStreamReader((ByteArrayInputStream) entity);
     }
 
-    private void verifyEqual(JsonObject sakJson, Sak sak) {
-        assertThat(sakJson.get("id").getAsLong()).isEqualTo(sak.getId());
-        assertThat(sakJson.get("tema").getAsString()).isEqualTo(sak.getTema());
+    private void verifyEqual(SakJson sakJson, Sak sak) {
+        assertThat(sakJson.getId()).isEqualTo(sak.getId());
+        assertThat(sakJson.getTema()).isEqualTo(sak.getTema());
         if (StringUtils.isNotBlank(sak.getAktoerId())) {
-            assertThat(sakJson.get("aktoerId").getAsString()).isEqualTo(sak.getAktoerId());
+            assertThat(sakJson.getAktoerId()).isEqualTo(sak.getAktoerId());
         } else if (StringUtils.isNotBlank(sak.getOrgnr())) {
-            assertThat(sakJson.get("orgnr").getAsString()).isEqualTo(sak.getOrgnr());
+            assertThat(sakJson.getOrgnr()).isEqualTo(sak.getOrgnr());
         }
         if (StringUtils.isNotBlank(sak.getFagsakNr())) {
-            assertThat(sakJson.get("fagsakNr").getAsString()).isEqualTo(sak.getFagsakNr());
+            assertThat(sakJson.getFagsakNr()).isEqualTo(sak.getFagsakNr());
         }
         if(StringUtils.isNotBlank(sak.getApplikasjon())) {
-            assertThat(sakJson.get("applikasjon").getAsString()).isEqualTo(sak.getApplikasjon());
+            assertThat(sakJson.getApplikasjon()).isEqualTo(sak.getApplikasjon());
         }
     }
 
