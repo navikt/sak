@@ -18,6 +18,7 @@ preStopHookPath: internal/prestop
 resources:
   limits:
     cpu: 4000m
+    memory: 1024Mi
 fasitResources:
   used:
     - alias: appdynamics
