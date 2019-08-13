@@ -1,4 +1,5 @@
 image: "repo.adeo.no:5443/dok/sak"
+team: teamdokumenthandtering
 replicas:
   min: 2
   max: 12
