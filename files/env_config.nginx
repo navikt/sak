@@ -1,7 +1,7 @@
 charset utf-8;
 
 server {
-    listen 80;
+    listen 8080;
     server_name  _;
 
     # Proxy headers. Will be overwritten if you set them in blocks.
