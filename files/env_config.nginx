@@ -4,15 +4,6 @@ server {
     listen 8080;
     server_name  _;
 
-    # Proxy headers. Will be overwritten if you set them in blocks.
-    proxy_hide_header       Content-Security-Policy;
-    proxy_hide_header       Set-Cookie;
-    proxy_http_version      1.1;
-    proxy_set_header        Referer $http_referer;
-    proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
-    proxy_set_header        X-Real-IP $remote_addr;
-    proxy_ssl_verify        off;
-
     # Health check for NAIS
     location = "/internal/alive" {
         return 200 "Application: UP";
@@ -25,5 +16,12 @@ server {
         default_type text/plain;
     }
 
-    include /nginx/*.nginx;
+    location /api/v1/saker {
+        proxy_http_version            1.1;
+        proxy_set_header              X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header              X-Real-IP $remote_addr;
+        proxy_ssl_verify              off;
+        proxy_pass_request_headers    on;
+        proxy_pass                    ${DOKARKIV_SAK_REST_URL};
+    }
 }

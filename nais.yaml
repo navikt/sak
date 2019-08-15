@@ -57,6 +57,8 @@ fasitResources:
          serviceuser_base_dn: LDAP_SERVICEUSER_BASEDN
     - alias: srvsak
       resourceType: credential
+    - alias: Dokarkiv_Sak_Rest
+      resourceType: restservice
 
   exposed:
     - alias: sak.saker
