@@ -34,9 +34,6 @@ server {
 
     location @404_json {
       default_type application/json;
-      return 404 '{
-        "status": "404",
-        "message": "Not Found"
-      }';
+      return 404 '{"status": "404", "message": "Not Found"}';
     }
 }
