@@ -5,6 +5,9 @@ COPY files/run_nginx.sh /run_nginx.sh
 RUN chmod +x /run_nginx.sh
 RUN rm -rf /etc/nginx/conf.d/*
 
-COPY files/env_config.nginx /etc/nginx/conf.d/env_config.nginx
+COPY files/conf.d/* /etc/nginx/conf.d/
+
+RUN JSON_MESSAGE_FORMAT=$(awk '{printf "%s\\\\n", $0}' /etc/nginx/conf.d/proxy_log_format.txt) \
+    envsubst < /etc/nginx/conf.d/00_log.conf > /etc/nginx/conf.d/00_log.conf
 
 CMD "/run_nginx.sh"

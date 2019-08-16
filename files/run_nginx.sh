@@ -1,4 +1,3 @@
-
 set -e
 cd /etc/nginx/conf.d
 
