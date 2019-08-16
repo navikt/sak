@@ -11,7 +11,10 @@ RUN JSON_MESSAGE_FORMAT=$(awk '{printf "%s\\\\n", $0}' /etc/nginx/conf.d/proxy_m
     envsubst < /etc/nginx/conf.d/json_log_format.txt \
     > /etc/nginx/conf.d/json_log_format.txt
 
-RUN apk add --no-cache jq
+RUN HTTPS_PROXY=http://webproxy-utvikler.nav.no:8088 \
+    HTTP_PROXY=http://webproxy-utvikler.nav.no:8088 \
+    apk add --no-cache jq
+
 RUN jq -c . < /etc/nginx/conf.d/json_log_format.txt > /etc/nginx/conf.d/json_log_format.txt
 
 RUN PROXY_LOG_FORMAT=$(awk '{printf "%s\\\\n", $0}' /etc/nginx/conf.d/json_log_format.txt) \
