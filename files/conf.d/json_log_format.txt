@@ -1,4 +1,0 @@
-{
-    "level": "info",
-    "message": "${JSON_MESSAGE_FORMAT}"
-}
