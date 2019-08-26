@@ -10,7 +10,7 @@ RUN mkdir /conf.d
 COPY files/conf.d/* /conf.d/
 
 RUN PROXY_MESSAGE_FORMAT=$(python3 escape_string.py /conf.d/proxy_message_format.txt) \
-python3 envsubst.py /conf.d/json_log_format.json
+python3 envsubst.py /conf.d/json_log_format.json -env PROXY_MESSAGE_FORMAT
 
 RUN JSON_LOG_FORMAT=$(python3 escape_string.py /conf.d/json_log_format.json) \
 python3 envsubst.py /conf.d/00_log.conf
