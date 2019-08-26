@@ -1,4 +1,4 @@
-$remote_addr -> $request_method $proxy_host$sak_endpoint
-correlation_id:  $http_x_correlation_id
-request_time:    $request_time ms
-response_time:   $upstream_response_time ms
+$remote_addr ->    $request_method $proxy_host$sak_endpoint
+x_correlation_id:  $http_x_correlation_id
+request_time:      $request_time ms
+response_time:     $upstream_response_time ms

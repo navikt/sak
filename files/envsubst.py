@@ -7,8 +7,17 @@ if __name__ == "__main__":
     parser.add_argument("-o", action='store',
                         type=argparse.FileType('w'), dest='output',
                         help="redirect substituted content to file (default: same as input)")
+    parser.add_argument('-env', action='append',
+                        help='Only replace this variable (can be used multiple times)',
+                        default=[])
+
     args = parser.parse_args()
     if not args.output:
         args.output = args.input
 
-    os.system(f'envsubst < {args.input} > {args.output}')
+    envlist = list(map(lambda x: f'${x}', args.env))
+    env = ",".join(envlist)
+    if env:
+        env = f'\'{env}\''
+
+    os.system(f'envsubst {env}< {args.input} > {args.output}')
