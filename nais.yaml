@@ -12,7 +12,6 @@ healthcheck:
   readiness:
     path: internal/ready
     initialDelay: 20
-preStopHookPath: internal/prestop
 resources:
   limits:
     cpu: 4000m
