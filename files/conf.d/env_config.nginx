@@ -1,0 +1,39 @@
+charset utf-8;
+
+map $request_uri $sak_endpoint {
+    ~/api/v1/saker(?<path>.*)$  /rest/saker$path;
+}
+
+server {
+    listen 8080;
+    server_name  _;
+
+    # Health check for NAIS
+    location = "/internal/alive" {
+        return 200 "Application: UP";
+        default_type text/plain;
+    }
+
+    # Readiness check for NAIS
+    location = "/internal/ready" {
+        return 200 "Application: READY";
+        default_type text/plain;
+    }
+
+    location /api/v1/saker {
+        access_log                    /var/log/nginx/access.log  access_proxy_log;
+        proxy_http_version            1.1;
+        proxy_set_header              X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header              X-Real-IP $remote_addr;
+        proxy_ssl_verify              off;
+        proxy_pass_request_headers    on;
+        proxy_pass                    ${DOKARKIV_SAK_REST_URL};
+    }
+
+    error_page 404 @404_json;
+
+    location @404_json {
+      default_type application/json;
+      return 404 '{"status": "404", "message": "Not Found"}';
+    }
+}

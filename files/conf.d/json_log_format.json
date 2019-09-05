@@ -1,0 +1,5 @@
+{
+    "level": "info",
+    "message": "${PROXY_MESSAGE_FORMAT}",
+    "x_correlation_id": "$http_x_correlation_id"
+}

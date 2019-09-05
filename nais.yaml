@@ -12,10 +12,6 @@ healthcheck:
   readiness:
     path: internal/ready
     initialDelay: 20
-prometheus:
-  enabled: true
-  path: internal/metrics
-preStopHookPath: internal/prestop
 resources:
   limits:
     cpu: 4000m
@@ -57,6 +53,8 @@ fasitResources:
          serviceuser_base_dn: LDAP_SERVICEUSER_BASEDN
     - alias: srvsak
       resourceType: credential
+    - alias: Dokarkiv_Sak_Rest
+      resourceType: restservice
 
   exposed:
     - alias: sak.saker
