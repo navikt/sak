@@ -76,6 +76,7 @@ public class SakApplication extends ResourceConfig {
 
         final Database database = createDatabase(sakDataSource);
 
+        migrateSak(sakDataSource);
         registerApiResources(database, sakConfiguration);
         registerFilters(sakConfiguration);
         registerExceptionmappers();
@@ -84,6 +85,10 @@ public class SakApplication extends ResourceConfig {
         initSAML();
 
         log.info("Jersey-Application ferdig initialisert");
+    }
+
+    void migrateSak(final DataSource dataSource) {
+        // noop
     }
 
     void registerApiResources(final Database database, final SakConfiguration sakConfiguration) {
@@ -187,7 +192,7 @@ public class SakApplication extends ResourceConfig {
             .create()
             .setDefaultRequestConfig(requestConfig);
 
-        final Username******passord=gammelt_passord******(
+        final Username***passord=gammelt_passord***(
             sakConfiguration.getRequiredString("SRVSAK_USERNAME"),
             sakConfiguration.getRequiredString("SRVSAK_PASSWORD"));
 
