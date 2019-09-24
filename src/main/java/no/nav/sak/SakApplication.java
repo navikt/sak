@@ -1,5 +1,7 @@
 package no.nav.sak;
 
+import static java.util.logging.Logger.getLogger;
+
 import com.zaxxer.hikari.HikariDataSource;
 import com.zaxxer.hikari.metrics.prometheus.PrometheusMetricsTrackerFactory;
 import io.prometheus.client.hotspot.DefaultExports;
@@ -7,11 +9,16 @@ import io.swagger.jaxrs.config.BeanConfig;
 import io.swagger.jaxrs.listing.ApiListingResource;
 import io.swagger.jaxrs.listing.SwaggerSerializers;
 import no.nav.resilience.ResilienceConfig;
-import no.nav.sak.infrastruktur.*;
+import no.nav.sak.infrastruktur.CorrelationFilter;
+import no.nav.sak.infrastruktur.Database;
+import no.nav.sak.infrastruktur.DefaultExceptionMapper;
+import no.nav.sak.infrastruktur.MethodNotAllowedExceptionMapper;
+import no.nav.sak.infrastruktur.NotFoundExceptionMapper;
+import no.nav.sak.infrastruktur.ParamExceptionMapper;
+import no.nav.sak.infrastruktur.PrometheusFilter;
 import no.nav.sak.infrastruktur.abac.SakPEP;
 import no.nav.sak.infrastruktur.authentication.AuthenticationFilter;
 import no.nav.sak.infrastruktur.rest.ExternalApiExceptionMapper;
-import no.nav.sak.infrastruktur.rest.ServiceUnavailableException;
 import no.nav.sak.infrastruktur.rest.ServiceUnavailableExceptionMapper;
 import no.nav.sak.validering.ConstraintValidationExceptionMapper;
 import no.nav.sikkerhet.abac.ABACClient;
@@ -56,23 +63,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
-import static java.util.logging.Logger.getLogger;
-
 public class SakApplication extends ResourceConfig {
 
     private static final Logger log = LoggerFactory.getLogger(SakApplication.class);
 
     @SuppressWarnings("WeakerAccess") //Påkrevd public
     public SakApplication() {
-
         DefaultExports.initialize();
 
         final SakConfiguration sakConfiguration = new SakConfiguration();
         final DataSource sakDataSource = createSakDataSource(sakConfiguration);
-
-        migrateDataWarehouse(sakConfiguration);
-
-        migrateSak(sakDataSource);
 
         final Database database = createDatabase(sakDataSource);
 
@@ -84,16 +84,6 @@ public class SakApplication extends ResourceConfig {
         initSAML();
 
         log.info("Jersey-Application ferdig initialisert");
-    }
-
-    void migrateDataWarehouse(final SakConfiguration sakConfiguration) {
-
-        if(sakConfiguration.getBoolean("MIGRATE_DVH", true)) {
-            DataSource sakGrDataSource = createSakGrDataSource(sakConfiguration);
-            migrateSakGr(sakGrDataSource);
-        } else {
-            log.warn("Datavarehus-migrering er skrudd av - ev. endringer i skjema vil ikke migreres");
-        }
     }
 
     void registerApiResources(final Database database, final SakConfiguration sakConfiguration) {
@@ -141,10 +131,6 @@ public class SakApplication extends ResourceConfig {
         final BasicAuthenticator basicAuthenticator = new BasicAuthenticator(ldapConfiguration, cache);
         final Authenticator authenticator = new Authenticator(oidcTokenValidator, samlValidator, basicAuthenticator);
         register(new AuthenticationFilter(authenticator,ResilienceConfig.ofDefaults()));
-    }
-
-    void migrateSak(final DataSource dataSource) {
-        new FlywayMigrator(dataSource, "classpath:db/migration", "classpath:db/oracle/migration").migrate();
     }
 
     protected Database createDatabase(final DataSource dataSource) {
@@ -201,7 +187,7 @@ public class SakApplication extends ResourceConfig {
             .create()
             .setDefaultRequestConfig(requestConfig);
 
-        final Username***passord=gammelt_passord***(
+        final Username******passord=gammelt_passord******(
             sakConfiguration.getRequiredString("SRVSAK_USERNAME"),
             sakConfiguration.getRequiredString("SRVSAK_PASSWORD"));
 
@@ -223,10 +209,6 @@ public class SakApplication extends ResourceConfig {
         register(SwaggerSerializers.class);
     }
 
-    private void migrateSakGr(final DataSource sakGrDataSource) {
-        new FlywayMigrator(sakGrDataSource, "classpath:db/dvh/migration").migrate();
-    }
-
     private void registerLoggingFeature() {
         SLF4JBridgeHandler.removeHandlersForRootLogger();
         SLF4JBridgeHandler.install();
@@ -237,6 +219,7 @@ public class SakApplication extends ResourceConfig {
     protected DataSource createSakDataSource(final SakConfiguration sakConfiguration) {
 
         final HikariDataSource dataSource = new HikariDataSource();
+        dataSource.setSchema("JOARK");
         dataSource.setMetricsTrackerFactory(new PrometheusMetricsTrackerFactory());
 
         dataSource.setUsername(sakConfiguration.getRequiredString("SAKDS_USERNAME"));
@@ -244,19 +227,6 @@ public class SakApplication extends ResourceConfig {
         dataSource.setJdbcUrl(sakConfiguration.getRequiredString("SAKDS_URL"));
 
         log.info("Opprettet datasource: {}", dataSource.getJdbcUrl());
-        return dataSource;
-    }
-
-    private DataSource createSakGrDataSource(final SakConfiguration sakConfiguration) {
-
-        final HikariDataSource dataSource = new HikariDataSource();
-
-        dataSource.setUsername(sakConfiguration.getRequiredString("SAK_GR_DS_USERNAME"));
-        dataSource.setPassword(sakConfiguration.getRequiredString("SAK_GR_DS_PASSWORD"));
-        dataSource.setJdbcUrl(sakConfiguration.getRequiredString("SAK_GR_DS_URL"));
-
-        log.info("Opprettet datasource for dvh: {}", dataSource.getJdbcUrl());
-
         return dataSource;
     }
 
