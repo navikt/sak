@@ -14,5 +14,5 @@ CREATE TABLE sak_gr (
     CONSTRAINT pk_sak_gr PRIMARY KEY (sak_gr_id)
 );
 
-CREATE SEQUENCE SAK_SEQ;
+CREATE SEQUENCE seq_sak;
 
