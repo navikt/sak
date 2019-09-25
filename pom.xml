@@ -8,13 +8,6 @@
     <artifactId>sak</artifactId>
     <version>1.0-SNAPSHOT</version>
 
-    <!-- Skip compiling src directory -->
-    <build>
-        <sourceDirectory>ignored</sourceDirectory>
-        <testSourceDirectory>ignored</testSourceDirectory>
-    </build>
-
-    <?ignore
     <properties>
         <oppgavehandtering-security.version>2.00.09</oppgavehandtering-security.version>
         <oppgavehandtering.resilience.version>1.00.03</oppgavehandtering.resilience.version>
@@ -444,6 +437,7 @@
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
             <version>${flyway.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -919,5 +913,4 @@
             </plugin>
         </plugins>
     </build>
-    ?>
 </project>
