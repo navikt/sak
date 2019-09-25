@@ -33,7 +33,7 @@ public class SakRepository {
         Histogram.Timer timer = startTimer("insert");
         try {
             Long id = database.insert("insert into sak (id, aktoerid, orgnr, tema, applikasjon, fagsaknr, opprettet_av, opprettet_tidspunkt)" +
-                    " values (sak_seq.nextval, ?, ?, ?, ?, ?, ?, ?)",
+                    " values (seq_sak.nextval, ?, ?, ?, ?, ?, ?, ?)",
                 sak.getAktoerId(),
                 sak.getOrgnr(),
                 sak.getTema(),
