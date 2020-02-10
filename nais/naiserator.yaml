@@ -1,0 +1,56 @@
+kind: Application
+apiVersion: nais.io/v1alpha1
+metadata:
+  name: sak
+  namespace: {{ NAMESPACE }}
+  labels:
+    team: teamdokumenthandtering
+spec:
+  env:
+    - name: ABAC_PDP_ENDPOINT
+      value: {{ ABAC_PDP_ENDPOINT }}
+    - name: OPENIDCONNECT_ISSO_JWKS
+      value: {{ OPENIDCONNECT_ISSO_JWKS }}
+    - name: OPENIDCONNECT_ISSO_ISSUER
+      value: {{ OPENIDCONNECT_ISSO_ISSUER }}
+    - name: STS_ISSUER
+      value: {{ STS_ISSUER }}
+    - name: STS_JWKS
+      value: {{ STS_JWKS }}
+  image: {{ image }}
+  ingresses:
+        {{#each INGRESSES}}
+          - {{this }}
+        {{/each}}
+  liveness:
+    path: internal/alive
+    port: 8080
+    initialDelay: 20
+  port: 8080
+  preStopHookPath: internal/prestop
+  prometheus:
+    enabled: true
+    path: internal/metrics
+  readiness:
+    path: internal/ready
+    port: 8080
+    initialDelay: 20
+  replicas:
+    min: 2
+    max: 12
+    cpuThresholdPercentage: 50
+  resources:
+    limits:
+      cpu: 4000m
+      memory: 1024Mi
+  vault:
+    enabled: true
+    paths:
+      - kvPath: {{ SAKDS }}
+        mountPath: /var/run/secrets/nais.io/sakDS
+      - kvPath: {{ LDAP }}
+        mountPath: /var/run/secrets/nais.io/ldap
+      - kvPath: {{ SRVSAK }}
+        mountPath: /var/run/secrets/nais.io/srvsak
+      - kvPath: {{ VAULT }}
+        mountPath: /var/run/secrets/nais.io/vault

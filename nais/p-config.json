@@ -1,0 +1,15 @@
+{
+	"ABAC_PDP_ENDPOINT": "https://wasapp.adeo.no/asm-pdp/authorize",
+	"OPENIDCONNECT_ISSO_JWKS": "https://isso.adeo.no/isso/oauth2/connect/jwk_uri",
+	"OPENIDCONNECT_ISSO_ISSUER": "https://isso.adeo.no:443/isso/oauth2",
+	"STS_ISSUER": "https://security-token-service.nais.adeo.no",
+	"STS_JWKS": "https://security-token-service.nais.adeo.no/rest/v1/sts/jwks",
+	"LDAP": "/serviceuser/data/prod/srvssolinux",
+	"SRVSAK": "/serviceuser/data/prod/srvsak",
+	"SAKDS": "/oracle/data/prod/creds/sak-sak",
+	"VAULT": "/kv/prod/fss/sak/default",
+	"NAMESPACE": "default",
+	"INGRESSES": [
+		"https://sak.nais.adeo.no"
+	]
+}
