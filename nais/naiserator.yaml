@@ -17,8 +17,8 @@ spec:
       value: {{ STS_ISSUER }}
     - name: STS_JWKS
       value: {{ STS_JWKS }}
-    - name: {{ SAKDS_URL }}
-      value: SAKDS_URL
+    - name: SAKDS_URL
+      value: {{ SAKDS_URL }}
   image: {{ image }}
   ingresses:
         {{#each INGRESSES}}
