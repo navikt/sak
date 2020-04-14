@@ -14,8 +14,8 @@ class LastTestSimulation extends Simulation {
     private val authHeaderBasic = new BasicAuthTestHeaderProvider().getHeader
     private val httpProtocol =
         http
-            .baseURL("https://sak-t8.nais.preprod.local/api/v1")
-            .warmUp("https://sak-t8.nais.preprod.local/internal/alive")
+            .baseURL("https://sak-t6.nais.preprod.local/api/v1")
+            .warmUp("https://sak-t6.nais.preprod.local/internal/alive")
 
     private val aktoerIdFeeder = csv("data/aktoerId.csv").circular
     private val temaFeeder = csv("data/tema.csv").circular
