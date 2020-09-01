@@ -12,7 +12,7 @@ import static org.mockito.Mockito.mock;
 @SuppressWarnings("unchecked")
 public class JunitBasicAuthenticator extends BasicAuthenticator {
     public static final String USERNAME = "username";
-    public static final String ***passord=gammelt_passord***";
+    public static final String PASSWORD = "password";
 
     public JunitBasicAuthenticator(LdapConfiguration ldapConfiguration) {
         super(ldapConfiguration, mock(Cache.class));

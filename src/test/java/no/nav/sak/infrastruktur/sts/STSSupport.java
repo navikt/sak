@@ -29,7 +29,7 @@ import java.nio.charset.Charset;
 import java.util.HashMap;
 
 public class STSSupport {
-    private static final String TRUSTSTORE_***passord=gammelt_passord***";
+    private static final String TRUSTSTORE_PASSWORD = "truststore.password";
     private static final String TRUSTSTORE = "nav_truststore_nonproduction-t.jts";
     private static final String TOKEN_TYPE = "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1#SAMLV2.0";
     private static final String KEY_TYPE = "http://docs.oasis-open.org/ws-sx/ws-trust/200512/Bearer";

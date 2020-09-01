@@ -95,7 +95,7 @@ public class ContractTests {
     public void setStatehentSakSomEksistererPerson() {
         sakRepository.lagre(
             Sak.Builder.enSak()
-                .medAktoerId("***gammelt_fnr***57")
+                .medAktoerId("1000002216857")
                 .medTema("BAR")
                 .medApplikasjon("enApplikasjon")
                 .medOpprettetAv("opprettetAvEnSaksbehandler")

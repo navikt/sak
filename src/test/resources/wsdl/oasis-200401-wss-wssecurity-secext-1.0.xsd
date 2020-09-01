@@ -197,7 +197,7 @@ This document and the information contained herein is provided on an “AS IS”
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-    <xsd:element name="***passord=gammelt_passord***"/>
+    <xsd:element name="Password" type="wsse:PasswordString"/>
     <xsd:element name="Nonce" type="wsse:EncodedString"/>
     <xsd:simpleType name="FaultcodeEnum">
         <xsd:restriction base="xsd:QName">
