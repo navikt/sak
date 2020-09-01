@@ -11,7 +11,7 @@
             "request": {
                 "method": "GET",
                 "path": "/api/v1/saker/",
-                "query": "aktoerId=***gammelt_fnr***57&tema=BAR",
+                "query": "aktoerId=1000002216857&tema=BAR",
                 "headers": {
                     "X-Correlation-ID": "0"
                 }
@@ -115,7 +115,7 @@
                     "X-Correlation-ID": "0"
                 },
                 "body": {
-                    "aktoerId": "***gammelt_fnr***0",
+                    "aktoerId": "101010101010",
                     "tema": "etTema",
                     "applikasjon": "Ruting",
                     "fagsakNr": "etFagSakNr"
@@ -128,7 +128,7 @@
                 },
                 "body": {
                     "id": "?",
-                    "aktoerId": "***gammelt_fnr***0",
+                    "aktoerId": "101010101010",
                     "tema": "etTema",
                     "applikasjon": "Ruting",
                     "fagsakNr": "etFagSakNr",

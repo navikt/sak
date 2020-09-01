@@ -9,7 +9,7 @@ fi
 if test -f /var/run/secrets/nais.io/sakDS/password;
 then
     echo "Setting SAKDS_PASSWORD"
-    export SAKDS_***passord=gammelt_passord***)
+    export SAKDS_PASSWORD=$(cat /var/run/secrets/nais.io/sakDS/password)
 fi
 
 if test -f /var/run/secrets/nais.io/ldap/username;
@@ -21,7 +21,7 @@ fi
 if test -f /var/run/secrets/nais.io/ldap/password;
 then
     echo "Setting LDAP_PASSWORD"
-    export LDAP_***passord=gammelt_passord***)
+    export LDAP_PASSWORD=$(cat /var/run/secrets/nais.io/ldap/password)
 fi
 
 if test -f /var/run/secrets/nais.io/srvsak/username;
@@ -33,5 +33,5 @@ fi
 if test -f /var/run/secrets/nais.io/srvsak/password;
 then
     echo "Setting SRVSAK_PASSWORD"
-    export SRVSAK_***passord=gammelt_passord***)
+    export SRVSAK_PASSWORD=$(cat /var/run/secrets/nais.io/srvsak/password)
 fi

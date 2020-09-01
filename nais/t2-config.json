@@ -1,0 +1,16 @@
+{
+	"ABAC_PDP_ENDPOINT": "https://wasapp-t2.adeo.no/asm-pdp/authorize",
+	"OPENIDCONNECT_ISSO_JWKS": "https://isso-t.adeo.no/isso/oauth2/connect/jwk_uri",
+	"OPENIDCONNECT_ISSO_ISSUER": "https://isso-t.adeo.no:443/isso/oauth2",
+	"STS_ISSUER": "https://security-token-service-t4.nais.preprod.local",
+	"STS_JWKS": "https://security-token-service-t4.nais.preprod.local/rest/v1/sts/jwks",
+    "SAKDS_URL": "jdbc:oracle:thin:@d26dbfl029.test.local:1521/joark_t2",
+	"LDAP": "/serviceuser/data/test/srvssolinux",
+	"SRVSAK": "/serviceuser/data/test/srvsak",
+	"SAKDS": "/oracle/data/dev/creds/sak_t2-user",
+	"VAULT": "/kv/preprod/fss/sak/t2",
+	"NAMESPACE": "t2",
+	"INGRESSES": [
+		"https://sak-t2.nais.preprod.local"
+	]
+}

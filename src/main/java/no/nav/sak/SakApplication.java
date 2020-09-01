@@ -192,7 +192,7 @@ public class SakApplication extends ResourceConfig {
             .create()
             .setDefaultRequestConfig(requestConfig);
 
-        final Username***passord=gammelt_passord***(
+        final UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(
             sakConfiguration.getRequiredString("SRVSAK_USERNAME"),
             sakConfiguration.getRequiredString("SRVSAK_PASSWORD"));
 

@@ -47,7 +47,7 @@ class OidcAuthenticator {
     }
 
     String getAuthorizationCode(String brukernavn, String passord) throws IOException {
-        if (brukernavn == null || ***passord=gammelt_passord***()) {
+        if (brukernavn == null || passord == null || brukernavn.isEmpty() || passord.isEmpty()) {
             throw new IllegalArgumentException("Brukernavn og/eller passord mangler.");
         }
         CookieStore cookieStore = new BasicCookieStore();

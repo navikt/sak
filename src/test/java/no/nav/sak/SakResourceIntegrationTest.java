@@ -43,7 +43,7 @@ class SakResourceIntegrationTest {
     @Test
     void gis_tilgang_med_basic_auth() throws Exception {
         String username = sakConfiguration.getRequiredString("SRVSAK_USERNAME");
-        String ***passord=gammelt_passord***");
+        String password = sakConfiguration.getRequiredString("SRVSAK_PASSWORD");
         String unencoded = username + ":" + password;
         String authHeaderBasic = "Basic " + Base64.getEncoder().encodeToString(unencoded.getBytes("utf-8"));
         Header authorizationHeader = new Header("Authorization",

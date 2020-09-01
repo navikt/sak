@@ -82,7 +82,7 @@ public class SakJson {
     }
 
     @JsonProperty("aktoerId")
-    @ApiModelProperty(value = "Id til aktøren saken gjelder", example = "***gammelt_fnr***")
+    @ApiModelProperty(value = "Id til aktøren saken gjelder", example = "10038999999")
     public String getAktoerId() {
         return aktoerId;
     }

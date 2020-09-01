@@ -35,7 +35,7 @@ class AuthorizationTest {
 
 
     private SakConfiguration sakConfiguration = new SakConfiguration();
-    private String navressurs***passord=gammelt_passord***");
+    private String navressursPassord = sakConfiguration.getRequiredString("NAVRESSURS_PASSWORD");
 
     @BeforeAll
     static void setup() throws Exception {

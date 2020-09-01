@@ -23,7 +23,7 @@ public class OidcLogin {
 
     public String getIdToken()  {
         String username = sakConfiguration.getRequiredString("junit.sts.user");
-        String ***passord=gammelt_passord***");
+        String password = sakConfiguration.getRequiredString("junit.sts.password");
         return getIdToken(username, password);
     }
 
