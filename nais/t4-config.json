@@ -11,6 +11,6 @@
 	"VAULT": "/kv/preprod/fss/sak/t4",
 	"NAMESPACE": "t4",
 	"INGRESSES": [
-		"https://sak-t4.nais.preprod.local"
+		"https://sak-t4.nais.preprod.local", "https://sak-t4.dev.adeo.no"
 	]
 }
