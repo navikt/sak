@@ -11,6 +11,6 @@
 	"VAULT": "/kv/preprod/fss/sak/q2",
 	"NAMESPACE": "q2",
 	"INGRESSES": [
-		"https://sak-q2.nais.preprod.local"
+		"https://sak-q2.nais.preprod.local", "https://sak-q2.dev.adeo.no"
 	]
 }
