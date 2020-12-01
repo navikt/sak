@@ -30,7 +30,7 @@
         <rest.assured.version>2.9.0</rest.assured.version>
         <swagger.version>1.5.12</swagger.version>
         <swagger-ui.version>3.26.1</swagger-ui.version>
-        <logstash.encoder.version>6.3</logstash.encoder.version>
+        <logstash.encoder.version>6.5</logstash.encoder.version>
         <jose4j.version>0.6.3</jose4j.version>
         <nimbusds.version>5.47</nimbusds.version>
         <abac.attribute.version>3.2.5</abac.attribute.version>
@@ -44,7 +44,7 @@
 
         <!--Managed transitive deps -->
         <akka.actor.version>2.5.4</akka.actor.version>
-        <jackson.version>2.9.4</jackson.version>
+        <jackson.version>2.10.5</jackson.version>
         <scala.reflect.version>2.12.3</scala.reflect.version>
         <scala.library.version>2.12.3</scala.library.version>
         <scala.parser.combinators.version>1.0.6</scala.parser.combinators.version>
