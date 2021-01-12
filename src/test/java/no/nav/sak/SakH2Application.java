@@ -1,6 +1,5 @@
 package no.nav.sak;
 
-import com.sun.org.apache.regexp.internal.RE;
 import no.nav.resilience.ResilienceConfig;
 import no.nav.sak.infrastruktur.FlywayMigrator;
 import no.nav.sak.infrastruktur.JunitDataSource;
