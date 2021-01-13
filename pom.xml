@@ -71,8 +71,8 @@
         <httpmime.version>4.5.13</httpmime.version>
 
         <!--Build settings -->
-        <maven.surefire.version>3.0.0-M1</maven.surefire.version>
-        <maven.failsafe.version>3.0.0-M1</maven.failsafe.version>
+        <maven.surefire.version>3.0.0-M2</maven.surefire.version>
+        <maven.failsafe.version>3.0.0-M2</maven.failsafe.version>
         <scala.maven.version>4.4.0</scala.maven.version>
         <maven.compiler.target>11</maven.compiler.target>
         <maven.compiler.source>11</maven.compiler.source>
@@ -844,7 +844,6 @@
                     </argLine>
                     <properties>
                         <excludedGroups>integration-test, mutation-tests</excludedGroups>
-                        <excludedTags>integration-test, mutation-tests</excludedTags>
                     </properties>
                 </configuration>
             </plugin>
