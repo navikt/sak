@@ -89,6 +89,9 @@
         <gatling-maven-plugin.version>3.1.1</gatling-maven-plugin.version>
 
         <maven-enforcer-plugin.version>3.0.0-M3</maven-enforcer-plugin.version>
+        <maven-shade-plugin.version>3.2.4</maven-shade-plugin.version>
+        <maven-toolchains-plugin.version>3.0.0</maven-toolchains-plugin.version>
+
     </properties>
 
     <packaging>jar</packaging>
@@ -762,7 +765,9 @@
                         </executions>
                         <configuration>
                             <coverageThreshold>70</coverageThreshold>
-                            <excludedTestClasses>no.nav.sak.SakResourceIntegrationTest,no.nav.sak.server.StartJettyTest</excludedTestClasses>
+                            <excludedTestClasses>
+                                no.nav.sak.SakResourceIntegrationTest,no.nav.sak.server.StartJettyTest
+                            </excludedTestClasses>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -796,6 +801,26 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-toolchains-plugin</artifactId>
+                <version>${maven-toolchains-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>toolchain</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <toolchains>
+                        <jdk>
+                            <version>11</version>
+                            <vendor>openjdk</vendor>
+                        </jdk>
+                    </toolchains>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>net.alchim31.maven</groupId>
                 <artifactId>scala-maven-plugin</artifactId>
@@ -850,7 +875,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.2.4</version>
+                <version>${maven-shade-plugin.version}</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -859,10 +884,12 @@
                         </goals>
                         <configuration>
                             <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                <transformer
+                                    implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <mainClass>no.nav.sak.server.StartJetty</mainClass>
                                 </transformer>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                                <transformer
+                                    implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
                             </transformers>
                             <filters>
                                 <filter>
