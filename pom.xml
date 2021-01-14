@@ -908,9 +908,6 @@
                         </goals>
                         <configuration>
                             <rules>
-                                <ruleJavaVersionToolchainAware implementation="com.github.paulmoloney.maven.plugins.enforcer.RuleJavaVersionToolchainAware">
-                                    <version>11</version>
-                                </ruleJavaVersionToolchainAware>
                                 <requireJavaVersion>
                                     <version>11</version>
                                 </requireJavaVersion>
