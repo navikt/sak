@@ -29,7 +29,8 @@ av mutasjonstester som kan kjøres med mvn test -Pmutation-tests, og
 
 Applikasjonen pakkes til en 'fat-jar' vha maven-shade-plugin. Applikasjonen kan deretter kjøres opp lokalt på følgende måte:
 
-java -jar <app>.jar 
+1. i root folder til prosjektet kjør kommando `mvn package`, for å bygge Jar filen.
+2. i `./target` folder kjør kommando `java -jar <app>.jar`
 
 Merk at konfigurasjon må være satt enten i sak.properties, som system.properties (-D) eller som env-variabler for at applikasjonen skal
 starte. 
