@@ -848,7 +848,7 @@
                             --illegal-access=permit
                         </argLine>
                         <properties>
-                            <excludedGroups>integration-test, mutation-tests</excludedGroups>
+                            <excludedGroups>integration-test</excludedGroups>
                         </properties>
                     </configuration>
                 </plugin>
