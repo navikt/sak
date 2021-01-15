@@ -29,7 +29,7 @@
         <prometheus.version>0.6.0</prometheus.version>
         <rest.assured.version>2.9.0</rest.assured.version>
         <swagger.version>1.5.12</swagger.version>
-        <swagger-ui.version>3.26.1</swagger-ui.version>
+        <swagger-ui.version>3.38.0</swagger-ui.version>
         <logstash.encoder.version>6.5</logstash.encoder.version>
         <jose4j.version>0.6.3</jose4j.version>
         <nimbusds.version>5.47</nimbusds.version>
