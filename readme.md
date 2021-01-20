@@ -43,6 +43,10 @@ docker run <app> -p<fri port på host>:8080
 Her vil også properties enten måtte tilgjengeliggjøres i jar, eller det må sendes med env-variabler i run-kommando. 
 
 
+### Swagger
+
+Url for komme til swagger-ui er `<ingress>` og for å sette oppsett så må swagger.json settes under `explore` til `<ingress>/api/swagger.json`
+
 ### Deploy
 
 Applikasjonen kjører på NAIS-plattformen (se https://confluence.adeo.no/pages/viewpage.action?pageId=210440645)
