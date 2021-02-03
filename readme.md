@@ -45,7 +45,11 @@ Her vil også properties enten måtte tilgjengeliggjøres i jar, eller det må s
 
 ### Swagger
 
-Url for komme til swagger-ui er `<ingress>` og for å sette oppsett så må swagger.json settes under `explore` til `<ingress>/api/swagger.json`
+1. Åpne denne url `<ingress>` i en nettleser
+2. Når du kommer inn til nettleseren vil du se at du får feilmeldingen `Failed to load API definition`. Dette er fordi swagger pekker på en swagger.json konfigurasjon som er feil og ikke tilgjengelig.
+3. For å sette korrekt konfigurasjon så vil du gå til feltet `explore` på nettsiden.
+4. På dette feltet vil vi at swagger skal hente konfigurasjonen fra `sak`, dette gjøres med å skrive dette inn i feltet `<ingress>/api/swagger.json`.
+5. Når du har tryket på `explore` knappen vil swagger hente konfigurasjonen fra applikasjonen.
 
 ### Deploy
 
