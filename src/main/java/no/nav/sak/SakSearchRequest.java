@@ -13,7 +13,7 @@ import static org.apache.commons.lang3.builder.ToStringStyle.SHORT_PREFIX_STYLE;
 public class SakSearchRequest {
     @QueryParam("aktoerId")
     @ApiParam("Filtrering på saker opprettet for en aktør (person)")
-    private String aktoerId;
+    private List<String> aktoerId;
     @QueryParam("orgnr")
     @ApiParam("Filtrering på saker opprettet for en organisasjon")
     private String orgnr;
@@ -31,11 +31,11 @@ public class SakSearchRequest {
         //JaxRSActionDelAct
     }
 
-    public String getAktoerId() {
+    public List<String> getAktoerId() {
         return aktoerId;
     }
 
-    public void setAktoerId(String aktoerId) {
+    public void setAktoerId(List<String> aktoerId) {
         this.aktoerId = aktoerId;
     }
 

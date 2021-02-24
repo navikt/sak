@@ -59,7 +59,7 @@ class SakRepositoryTest {
         Sak sak1 = sakRepository.lagre(new SakTestData().aktoerId(aktoerId).build());
         Sak sak2 = sakRepository.lagre(new SakTestData().aktoerId(aktoerId).build());
 
-        List<Sak> saker = sakRepository.finnSaker(SakSearchCriteria.create().medAktoerId(sak1.getAktoerId()));
+        List<Sak> saker = sakRepository.finnSaker(SakSearchCriteria.create().medAktoerId(List.of(sak1.getAktoerId())));
         assertThat(saker).containsOnly(sak1, sak2);
     }
 
