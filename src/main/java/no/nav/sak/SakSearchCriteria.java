@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class SakSearchCriteria {
-    private String aktoerId;
+    private List<String> aktoerId = new ArrayList<>();
     private String orgnr;
     private List<String> tema = new ArrayList<>();
     private String fagsakNr;
@@ -22,7 +22,7 @@ public class SakSearchCriteria {
         return new SakSearchCriteria();
     }
 
-    SakSearchCriteria medAktoerId(String aktoerId) {
+    SakSearchCriteria medAktoerId(List<String> aktoerId) {
         this.aktoerId = aktoerId;
         return this;
     }
@@ -48,8 +48,8 @@ public class SakSearchCriteria {
     }
 
 
-    public Optional<String> getAktoerId() {
-        return Optional.ofNullable(aktoerId);
+    public List<String> getAktoerId() {
+        return aktoerId;
     }
 
     public Optional<String> getOrgnr() {

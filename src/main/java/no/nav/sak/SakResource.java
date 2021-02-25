@@ -1,6 +1,20 @@
 package no.nav.sak;
 
-import io.swagger.annotations.*;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiKeyAuthDefinition;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
+import io.swagger.annotations.BasicAuthDefinition;
+import io.swagger.annotations.Contact;
+import io.swagger.annotations.Info;
+import io.swagger.annotations.ResponseHeader;
+import io.swagger.annotations.SecurityDefinition;
+import io.swagger.annotations.SwaggerDefinition;
 import no.nav.sak.infrastruktur.EnableApiFilters;
 import no.nav.sak.infrastruktur.ErrorResponse;
 import no.nav.sak.infrastruktur.abac.AuthorizationRequest;
@@ -11,7 +25,13 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
 import javax.validation.Valid;
-import javax.ws.rs.*;
+import javax.ws.rs.BeanParam;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -20,6 +40,7 @@ import javax.ws.rs.core.UriInfo;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -96,7 +117,7 @@ public class SakResource {
     private final SakPEP sakPEP;
 
     SakResource(
-          final SakRepository sakRepository
+        final SakRepository sakRepository
         , final SakPEP sakPEP) {
 
         this.sakRepository = sakRepository;
@@ -118,7 +139,7 @@ public class SakResource {
         }
     )
     public Response hentSak(
-          @PathParam("id") final Long id
+        @PathParam("id") final Long id
         , @Context final ContainerRequestContext ctx) {
 
         log.info("Henter sak med id: {}", id);
@@ -161,41 +182,33 @@ public class SakResource {
         }
     )
     public Response finnSaker(
-          @Valid @BeanParam final SakSearchRequest sakSearchRequest
+        @Valid @BeanParam final SakSearchRequest sakSearchRequest
         , @Context final ContainerRequestContext ctx) {
 
         log.info("Søker etter saker for: {}", sakSearchRequest);
-
-        final ABACResult abacResult =
-            sakPEP.autoriser(ctx, new AuthorizationRequest(sakSearchRequest.getAktoerId()));
-        final ABACResult.Code abacResultCode = abacResult.getResultCode();
-        final Response response;
-        if (ABACResult.Code.OK.equals(abacResultCode)) {
-
-            if (abacResult.hasAccess()) {
-
-                final List<Sak> saker =
-                    sakRepository.finnSaker(sakSearchRequest.toCriteria());
-                response =
-                    Response
-                        .ok(
-                            saker
-                                .stream()
-                                .filter(s -> harTilgangTilSakInterneRegler(ctx, s))
-                                .map(SakJson::new)
-                                .collect(toList())
-                        )
-                        .build();
-            } else {
-
-                response = Response.ok(new ArrayList<>()).build();
+        for (String aktoerId : sakSearchRequest.getAktoerId()) {
+            final ABACResult abacResult =
+                sakPEP.autoriser(ctx, new AuthorizationRequest(aktoerId));
+            final ABACResult.Code abacResultCode = abacResult.getResultCode();
+            if (!ABACResult.Code.OK.equals(abacResultCode)) {
+                return makeResponseUponAbacFailure(abacResultCode);
+            } else if (!abacResult.hasAccess()) {
+                return Response.ok(new ArrayList<>()).build();
             }
-        } else {
-
-            response = makeResponseUponAbacFaliure(abacResultCode);
         }
 
-        return response;
+        final List<Sak> saker =
+            sakRepository.finnSaker(sakSearchRequest.toCriteria());
+        return
+            Response
+                .ok(
+                    saker
+                        .stream()
+                        .filter(s -> harTilgangTilSakInterneRegler(ctx, s))
+                        .map(SakJson::new)
+                        .collect(toList())
+                )
+                .build();
     }
 
     @POST
@@ -213,7 +226,7 @@ public class SakResource {
         }
     )
     public Response opprettSak(
-          @Valid @ApiParam(value = "Saken som skal opprettes", required = true) final SakJson sakJson
+        @Valid @ApiParam(value = "Saken som skal opprettes", required = true) final SakJson sakJson
         , @Context final UriInfo uriInfo
         , @Context final ContainerRequestContext ctx
     ) throws URISyntaxException {
@@ -242,7 +255,7 @@ public class SakResource {
             }
         } else {
 
-            response = makeResponseUponAbacFaliure(abacResultCode);
+            response = makeResponseUponAbacFailure(abacResultCode);
         }
 
         return response;
@@ -288,7 +301,7 @@ public class SakResource {
     }
 
     private boolean harTilgangTilSakInterneRegler(
-          final ContainerRequestContext ctx
+        final ContainerRequestContext ctx
         , final Sak sak) {
 
         final boolean temaKontroll = Objects.equals("KTR", sak.getTema());
@@ -306,7 +319,7 @@ public class SakResource {
             SakSearchCriteria
                 .create()
                 .medOrgnr(sak.getOrgnr())
-                .medAktoerId(sak.getAktoerId())
+                .medAktoerId(sak.getAktoerId() != null ? Arrays.asList(sak.getAktoerId()) : null)
                 .medFagsakNr(sak.getFagsakNr())
                 .medApplikasjon(sak.getApplikasjon());
 
@@ -315,7 +328,7 @@ public class SakResource {
     }
 
     private Response checkUsersAccessToSak(
-          final ContainerRequestContext ctx
+        final ContainerRequestContext ctx
         , final Sak sak
     ) {
 
@@ -347,13 +360,13 @@ public class SakResource {
             }
         } else {
 
-            response = makeResponseUponAbacFaliure(abacResultCode);
+            response = makeResponseUponAbacFailure(abacResultCode);
         }
 
         return response;
     }
 
-    private Response makeResponseUponAbacFaliure(final ABACResult.Code abacResultCode) {
+    private Response makeResponseUponAbacFailure(final ABACResult.Code abacResultCode) {
 
         final Response.Status responseStatus =
             mapABACResultCodeToResponseStatus(abacResultCode);

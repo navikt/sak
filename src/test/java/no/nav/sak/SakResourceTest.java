@@ -335,6 +335,22 @@ class SakResourceTest extends AbstractSakResourceTest {
         verify400(response);
     }
 
+    @Test
+    void soeker_opp_saker_for_flere_aktoerId() {
+        opprett100Tilfeldigesaker();
+        String aktoerId1 = RandomStringUtils.randomNumeric(11);
+        Sak sak1 = sakRepository.lagre(new SakTestData().aktoerId(aktoerId1).build());
+
+        String aktoerId2 = RandomStringUtils.randomNumeric(11);
+        Sak sak2 = sakRepository.lagre(new SakTestData().aktoerId(aktoerId2).build());
+        Response response = executeGetRequest(
+            sakRootTarget()
+                .queryParam("aktoerId", sak1.getAktoerId())
+                .queryParam("aktoerId", sak2.getAktoerId()));
+
+        verifySearchResponseMatching(response, asList(sak1, sak2));
+    }
+
     @Override
     protected Application configure() {
         return new SakJunitApplication();

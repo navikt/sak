@@ -66,7 +66,10 @@ public class SakRepository {
 
     public List<Sak> finnSaker(SakSearchCriteria sakSearchCriteria) {
         Query query = new Query("select * from sak");
-        sakSearchCriteria.getAktoerId().ifPresent(aktoerId -> query.and("aktoerId = ?", aktoerId));
+        if (sakSearchCriteria.getAktoerId() != null && !sakSearchCriteria.getAktoerId().isEmpty()) {
+            String parameters = sakSearchCriteria.getAktoerId().stream().map(t -> "?").collect(Collectors.joining(","));
+            query.in("aktoerId in (" + parameters + ")", sakSearchCriteria.getAktoerId());
+        }
         sakSearchCriteria.getOrgnr().ifPresent(orgnr -> query.and("orgnr = ?", orgnr));
         sakSearchCriteria.getApplikasjon().ifPresent(applikasjon -> query.and("applikasjon = ?", applikasjon));
 
