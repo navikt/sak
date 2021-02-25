@@ -191,7 +191,7 @@ public class SakResource {
                 sakPEP.autoriser(ctx, new AuthorizationRequest(aktoerId));
             final ABACResult.Code abacResultCode = abacResult.getResultCode();
             if (!ABACResult.Code.OK.equals(abacResultCode)) {
-                return makeResponseUponAbacFaliure(abacResultCode);
+                return makeResponseUponAbacFailure(abacResultCode);
             } else if (!abacResult.hasAccess()) {
                 return Response.ok(new ArrayList<>()).build();
             }
@@ -255,7 +255,7 @@ public class SakResource {
             }
         } else {
 
-            response = makeResponseUponAbacFaliure(abacResultCode);
+            response = makeResponseUponAbacFailure(abacResultCode);
         }
 
         return response;
@@ -360,13 +360,13 @@ public class SakResource {
             }
         } else {
 
-            response = makeResponseUponAbacFaliure(abacResultCode);
+            response = makeResponseUponAbacFailure(abacResultCode);
         }
 
         return response;
     }
 
-    private Response makeResponseUponAbacFaliure(final ABACResult.Code abacResultCode) {
+    private Response makeResponseUponAbacFailure(final ABACResult.Code abacResultCode) {
 
         final Response.Status responseStatus =
             mapABACResultCodeToResponseStatus(abacResultCode);
