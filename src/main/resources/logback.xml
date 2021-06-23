@@ -50,27 +50,6 @@
         </encoder>
     </appender>
 
-    <appender name="STDOUT_JSON_TJENESTEKALL" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
-            <providers>
-                <timestamp/>
-                <version/>
-                <loggerName/>
-                <logLevel/>
-                <logLevelValue/>
-                <stackTrace/>
-                <pattern>
-                    <pattern>
-                        {
-                        "message": "%replace(%msg){'aktoerId([^\\n]+)', 'aktoerId: *******'}"
-                        }
-                    </pattern>
-                </pattern>
-                <mdc/>
-            </providers>
-        </encoder>
-    </appender>
-
     <appender name="SECURITYLOG" class="com.papertrailapp.logback.Syslog4jAppender">
         <layout class="ch.qos.logback.classic.PatternLayout">
             <pattern>%level %mdc{correlation-id} %m%n%xEx</pattern>
@@ -99,14 +78,6 @@
     <logger name="org.flyway" level="DEBUG" additivity="false">
         <appender-ref ref="STDOUT_JSON"/>
         <appender-ref ref="METRICS"/>
-    </logger>
-
-    <logger name="org.glassfish.jersey.logging" level="INFO" additivity="false">
-        <appender-ref ref="STDOUT_JSON_TJENESTEKALL"/>
-    </logger>
-
-    <logger name="org.apache.http" level="INFO" additivity="false">
-        <appender-ref ref="STDOUT_JSON"/>
     </logger>
 
     <logger name="securitylog" level="INFO" additivity="false">
