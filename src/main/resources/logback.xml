@@ -64,7 +64,7 @@
         <appender-ref ref="STDOUT_JSON_FILTERED"/>
     </logger>
 
-    <root level="INFO">
+    <root level="WARN">
         <appender-ref ref="STDOUT_JSON"/>
         <appender-ref ref="METRICS"/>
     </root>
