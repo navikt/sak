@@ -29,27 +29,6 @@
         </encoder>
     </appender>
 
-    <appender name="STDOUT_JSON_TJENESTEKALL" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
-            <providers>
-                <timestamp/>
-                <version/>
-                <loggerName/>
-                <logLevel/>
-                <logLevelValue/>
-                <stackTrace/>
-                <pattern>
-                    <pattern>
-                        {
-                        "message": "%replace(%msg){'Authorization([^\\n]+)', 'Authorization: *******'}"
-                        }
-                    </pattern>
-                </pattern>
-                <mdc/>
-            </providers>
-        </encoder>
-    </appender>
-
     <appender name="SECURITYLOG" class="com.papertrailapp.logback.Syslog4jAppender">
         <layout class="ch.qos.logback.classic.PatternLayout">
             <pattern>%level %mdc{correlation-id} %m%n%xEx</pattern>
