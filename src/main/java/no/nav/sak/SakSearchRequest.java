@@ -83,7 +83,6 @@ public class SakSearchRequest {
     @Override
     public String toString() {
         return new ToStringBuilder(this, SHORT_PREFIX_STYLE)
-            .append("aktoerId", aktoerId)
             .append("orgnr", orgnr)
             .append("applikasjon", applikasjon)
             .append("tema", tema)
