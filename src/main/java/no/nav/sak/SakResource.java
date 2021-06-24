@@ -185,7 +185,7 @@ public class SakResource {
         @Valid @BeanParam final SakSearchRequest sakSearchRequest
         , @Context final ContainerRequestContext ctx) {
 
-        log.info("Søker etter saker for applikasjon={}, fagsaknr={}, tema={}", sakSearchRequest.getApplikasjon(), sakSearchRequest.getFagsakNr(), sakSearchRequest.getTema());
+        log.info("Søker etter saker for aktørId=******, orgnr={}, applikasjon={}, fagsaknr={}, tema={}", sakSearchRequest.getOrgnr(), sakSearchRequest.getApplikasjon(), sakSearchRequest.getFagsakNr(), sakSearchRequest.getTema());
         for (String aktoerId : sakSearchRequest.getAktoerId()) {
             final ABACResult abacResult =
                 sakPEP.autoriser(ctx, new AuthorizationRequest(aktoerId));
