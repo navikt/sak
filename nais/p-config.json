@@ -1,5 +1,5 @@
 {
-	"ABAC_PDP_ENDPOINT": "https://wasapp.adeo.no/asm-pdp/authorize",
+	"ABAC_PDP_ENDPOINT": "https://abac-sak.intern.nav.no/application/authorize",
 	"OPENIDCONNECT_ISSO_JWKS": "https://isso.adeo.no/isso/oauth2/connect/jwk_uri",
 	"OPENIDCONNECT_ISSO_ISSUER": "https://isso.adeo.no:443/isso/oauth2",
 	"STS_ISSUER": "https://security-token-service.nais.adeo.no",
