@@ -9,8 +9,10 @@
 	"SRVSAK": "/serviceuser/data/dev/srvsak",
 	"SAKDS": "/oracle/data/dev/creds/sak_q1-sak",
 	"VAULT": "/kv/preprod/fss/sak/q1",
-	"NAMESPACE": "q1",
+	"NAMESPACE": "teamdokumenthandtering",
 	"INGRESSES": [
-		"https://sak-q1.nais.preprod.local", "https://sak-q1.dev.adeo.no"
+		"https://sak-q1.nais.preprod.local",
+        "https://sak-q1.dev.adeo.no",
+        "https://sak.dev.intern.nav.no"
 	]
 }

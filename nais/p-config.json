@@ -9,8 +9,9 @@
 	"SRVSAK": "/serviceuser/data/prod/srvsak",
 	"SAKDS": "/oracle/data/prod/creds/sak-sak",
 	"VAULT": "/kv/prod/fss/sak/default",
-	"NAMESPACE": "default",
+	"NAMESPACE": "teamdokumenthandtering",
 	"INGRESSES": [
-		"https://sak.nais.adeo.no"
+		"https://sak.nais.adeo.no",
+        "https://sak.intern.nav.no"
 	]
 }
