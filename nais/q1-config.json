@@ -13,6 +13,6 @@
 	"INGRESSES": [
 		"https://sak-q1.nais.preprod.local",
         "https://sak-q1.dev.adeo.no",
-        "https://sak.dev.intern.nav.no"
+        "https://sak-q1.dev.intern.nav.no"
 	]
 }
