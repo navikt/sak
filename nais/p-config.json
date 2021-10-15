@@ -10,6 +10,8 @@
 	"SAKDS": "/oracle/data/prod/creds/sak-sak",
 	"VAULT": "/kv/prod/fss/sak/default",
 	"NAMESPACE": "teamdokumenthandtering",
+    "MIN_REPLICAS": 2,
+    "MAX_REPLICAS": 12,
 	"INGRESSES": [
 		"https://sak.nais.adeo.no",
         "https://sak.intern.nav.no"

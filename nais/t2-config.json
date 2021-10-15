@@ -10,6 +10,8 @@
 	"SAKDS": "/oracle/data/dev/creds/sak_t2-user",
 	"VAULT": "/kv/preprod/fss/sak/t2",
 	"NAMESPACE": "t2",
+    "MIN_REPLICAS": 1,
+    "MAX_REPLICAS": 2,
 	"INGRESSES": [
 		"https://sak-t2.nais.preprod.local", "https://sak-t2.dev.adeo.no"
 	]

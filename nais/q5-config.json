@@ -10,6 +10,8 @@
 	"SAKDS": "/oracle/data/dev/creds/sak_q5-sak",
 	"VAULT": "/kv/preprod/fss/sak/q5",
 	"NAMESPACE": "q5",
+    "MIN_REPLICAS": 1,
+    "MAX_REPLICAS": 2,
 	"INGRESSES": [
 		"https://sak-q5.nais.preprod.local",
         "https://sak-q5.dev.adeo.no",
