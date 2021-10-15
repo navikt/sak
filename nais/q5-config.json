@@ -1,18 +1,20 @@
 {
-	"ABAC_PDP_ENDPOINT": "https://abac-sak-q1.dev.intern.nav.no/application/asm-pdp/authorize",
-	"OPENIDCONNECT_ISSO_JWKS": "https://isso-q.adeo.no/isso/oauth2/connect/jwk_uri",
-	"OPENIDCONNECT_ISSO_ISSUER": "https://isso-q.adeo.no:443/isso/oauth2",
-	"STS_ISSUER": "https://security-token-service.nais.preprod.local",
-	"STS_JWKS": "https://security-token-service.nais.preprod.local/rest/v1/sts/jwks",
-    "SAKDS_URL": "jdbc:oracle:thin:@a01dbfl032.adeo.no:1521/joark_q5",
-	"LDAP": "/serviceuser/data/dev/srvssolinux",
-	"SRVSAK": "/serviceuser/data/dev/srvsak",
-	"SAKDS": "/oracle/data/dev/creds/sak_q5-sak",
-	"VAULT": "/kv/preprod/fss/sak/q5",
-	"NAMESPACE": "q5",
-	"INGRESSES": [
-		"https://sak-q5.nais.preprod.local",
-        "https://sak-q5.dev.adeo.no",
-        "https://sak-q5.dev.intern.nav.no"
-	]
+  "ABAC_PDP_ENDPOINT": "https://abac-sak-q1.dev.intern.nav.no/application/asm-pdp/authorize",
+  "OPENIDCONNECT_ISSO_JWKS": "https://isso-q.adeo.no/isso/oauth2/connect/jwk_uri",
+  "OPENIDCONNECT_ISSO_ISSUER": "https://isso-q.adeo.no:443/isso/oauth2",
+  "STS_ISSUER": "https://security-token-service.nais.preprod.local",
+  "STS_JWKS": "https://security-token-service.nais.preprod.local/rest/v1/sts/jwks",
+  "SAKDS_URL": "jdbc:oracle:thin:@a01dbfl032.adeo.no:1521/joark_q5",
+  "LDAP": "/serviceuser/data/dev/srvssolinux",
+  "SRVSAK": "/serviceuser/data/dev/srvsak",
+  "SAKDS": "/oracle/data/dev/creds/sak_q5-sak",
+  "VAULT": "/kv/preprod/fss/sak/q5",
+  "NAMESPACE": "q5",
+  "MIN_REPLICAS": 1,
+  "MAX_REPLICAS": 2,
+  "INGRESSES": [
+    "https://sak-q5.nais.preprod.local",
+    "https://sak-q5.dev.adeo.no",
+    "https://sak-q5.dev.intern.nav.no"
+  ]
 }
