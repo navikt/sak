@@ -9,7 +9,7 @@
   "SRVSAK": "/serviceuser/data/prod/srvsak",
   "SAKDS": "/oracle/data/prod/creds/sak-sak",
   "VAULT": "/kv/prod/fss/sak/default",
-  "NAMESPACE": "teamdokumenthandtering",
+  "APP_NAME": "sak",
   "MIN_REPLICAS": 2,
   "MAX_REPLICAS": 12,
   "INGRESSES": [

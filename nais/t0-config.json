@@ -9,11 +9,12 @@
   "SRVSAK": "/serviceuser/data/test/srvsak",
   "SAKDS": "/oracle/data/dev/creds/sak_t0-sak",
   "VAULT": "/kv/preprod/fss/sak/t0",
-  "NAMESPACE": "t0",
+  "APP_NAME": "sak-t0",
   "MIN_REPLICAS": 1,
   "MAX_REPLICAS": 2,
   "INGRESSES": [
     "https://sak-t0.nais.preprod.local",
-    "https://sak-t0.dev.adeo.no"
+    "https://sak-t0.dev.adeo.no",
+    "https://sak-t0.dev.intern.nav.no"
   ]
 }

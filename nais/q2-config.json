@@ -9,7 +9,7 @@
   "SRVSAK": "/serviceuser/data/dev/srvsak",
   "SAKDS": "/oracle/data/dev/creds/sak_q2-user",
   "VAULT": "/kv/preprod/fss/sak/q2",
-  "NAMESPACE": "teamdokumenthandtering",
+  "APP_NAME": "sak",
   "MIN_REPLICAS": 1,
   "MAX_REPLICAS": 2,
   "INGRESSES": [
