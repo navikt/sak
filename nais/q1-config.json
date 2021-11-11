@@ -8,7 +8,7 @@
   "LDAP": "/serviceuser/data/dev/srvssolinux",
   "SRVSAK": "/serviceuser/data/dev/srvsak",
   "SAKDS": "/oracle/data/dev/creds/sak_q1-sak",
-  "VAULT": "/kv/preprod/fss/sak/q1",
+  "VAULT": "/kv/preprod/fss/sak-q1/teamdokumenthandtering",
   "APP_NAME": "sak-q1",
   "MIN_REPLICAS": 1,
   "MAX_REPLICAS": 2,

@@ -8,7 +8,7 @@
   "LDAP": "/serviceuser/data/test/srvssolinux",
   "SRVSAK": "/serviceuser/data/test/srvsak",
   "SAKDS": "/oracle/data/dev/creds/sak_t5-sak",
-  "VAULT": "/kv/preprod/fss/sak/t5",
+  "VAULT": "/kv/preprod/fss/sak-t5/teamdokumenthandtering",
   "APP_NAME": "sak-t5",
   "MIN_REPLICAS": 1,
   "MAX_REPLICAS": 2,
