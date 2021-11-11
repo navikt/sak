@@ -54,5 +54,3 @@ spec:
         mountPath: /var/run/secrets/nais.io/ldap
       - kvPath: {{ SRVSAK }}
         mountPath: /var/run/secrets/nais.io/srvsak
-      - kvPath: {{ VAULT }}
-        mountPath: /var/run/secrets/nais.io/vault
