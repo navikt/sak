@@ -8,12 +8,12 @@
   "LDAP": "/serviceuser/data/test/srvssolinux",
   "SRVSAK": "/serviceuser/data/test/srvsak",
   "SAKDS": "/oracle/data/dev/creds/sak_t4-user",
-  "VAULT": "/kv/preprod/fss/sak/t4",
-  "NAMESPACE": "t4",
+  "APP_NAME": "sak-t4",
   "MIN_REPLICAS": 1,
   "MAX_REPLICAS": 2,
   "INGRESSES": [
     "https://sak-t4.nais.preprod.local",
-    "https://sak-t4.dev.adeo.no"
+    "https://sak-t4.dev.adeo.no",
+    "https://sak-t4.dev.intern.nav.no"
   ]
 }

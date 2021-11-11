@@ -8,8 +8,7 @@
   "LDAP": "/serviceuser/data/dev/srvssolinux",
   "SRVSAK": "/serviceuser/data/dev/srvsak",
   "SAKDS": "/oracle/data/dev/creds/sak_q5-sak",
-  "VAULT": "/kv/preprod/fss/sak/q5",
-  "NAMESPACE": "q5",
+  "APP_NAME": "sak-q5",
   "MIN_REPLICAS": 1,
   "MAX_REPLICAS": 2,
   "INGRESSES": [

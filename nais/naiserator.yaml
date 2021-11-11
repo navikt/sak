@@ -1,8 +1,8 @@
 kind: Application
 apiVersion: nais.io/v1alpha1
 metadata:
-  name: sak
-  namespace: {{ NAMESPACE }}
+  name: {{ APP_NAME }}
+  namespace: teamdokumenthandtering
   labels:
     team: teamdokumenthandtering
 spec:
@@ -54,5 +54,3 @@ spec:
         mountPath: /var/run/secrets/nais.io/ldap
       - kvPath: {{ SRVSAK }}
         mountPath: /var/run/secrets/nais.io/srvsak
-      - kvPath: {{ VAULT }}
-        mountPath: /var/run/secrets/nais.io/vault
