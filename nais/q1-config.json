@@ -12,6 +12,7 @@
   "MIN_REPLICAS": 1,
   "MAX_REPLICAS": 2,
   "INGRESSES": [
+    "https://sak.nais.preprod.local",
     "https://sak-q1.nais.preprod.local",
     "https://sak-q1.dev.adeo.no",
     "https://sak-q1.dev.intern.nav.no"
