@@ -75,10 +75,11 @@
 
         <jakarta.mail.version>1.4.7</jakarta.mail.version>
         <jakarta-annotations.version>2.0.0</jakarta-annotations.version>
-        <jakarta-validation.version>2.0.1.Final</jakarta-validation.version>
+        <jakarta-validation.version>3.0.1</jakarta-validation.version>
+        <jakarta-activation.version>2.1.0</jakarta-activation.version>
+
         <javax-validation.version>2.0.1.Final</javax-validation.version>
         <javax-activation.version>2.0.1</javax-activation.version>
-
         <javax.ws.rs.version>2.1.1</javax.ws.rs.version>
         <javax.servlet.version>4.0.1</javax.servlet.version>
 
@@ -127,12 +128,12 @@
             </dependency>
             <dependency>
                 <groupId>jakarta.validation</groupId>
-                <artifactId>validation-api</artifactId>
+                <artifactId>jakarta.validation-api</artifactId>
                 <version>${jakarta-validation.version}</version>
             </dependency>
             <dependency>
                 <groupId>jakarta.activation</groupId>
-                <artifactId>activation-api</artifactId>
+                <artifactId>jakarta.activation-api</artifactId>
                 <version>${jakarta-activation.version}</version>
             </dependency>
             <dependency>
@@ -148,11 +149,11 @@
 
 
             <!--            Beholde denne dependency til pakken swagger-jersey2-jaxrs inneholde validation-api >= 2.0.1.Final -->
-            <dependency>
-                <groupId>javax.validation</groupId>
-                <artifactId>validation-api</artifactId>
-                <version>${javax-validation.version}</version>
-            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>javax.validation</groupId>-->
+<!--                <artifactId>validation-api</artifactId>-->
+<!--                <version>${javax-validation.version}</version>-->
+<!--            </dependency>-->
 
             <dependency>
                 <groupId>io.swagger.core.v3</groupId>
@@ -629,6 +630,17 @@
     </dependencyManagement>
 
     <dependencies>
+
+        <dependency>
+            <groupId>jakarta.validation</groupId>
+            <artifactId>jakarta.validation-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>jakarta.activation</groupId>
+            <artifactId>jakarta.activation-api</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-server</artifactId>
