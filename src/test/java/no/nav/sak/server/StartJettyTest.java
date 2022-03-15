@@ -1,7 +1,7 @@
 package no.nav.sak.server;
 
-import com.jayway.restassured.RestAssured;
-import com.jayway.restassured.response.Header;
+import io.restassured.RestAssured;
+import io.restassured.http.Header;
 import no.nav.sak.SakConfiguration;
 import no.nav.sak.infrastruktur.authentication.saml.SAMLSupport;
 import org.junit.jupiter.api.AfterAll;

@@ -2,12 +2,12 @@ package no.nav.sak;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import no.nav.sak.validering.ExactlyOneOf;
 import no.nav.sak.validering.NotNullWhenDependsOnHasValue;
 import no.nav.sak.validering.Organisasjonsnummer;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;

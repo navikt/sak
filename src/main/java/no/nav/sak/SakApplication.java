@@ -117,11 +117,12 @@ public class SakApplication extends ResourceConfig {
             sakConfiguration.getRequiredString("javax.net.ssl.trustStore"),
             sakConfiguration.getRequiredString("javax.net.ssl.trustStorePassword"));
 
-        final LdapConfiguration ldapConfiguration = new LdapConfiguration(
-            sakConfiguration.getRequiredString("LDAP_SERVICEUSER_BASEDN"),
-            sakConfiguration.getRequiredString("LDAP_URL"),
-            sakConfiguration.getRequiredString("LDAP_USERNAME"),
-            sakConfiguration.getString("LDAP_PASSWORD", null));
+        final LdapConfiguration ldapConfiguration = LdapConfiguration.builder()
+                .withUrl(sakConfiguration.getRequiredString("LDAP_URL"))
+                .withBindUser(sakConfiguration.getRequiredString("LDAP_USERNAME"))
+                .withBindPassword(sakConfiguration.getString("LDAP_PASSWORD", null))
+                .withServiceUserBaseDN(sakConfiguration.getRequiredString("LDAP_SERVICEUSER_BASEDN"))
+                .build();
 
         final CacheManager cacheManager = CacheManagerBuilder.newCacheManagerBuilder()
             .withCache("basicAuth",

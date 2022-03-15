@@ -48,11 +48,12 @@ public class SakH2Application extends SakApplication {
             sakConfiguration.getRequiredString("sak.junit-truststore.path"),
             sakConfiguration.getRequiredString("sak.junit-truststore.password"));
 
-        LdapConfiguration ldapConfiguration = new LdapConfiguration(
-            sakConfiguration.getRequiredString("LDAP_SERVICEUSER_BASEDN"),
-            sakConfiguration.getRequiredString("LDAP_URL"),
-            sakConfiguration.getRequiredString("LDAP_USERNAME"),
-            null);
+        LdapConfiguration ldapConfiguration = LdapConfiguration.builder()
+                .withUrl(sakConfiguration.getRequiredString("LDAP_URL"))
+                .withServiceUserBaseDN(sakConfiguration.getRequiredString("LDAP_SERVICEUSER_BASEDN"))
+                .withBindUser(sakConfiguration.getRequiredString("LDAP_USERNAME"))
+                .withBindPassword(null)
+                .build();
 
         JunitBasicAuthenticator junitBasicAuthenticator = new JunitBasicAuthenticator(ldapConfiguration);
 

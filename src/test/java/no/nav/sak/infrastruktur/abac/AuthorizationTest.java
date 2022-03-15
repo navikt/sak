@@ -1,8 +1,8 @@
 package no.nav.sak.infrastruktur.abac;
 
-import com.jayway.restassured.http.ContentType;
-import com.jayway.restassured.response.Header;
-import com.jayway.restassured.specification.RequestSpecification;
+import io.restassured.http.ContentType;
+import io.restassured.http.Header;
+import io.restassured.specification.RequestSpecification;
 import no.nav.sak.Sak;
 import no.nav.sak.SakConfiguration;
 import no.nav.sak.SakJsonTestData;
@@ -11,8 +11,7 @@ import no.nav.sak.infrastruktur.oicd.OidcLogin;
 import no.nav.sak.server.DevJetty;
 import org.junit.jupiter.api.*;
 
-import static com.jayway.restassured.RestAssured.basePath;
-import static com.jayway.restassured.RestAssured.given;
+import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.not;
 

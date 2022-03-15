@@ -12,8 +12,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.core.UriInfo;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.core.UriInfo;
 
 import static no.nav.abac.xacml.NavAttributter.*;
 import static no.nav.sak.infrastruktur.SubjectType.SUBJECT_TYPE_SYSTEMBRUKER;
@@ -76,7 +76,7 @@ class SakPEPTest {
         when(ctx.getProperty(REQUEST_USERNAME)).thenReturn(username);
         when(ctx.getHeaderString("Authorization")).thenReturn(authHeaderContent);
             when(ctx.getUriInfo()).thenReturn(mock(UriInfo.class));
-        when(ctx.getRequest()).thenReturn(mock(javax.ws.rs.core.Request.class));
+        when(ctx.getRequest()).thenReturn(mock(jakarta.ws.rs.core.Request.class));
         return ctx;
     }
 

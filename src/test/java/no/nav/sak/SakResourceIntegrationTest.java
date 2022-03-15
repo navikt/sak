@@ -1,7 +1,7 @@
 package no.nav.sak;
 
 
-import com.jayway.restassured.response.Header;
+import io.restassured.http.Header;
 import no.nav.sak.infrastruktur.oicd.OidcLogin;
 import no.nav.sak.server.DevJetty;
 import org.junit.jupiter.api.AfterAll;
@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Base64;
 
-import static com.jayway.restassured.RestAssured.given;
+import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Tag("integration-test")
