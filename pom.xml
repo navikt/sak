@@ -78,6 +78,8 @@
         <jakarta-validation.version>3.0.1</jakarta-validation.version>
         <jakarta-activation.version>2.1.0</jakarta-activation.version>
 
+        <jaxb.version>2.3.6</jaxb.version>
+
         <javax-validation.version>2.0.1.Final</javax-validation.version>
         <javax-activation.version>2.0.1</javax-activation.version>
         <javax.ws.rs.version>2.1.1</javax.ws.rs.version>
@@ -109,6 +111,13 @@
 
     <dependencyManagement>
         <dependencies>
+
+            <dependency>
+                <groupId>org.glassfish.jaxb</groupId>
+                <artifactId>jaxb-runtime</artifactId>
+                <version>${jaxb.version}</version>
+                <scope>runtime</scope>
+            </dependency>
 
             <dependency>
                 <groupId>net.minidev</groupId>
@@ -630,6 +639,17 @@
     </dependencyManagement>
 
     <dependencies>
+
+        <dependency>
+            <groupId>org.glassfish.jaxb</groupId>
+            <artifactId>jaxb-runtime</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>jakarta.xml.bind</groupId>
+                    <artifactId>jakarta.xml.bind-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
 
         <dependency>
             <groupId>jakarta.validation</groupId>
