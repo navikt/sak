@@ -78,7 +78,7 @@
         <jakarta-validation.version>3.0.1</jakarta-validation.version>
         <jakarta-activation.version>2.1.0</jakarta-activation.version>
 
-        <jaxb.version>2.3.6</jaxb.version>
+        <jaxb.version>3.0.2</jaxb.version>
 
         <javax-validation.version>2.0.1.Final</javax-validation.version>
         <javax-activation.version>2.0.1</javax-activation.version>
