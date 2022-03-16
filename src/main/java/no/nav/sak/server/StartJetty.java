@@ -33,7 +33,7 @@ public class StartJetty {
             registerJerseyApplication(context);
             registerNaisServlets(context);
             registerMetricsServlet(context);
-            context.setBaseResource(Resource.newClassPathResource("META-INF/resources/webjars/swagger-ui/3.26.1"));
+            context.setBaseResource(Resource.newClassPathResource("META-INF/resources/webjars/swagger-ui/4.5.2"));
 
             server.setHandler(context);
             server.setStopAtShutdown(true);

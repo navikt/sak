@@ -1,5 +1,5 @@
 naiseratorPipeline {
     applicationName = "sak"
     dockerfileDir = "."
-    deployEnvironmentQ = "q1,q5"
+    deployEnvironmentQ = "q5"
 }
