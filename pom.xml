@@ -168,6 +168,11 @@
                 <artifactId>swagger-jaxrs2-jakarta</artifactId>
                 <version>${swagger-jaxrs2-jakarta.version}</version>
             </dependency>
+            <dependency>
+                <groupId>io.swagger.core.v3</groupId>
+                <artifactId>swagger-jaxrs2-servlet-initializer</artifactId>
+                <version>${swagger-jaxrs2-jakarta.version}}</version>
+            </dependency>
 
             <dependency>
                 <groupId>org.glassfish.jersey</groupId>
