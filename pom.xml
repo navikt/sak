@@ -116,7 +116,6 @@
                 <groupId>org.glassfish.jaxb</groupId>
                 <artifactId>jaxb-runtime</artifactId>
                 <version>${jaxb.version}</version>
-                <scope>runtime</scope>
             </dependency>
 
             <dependency>
