@@ -71,7 +71,7 @@ public class StartJetty {
 
     void registerJerseyApplication(ServletContextHandler context) {
         ServletHolder jerseyServlet = new ServletHolder(new ServletContainer());
-        jerseyServlet.setInitParameter("jakarta.ws.rs.core.Application", "no.nav.sak.SakApplication");
+        jerseyServlet.setInitParameter("jakarta.ws.rs.Application", "no.nav.sak.SakApplication");
         context.addServlet(jerseyServlet, "/api/*");
     }
 
