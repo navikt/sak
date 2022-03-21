@@ -491,6 +491,11 @@
                 <artifactId>oppgavehandtering-resilience</artifactId>
                 <version>${oppgavehandtering-resilience.version}</version>
             </dependency>
+            <dependency>
+                <groupId>javax.xml.bind</groupId>
+                <artifactId>jaxb-api</artifactId>
+                <version>${javax.xml.bind.version}</version>
+            </dependency>
 
             <!--Runtime-->
             <dependency>
@@ -651,13 +656,6 @@
                 <version>${javax.servlet.version}</version>
                 <scope>test</scope>
             </dependency>
-            <dependency>
-                <groupId>javax.xml.bind</groupId>
-                <artifactId>jaxb-api</artifactId>
-                <version>${javax.xml.bind.version}</version>
-                <scope>test</scope>
-            </dependency>
-
         </dependencies>
     </dependencyManagement>
 
