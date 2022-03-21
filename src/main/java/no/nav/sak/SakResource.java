@@ -70,7 +70,7 @@ import static no.nav.sak.infrastruktur.authentication.AuthenticationFilter.REQUE
             Vi ber nye konsumenter om å ta kontakt med teamet, dette for å få gjennomført ev. avklaringer, sikre korrekte tilganger, pact-test, og for å sikre at tjenesten støtter 
             forventet volum og ev. SLA.
             
-            Merk at vi forventer at Headeren <strong>\"X-Correlation-ID\"</strong> er angitt for alle tjenestekall. Denne logges alltid i Sak, og benyttes for å kunne sammenstille hendelser
+            Merk at vi forventer at Headeren <strong>"X-Correlation-ID"</strong> er angitt for alle tjenestekall. Denne logges alltid i Sak, og benyttes for å kunne sammenstille hendelser
             på tvers av kallkjeder. X-Correlation-ID skal oppgis ved forespørsel om bistand fra Team Oppgavehåntering vedr. feilsøk ifm. bruk av tjenesten
             Vi anbefaler at korrelasjonsID genereres så tidlig som mulig hos konsument, bindes til tråden, og logges sammen med alle hendelser som danner grunnlaget for kallet mot Sak.
             
@@ -83,32 +83,30 @@ import static no.nav.sak.infrastruktur.authentication.AuthenticationFilter.REQUE
         value = {
                 @SecurityScheme(
                         name = "Authorization",
-                        scheme = "Bearer",
                         in = HEADER,
                         description = """
                                 OIDC-token (JWT via OAuth2.0). Dette preferert autentiseringsmekanisme, og <strong>skal</strong>
                                 benyttes ved tjenestekall initiert av en bruker for å propagere konteksten (unntatt i særtilfeller - se Saml)
-                                Følgende format må brukes i input-feltet \"Value\" under: <strong>\"Bearer {token}\"</strong>.
+                                Følgende format må brukes i input-feltet "Value" under: <strong>"Bearer {token}"</strong>.
                                 Eksempel på verdi i input-felt: <strong>Bearer eYdmifml0ejugm</strong>
                                 
                                 Et gyldig token kommer til å ha mange flere karakterer enn i eksempelet.
                                 """,
-                        type = SecuritySchemeType.HTTP),
+                        type = SecuritySchemeType.APIKEY),
                 @SecurityScheme(
                         name = "Authorization",
-                        scheme = "Saml",
                         in = HEADER,
                         description = """
                                 P.t støttes ikke konvertering fra SAML til OIDC-token og det er derfor implementert støtte for Saml for å propagere brukercontext fra legacy-systemer
                                 (i.e. fra et system som kun eksponerer soap-tjenester og som skal gjøre tjenestekall videre mot Oppgave.
                                 I denne konteksten er et SAML token en SAML assertion som er Base 64 enkodet.
                                 På grunn av begrensninger i header-lengde, må saml-assertion strippes for whitespaces før den encodes
-                                Formatet skal være som følger: <strong>\"Saml {token}\"</strong>.
+                                Formatet skal være som følger: <strong>"Saml {token}"</strong>.
                                 Eksempel på verdi i input-felt: <strong>Saml eYdmifml0ejugm</strong>
                                 
                                 Et gyldig token kommer til å ha mange flere karakterer enn i eksempelet.
                                 """,
-                        type = SecuritySchemeType.HTTP
+                        type = SecuritySchemeType.APIKEY
                 ),
                 @SecurityScheme(
                         type = SecuritySchemeType.HTTP,
