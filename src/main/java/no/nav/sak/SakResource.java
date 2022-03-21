@@ -82,7 +82,7 @@ import static no.nav.sak.infrastruktur.authentication.AuthenticationFilter.REQUE
 @SecuritySchemes(
         value = {
                 @SecurityScheme(
-                        name = "Authorization",
+                        name = "Bearer",
                         in = HEADER,
                         description = """
                                 OIDC-token (JWT via OAuth2.0). Dette preferert autentiseringsmekanisme, og <strong>skal</strong>
@@ -94,7 +94,7 @@ import static no.nav.sak.infrastruktur.authentication.AuthenticationFilter.REQUE
                                 """,
                         type = SecuritySchemeType.APIKEY),
                 @SecurityScheme(
-                        name = "Authorization",
+                        name = "Saml",
                         in = HEADER,
                         description = """
                                 P.t støttes ikke konvertering fra SAML til OIDC-token og det er derfor implementert støtte for Saml for å propagere brukercontext fra legacy-systemer
