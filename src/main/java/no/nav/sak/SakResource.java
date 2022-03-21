@@ -109,8 +109,9 @@ import static no.nav.sak.infrastruktur.authentication.AuthenticationFilter.REQUE
                         type = SecuritySchemeType.APIKEY
                 ),
                 @SecurityScheme(
+                        name = "Basic Auth",
                         type = SecuritySchemeType.HTTP,
-                        scheme = "Basic",
+                        scheme = "basic",
                         description = "Basic auth kan brukes når det er snakk om system-til-system kommunikasjon"
                 )
         }
