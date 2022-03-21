@@ -77,7 +77,7 @@ import static no.nav.sak.infrastruktur.authentication.AuthenticationFilter.REQUE
             KorrelasjonsIDen skal være unik, og kan enten genereres med f.eks UUID.randomUUID() eller hvis aktuelt, hentes ut fra inngående tjenestekall (i.e. callId via modig-biblioteket)
             """,
         contact = @Contact(
-            name = "Team Oppgavehåndtering"
+            name = "Team Dokumentløsninger"
         )))
 @SecuritySchemes(
         value = {
