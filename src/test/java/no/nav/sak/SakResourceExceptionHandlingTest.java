@@ -32,7 +32,7 @@ public class SakResourceExceptionHandlingTest extends JerseyTest {
         assertThat(response.getStatus()).isEqualTo(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode());
         assertThat(response.getHeaderString("Content-Type")).isEqualTo("application/json");
 
-        JsonObject jsonObject = new JsonParser().parse(new InputStreamReader((ByteArrayInputStream) response.getEntity())).getAsJsonObject();
+        JsonObject jsonObject = JsonParser.parseReader(new InputStreamReader((ByteArrayInputStream) response.getEntity())).getAsJsonObject();
         assertThat(jsonObject.get("uuid")).isNotNull();
         assertThat(jsonObject.get("feilmelding")).isNotNull();
     }

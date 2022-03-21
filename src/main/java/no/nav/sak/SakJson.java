@@ -1,7 +1,7 @@
 package no.nav.sak;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import no.nav.sak.validering.ExactlyOneOf;
@@ -61,7 +61,7 @@ public class SakJson {
     }
 
     @JsonProperty("tema")
-    @ApiModelProperty(value = "Kode for tema iht. felles kodeverk", example = "AAP")
+    @Schema(description = "Kode for tema iht. felles kodeverk", example = "AAP")
     public String getTema() {
         return tema;
     }
@@ -71,7 +71,7 @@ public class SakJson {
     }
 
     @JsonProperty("applikasjon")
-    @ApiModelProperty(value = "Kode for applikasjon iht. felles kodeverk", notes = "For generelle saker skal denne være blank (Legacy = FS22). For fagsaker, i.e saker der det refereres" +
+    @Schema(description = "Kode for applikasjon iht. felles kodeverk. For generelle saker skal denne være blank (Legacy = FS22). For fagsaker, i.e saker der det refereres" +
         "til et fagsaknr, så skal man benytte applikasjonskoden for fagsystemet der saken behandles", example = "IT01")
     public String getApplikasjon() {
         return applikasjon;
@@ -82,7 +82,7 @@ public class SakJson {
     }
 
     @JsonProperty("aktoerId")
-    @ApiModelProperty(value = "Id til aktøren saken gjelder", example = "10038999999")
+    @Schema(description = "Id til aktøren saken gjelder", example = "10038999999")
     public String getAktoerId() {
         return aktoerId;
     }
@@ -92,13 +92,13 @@ public class SakJson {
     }
 
     @JsonProperty("opprettetAv")
-    @ApiModelProperty("Brukerident til den som opprettet saken")
+    @Schema(description = "Brukerident til den som opprettet saken")
     public String getOpprettetAv() {
         return opprettetAv;
     }
 
     @JsonProperty("orgnr")
-    @ApiModelProperty(value = "Orgnr til foretaket saken gjelder")
+    @Schema(description = "Orgnr til foretaket saken gjelder")
     public String getOrgnr() {
         return orgnr;
     }
@@ -108,7 +108,7 @@ public class SakJson {
     }
 
     @JsonProperty("fagsakNr")
-    @ApiModelProperty("Fagsaknr for den aktuelle saken - hvis aktuelt")
+    @Schema(description = "Fagsaknr for den aktuelle saken - hvis aktuelt")
     public String getFagsakNr() {
         return fagsakNr;
     }
@@ -118,7 +118,7 @@ public class SakJson {
     }
 
     @JsonProperty("opprettetTidspunkt")
-    @ApiModelProperty("Opprettet tidspunkt iht. ISO-8601")
+    @Schema(description = "Opprettet tidspunkt iht. ISO-8601")
     public String getOpprettetTidspunkt() {
         // Trunkert til millis presisjon pga BRUT001 og gsak SakV1 SOAP API.
         return ZonedDateTime.of(opprettetTidspunkt, ZoneId.systemDefault()).truncatedTo(ChronoUnit.MILLIS).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
