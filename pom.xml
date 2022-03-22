@@ -36,7 +36,7 @@
         <abac.attribute.version>3.3.13</abac.attribute.version>
         <ojdbc.version>21.5.0.0</ojdbc.version>
         <cxf.version>3.5.1</cxf.version>
-        <ldaptive.version>2.1.0</ldaptive.version>
+        <ldaptive.version>1.3.0</ldaptive.version>
         <logback-syslog4j.version>1.0.0</logback-syslog4j.version>
         <ehcache.version>3.9.9</ehcache.version>
         <reactive-streams.version>1.0.3</reactive-streams.version>
