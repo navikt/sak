@@ -236,15 +236,6 @@ public class SakApplication extends ResourceConfig {
         }
 
         register(OpenApiResource.class);
-
-//        BeanConfig beanConfig = new BeanConfig();
-//        beanConfig.setVersion("v1");
-//        beanConfig.setBasePath("/api");
-//        beanConfig.setTitle("Sak API");
-//        beanConfig.setResourcePackage("no.nav.sak");
-//        beanConfig.setScan();
-//        register(ApiListingResource.class);
-//        register(SwaggerSerializers.class);
     }
 
     private void registerLoggingFeature() {
