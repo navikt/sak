@@ -1,30 +1,19 @@
 package no.nav.sak;
 
-import static no.nav.sikkerhet.authentication.AuthenticationHeaderIdentifier.SAML;
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.io.ByteArrayInputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.util.List;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.Application;
-import javax.ws.rs.core.Response;
-
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.core.Response;
 import no.nav.sak.infrastruktur.Database;
 import no.nav.sak.infrastruktur.JunitDatabase;
 import no.nav.sak.infrastruktur.JunitTransactionSupport;
 import no.nav.sak.infrastruktur.authentication.saml.SAMLSupport;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.glassfish.jersey.test.JerseyTest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+
+import static no.nav.sikkerhet.authentication.AuthenticationHeaderIdentifier.SAML;
 
 abstract class AbstractSakResourceTest extends JerseyTest {
 

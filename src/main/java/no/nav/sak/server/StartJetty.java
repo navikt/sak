@@ -1,7 +1,8 @@
 package no.nav.sak.server;
 
-import io.prometheus.client.exporter.MetricsServlet;
 import io.prometheus.client.jetty.JettyStatisticsCollector;
+import io.prometheus.client.servlet.jakarta.exporter.MetricsServlet;
+import jakarta.servlet.Servlet;
 import no.nav.sak.infrastruktur.AliveCheckServlet;
 import no.nav.sak.infrastruktur.PrestopServlet;
 import no.nav.sak.infrastruktur.ReadyCheckServlet;
@@ -32,7 +33,7 @@ public class StartJetty {
             registerJerseyApplication(context);
             registerNaisServlets(context);
             registerMetricsServlet(context);
-            context.setBaseResource(Resource.newClassPathResource("META-INF/resources/webjars/swagger-ui/3.26.1"));
+            context.setBaseResource(Resource.newClassPathResource("META-INF/resources/webjars/swagger-ui/4.5.2"));
 
             server.setHandler(context);
             server.setStopAtShutdown(true);
@@ -70,7 +71,7 @@ public class StartJetty {
 
     void registerJerseyApplication(ServletContextHandler context) {
         ServletHolder jerseyServlet = new ServletHolder(new ServletContainer());
-        jerseyServlet.setInitParameter("javax.ws.rs.Application", "no.nav.sak.SakApplication");
+        jerseyServlet.setInitParameter("jakarta.ws.rs.Application", "no.nav.sak.SakApplication");
         context.addServlet(jerseyServlet, "/api/*");
     }
 
@@ -91,6 +92,6 @@ public class StartJetty {
     }
 
     private int getPort() {
-        return Integer.valueOf(System.getProperty("sak.port", "8080"));
+        return Integer.parseInt(System.getProperty("sak.port", "8080"));
     }
 }

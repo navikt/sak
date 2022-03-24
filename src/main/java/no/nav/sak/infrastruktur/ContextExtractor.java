@@ -2,7 +2,7 @@ package no.nav.sak.infrastruktur;
 
 import org.apache.commons.lang3.StringUtils;
 
-import javax.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.container.ContainerRequestContext;
 
 import static no.nav.sak.infrastruktur.SubjectType.SUBJECT_TYPE_EKSTERNBRUKER;
 import static no.nav.sak.infrastruktur.SubjectType.SUBJECT_TYPE_INTERNBRUKER;

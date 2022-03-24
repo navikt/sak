@@ -5,9 +5,13 @@ import static java.util.logging.Logger.getLogger;
 import com.zaxxer.hikari.HikariDataSource;
 import com.zaxxer.hikari.metrics.prometheus.PrometheusMetricsTrackerFactory;
 import io.prometheus.client.hotspot.DefaultExports;
-import io.swagger.jaxrs.config.BeanConfig;
-import io.swagger.jaxrs.listing.ApiListingResource;
-import io.swagger.jaxrs.listing.SwaggerSerializers;
+import io.swagger.v3.jaxrs2.integration.JaxrsOpenApiContextBuilder;
+import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
+import io.swagger.v3.oas.integration.OpenApiConfigurationException;
+import io.swagger.v3.oas.integration.SwaggerConfiguration;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.servers.Server;
 import no.nav.resilience.ResilienceConfig;
 import no.nav.sak.infrastruktur.CorrelationFilter;
 import no.nav.sak.infrastruktur.Database;
@@ -62,6 +66,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class SakApplication extends ResourceConfig {
 
@@ -117,11 +123,12 @@ public class SakApplication extends ResourceConfig {
             sakConfiguration.getRequiredString("javax.net.ssl.trustStore"),
             sakConfiguration.getRequiredString("javax.net.ssl.trustStorePassword"));
 
-        final LdapConfiguration ldapConfiguration = new LdapConfiguration(
-            sakConfiguration.getRequiredString("LDAP_SERVICEUSER_BASEDN"),
-            sakConfiguration.getRequiredString("LDAP_URL"),
-            sakConfiguration.getRequiredString("LDAP_USERNAME"),
-            sakConfiguration.getString("LDAP_PASSWORD", null));
+        final LdapConfiguration ldapConfiguration = LdapConfiguration.builder()
+                .withUrl(sakConfiguration.getRequiredString("LDAP_URL"))
+                .withBindUser(sakConfiguration.getRequiredString("LDAP_USERNAME"))
+                .withBindPassword(sakConfiguration.getString("LDAP_PASSWORD", null))
+                .withServiceUserBaseDN(sakConfiguration.getRequiredString("LDAP_SERVICEUSER_BASEDN"))
+                .build();
 
         final CacheManager cacheManager = CacheManagerBuilder.newCacheManagerBuilder()
             .withCache("basicAuth",
@@ -204,14 +211,31 @@ public class SakApplication extends ResourceConfig {
     }
 
     private void registerSwaggerResources() {
-        BeanConfig beanConfig = new BeanConfig();
-        beanConfig.setVersion("v1");
-        beanConfig.setBasePath("/api");
-        beanConfig.setTitle("Sak API");
-        beanConfig.setResourcePackage("no.nav.sak");
-        beanConfig.setScan();
-        register(ApiListingResource.class);
-        register(SwaggerSerializers.class);
+
+        OpenAPI openAPI = new OpenAPI();
+
+        Info info = new Info()
+                .title("Sak API")
+                .version("v1");
+
+        openAPI.info(info)
+                .addServersItem(new Server().url("/api"));
+
+        final SwaggerConfiguration swaggerConfiguration = new SwaggerConfiguration()
+                .openAPI(openAPI)
+                .prettyPrint(true)
+                .resourcePackages(Stream.of("no.nav.sak").collect(Collectors.toSet()));
+
+        try {
+            new JaxrsOpenApiContextBuilder<>()
+                    .application(this)
+                    .openApiConfiguration(swaggerConfiguration)
+                    .buildContext(true);
+        } catch (OpenApiConfigurationException e) {
+            throw new IllegalStateException(e);
+        }
+
+        register(OpenApiResource.class);
     }
 
     private void registerLoggingFeature() {

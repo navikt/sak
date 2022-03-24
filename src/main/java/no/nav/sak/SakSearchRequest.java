@@ -1,10 +1,10 @@
 package no.nav.sak;
 
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Parameter;
 import no.nav.sak.validering.AtLeastOneOf;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-import javax.ws.rs.QueryParam;
+import jakarta.ws.rs.QueryParam;
 import java.util.List;
 
 import static org.apache.commons.lang3.builder.ToStringStyle.SHORT_PREFIX_STYLE;
@@ -12,19 +12,19 @@ import static org.apache.commons.lang3.builder.ToStringStyle.SHORT_PREFIX_STYLE;
 @AtLeastOneOf(fields = {"aktoerId", "orgnr", "fagsakNr"})
 public class SakSearchRequest {
     @QueryParam("aktoerId")
-    @ApiParam("Filtrering på saker opprettet for en aktør (person)")
+    @Parameter(description = "Filtrering på saker opprettet for en aktør (person)")
     private List<String> aktoerId;
     @QueryParam("orgnr")
-    @ApiParam("Filtrering på saker opprettet for en organisasjon")
+    @Parameter(description = "Filtrering på saker opprettet for en organisasjon")
     private String orgnr;
     @QueryParam("applikasjon")
-    @ApiParam("Filtrering på applikasjon (iht felles kodeverk)")
+    @Parameter(description = "Filtrering på applikasjon (iht felles kodeverk)")
     private String applikasjon;
     @QueryParam("tema")
-    @ApiParam("Filtrering på tema (iht felles kodeverk)")
+    @Parameter(description = "Filtrering på tema (iht felles kodeverk)")
     private List<String> tema;
     @QueryParam("fagsakNr")
-    @ApiParam("Filtrering på fagsakNr")
+    @Parameter(description = "Filtrering på fagsakNr")
     private String fagsakNr;
 
     public SakSearchRequest() {

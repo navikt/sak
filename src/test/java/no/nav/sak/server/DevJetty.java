@@ -15,7 +15,7 @@ public class DevJetty extends StartJetty {
 
     void registerJerseyApplication(ServletContextHandler context) {
         ServletHolder jerseyServlet = new ServletHolder(new ServletContainer());
-        jerseyServlet.setInitParameter("javax.ws.rs.Application", "no.nav.sak.SakH2Application");
+        jerseyServlet.setInitParameter("jakarta.ws.rs.Application", "no.nav.sak.SakH2Application");
         context.addServlet(jerseyServlet, "/api/*");
     }
 

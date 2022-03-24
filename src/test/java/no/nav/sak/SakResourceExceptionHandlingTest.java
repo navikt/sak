@@ -10,8 +10,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import javax.ws.rs.core.Application;
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.core.Application;
+import jakarta.ws.rs.core.Response;
 import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
 
@@ -32,7 +32,7 @@ public class SakResourceExceptionHandlingTest extends JerseyTest {
         assertThat(response.getStatus()).isEqualTo(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode());
         assertThat(response.getHeaderString("Content-Type")).isEqualTo("application/json");
 
-        JsonObject jsonObject = new JsonParser().parse(new InputStreamReader((ByteArrayInputStream) response.getEntity())).getAsJsonObject();
+        JsonObject jsonObject = JsonParser.parseReader(new InputStreamReader((ByteArrayInputStream) response.getEntity())).getAsJsonObject();
         assertThat(jsonObject.get("uuid")).isNotNull();
         assertThat(jsonObject.get("feilmelding")).isNotNull();
     }
