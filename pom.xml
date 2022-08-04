@@ -86,6 +86,7 @@
         <jakarta.xml.bind.version>4.0.0</jakarta.xml.bind.version>
         <javax.xml.bind.version>2.3.1</javax.xml.bind.version>
         <jaxb.version>4.0.0</jaxb.version>
+        <servlet-api.version>4.0.1</servlet-api.version>
 
         <!--Build settings -->
         <maven.surefire.version>3.0.0-M2</maven.surefire.version>
@@ -111,7 +112,6 @@
 
     <dependencyManagement>
         <dependencies>
-
             <dependency>
                 <groupId>org.glassfish.jaxb</groupId>
                 <artifactId>jaxb-runtime</artifactId>
