@@ -4,6 +4,11 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.7.2</version>
+    </parent>
     <groupId>no.nav</groupId>
     <artifactId>sak</artifactId>
     <version>1.0-SNAPSHOT</version>
@@ -15,7 +20,7 @@
         <opensaml.version>3.4.6</opensaml.version>
 
         <jetty.version>11.0.8</jetty.version>
-        <jersey.version>3.0.4</jersey.version>
+        <jersey.version>3.0.5</jersey.version>
         <logback.version>1.2.11</logback.version>
         <slf4j.version>1.7.36</slf4j.version>
         <flyway.version>8.5.2</flyway.version>
@@ -35,7 +40,6 @@
         <nimbusds.version>9.27</nimbusds.version>
         <abac.attribute.version>3.3.13</abac.attribute.version>
         <ojdbc.version>21.5.0.0</ojdbc.version>
-        <cxf.version>3.5.1</cxf.version>
         <ldaptive.version>1.3.0</ldaptive.version>
         <logback-syslog4j.version>1.0.0</logback-syslog4j.version>
         <ehcache.version>3.9.9</ehcache.version>
@@ -74,18 +78,14 @@
         <httpmime.version>4.5.13</httpmime.version>
         <java-support.version>8.0.0</java-support.version>
 
-        <jakarta.mail.version>1.4.7</jakarta.mail.version>
-        <jakarta-annotations.version>2.0.0</jakarta-annotations.version>
-        <jakarta-validation.version>3.0.1</jakarta-validation.version>
-        <jakarta-activation.version>2.1.0</jakarta-activation.version>
-
-        <jaxb.version>3.0.2</jaxb.version>
-
-        <javax-validation.version>2.0.1.Final</javax-validation.version>
-        <javax-activation.version>2.0.1</javax-activation.version>
-        <javax.ws.rs.version>2.1.1</javax.ws.rs.version>
-        <javax.servlet.version>4.0.1</javax.servlet.version>
+        <jakarta.mail.version>2.1.0</jakarta.mail.version>
+        <jakarta-annotations.version>2.1.1</jakarta-annotations.version>
+        <jakarta-validation.version>3.0.2</jakarta-validation.version>
+        <jakarta-activation-api.version>2.1.0</jakarta-activation-api.version>
+        <jakarta-rs-api.version>3.1.0</jakarta-rs-api.version>
+        <jakarta.xml.bind.version>4.0.0</jakarta.xml.bind.version>
         <javax.xml.bind.version>2.3.1</javax.xml.bind.version>
+        <jaxb.version>4.0.0</jaxb.version>
 
         <!--Build settings -->
         <maven.surefire.version>3.0.0-M2</maven.surefire.version>
@@ -94,11 +94,9 @@
         <maven.compiler.source>17</maven.compiler.source>
 
         <!--Test -->
-        <junit.version>5.7.0</junit.version>
         <junit.platform.version>1.3.2</junit.platform.version>
         <pitest-junit5-plugin.version>0.12</pitest-junit5-plugin.version>
         <pitest-maven.version>1.6.2</pitest-maven.version>
-        <mockito.version>1.10.19</mockito.version>
         <gatling.version>2.3.1</gatling.version>
         <gatling-maven-plugin.version>3.1.1</gatling-maven-plugin.version>
 
@@ -144,7 +142,7 @@
             <dependency>
                 <groupId>jakarta.activation</groupId>
                 <artifactId>jakarta.activation-api</artifactId>
-                <version>${jakarta-activation.version}</version>
+                <version>${jakarta-activation-api.version}</version>
             </dependency>
             <dependency>
                 <groupId>jakarta.servlet</groupId>
@@ -155,6 +153,11 @@
                 <groupId>jakarta.mail</groupId>
                 <artifactId>mail</artifactId>
                 <version>${jakarta.mail.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>jakarta.ws.rs</groupId>
+                <artifactId>jakarta.ws.rs-api</artifactId>
+                <version>${jakarta-rs-api.version}</version>
             </dependency>
 
             <dependency>
@@ -479,9 +482,19 @@
                 <version>${oppgavehandtering-resilience.version}</version>
             </dependency>
             <dependency>
+                <groupId>jakarta.xml.bind</groupId>
+                <artifactId>jakarta.xml.bind-api</artifactId>
+                <version>${jakarta.xml.bind.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>javax.xml.bind</groupId>
                 <artifactId>jaxb-api</artifactId>
                 <version>${javax.xml.bind.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.glassfish</groupId>
+                <artifactId>jakarta.el</artifactId>
+                <version>4.0.0</version>
             </dependency>
 
             <!--Runtime-->
@@ -498,10 +511,9 @@
                 <scope>runtime</scope>
             </dependency>
             <dependency>
-                <groupId>javax.ws.rs</groupId>
-                <artifactId>javax.ws.rs-api</artifactId>
-                <version>${javax.ws.rs.version}</version>
-                <scope>runtime</scope>
+                <groupId>org.hibernate.validator</groupId>
+                <artifactId>hibernate-validator</artifactId>
+                <version>7.0.0.Final</version>
             </dependency>
 
             <!--Test-->
@@ -560,18 +572,6 @@
                 <scope>test</scope>
             </dependency>
             <dependency>
-                <groupId>org.junit.jupiter</groupId>
-                <artifactId>junit-jupiter-api</artifactId>
-                <version>${junit.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.junit.jupiter</groupId>
-                <artifactId>junit-jupiter-engine</artifactId>
-                <version>${junit.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
                 <groupId>org.assertj</groupId>
                 <artifactId>assertj-core</artifactId>
                 <version>${assertj.version}</version>
@@ -581,12 +581,6 @@
                 <groupId>io.rest-assured</groupId>
                 <artifactId>rest-assured</artifactId>
                 <version>${rest.assured.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.mockito</groupId>
-                <artifactId>mockito-all</artifactId>
-                <version>${mockito.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
@@ -601,58 +595,19 @@
                 <version>${nimbusds.version}</version>
                 <scope>test</scope>
             </dependency>
-            <dependency>
-                <groupId>org.apache.cxf</groupId>
-                <artifactId>cxf-rt-ws-security</artifactId>
-                <version>${cxf.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.cxf</groupId>
-                <artifactId>cxf-rt-frontend-jaxws</artifactId>
-                <version>${cxf.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.cxf</groupId>
-                <artifactId>cxf-rt-ws-policy</artifactId>
-                <version>${cxf.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.cxf</groupId>
-                <artifactId>cxf-core</artifactId>
-                <version>${cxf.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.cxf</groupId>
-                <artifactId>cxf-rt-transports-http</artifactId>
-                <version>${cxf.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.cxf</groupId>
-                <artifactId>cxf-rt-transports-http-jetty</artifactId>
-                <version>${cxf.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>javax.servlet</groupId>
-                <artifactId>javax.servlet-api</artifactId>
-                <version>${javax.servlet.version}</version>
-                <scope>test</scope>
-            </dependency>
         </dependencies>
     </dependencyManagement>
 
     <dependencies>
 
         <dependency>
+            <groupId>jakarta.xml.bind</groupId>
+            <artifactId>jakarta.xml.bind-api</artifactId>
+        </dependency>
+        <dependency>
             <groupId>javax.xml.bind</groupId>
             <artifactId>jaxb-api</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.glassfish.jaxb</groupId>
             <artifactId>jaxb-runtime</artifactId>
@@ -848,15 +803,16 @@
 
         <!--Test -->
         <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.vaadin.external.google</groupId>
+                    <artifactId>android-json</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
-
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-engine</artifactId>
-        </dependency>
-
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
@@ -866,6 +822,12 @@
             <groupId>org.glassfish.jersey.test-framework.providers</groupId>
             <artifactId>jersey-test-framework-provider-inmemory</artifactId>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>junit</groupId>
+                    <artifactId>junit</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -876,11 +838,6 @@
         <dependency>
             <groupId>io.rest-assured</groupId>
             <artifactId>rest-assured</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-all</artifactId>
         </dependency>
 
         <dependency>
@@ -943,56 +900,6 @@
         <dependency>
             <groupId>com.nimbusds</groupId>
             <artifactId>oauth2-oidc-sdk</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-ws-security</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.neethi</groupId>
-                    <artifactId>neethi</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>jakarta.xml.bind</groupId>
-                    <artifactId>jakarta.xml.bind-api</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-frontend-jaxws</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-ws-policy</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-core</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>jakarta.xml.bind</groupId>
-                    <artifactId>jakarta.xml.bind-api</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-transports-http</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-transports-http-jetty</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>javax.ws.rs</groupId>
-            <artifactId>javax.ws.rs-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
         </dependency>
 
         <dependency>
@@ -1095,16 +1002,6 @@
                             <artifactId>junit-platform-surefire-provider</artifactId>
                             <version>${junit.platform.version}</version>
                         </dependency>
-                        <dependency>
-                            <groupId>org.junit.jupiter</groupId>
-                            <artifactId>junit-jupiter-engine</artifactId>
-                            <version>${junit.version}</version>
-                        </dependency>
-                        <dependency>
-                            <groupId>org.junit.vintage</groupId>
-                            <artifactId>junit-vintage-engine</artifactId>
-                            <version>${junit.version}</version>
-                        </dependency>
                     </dependencies>
                     <configuration>
                         <argLine>
@@ -1176,6 +1073,7 @@
                 <version>${maven-shade-plugin.version}</version>
                 <executions>
                     <execution>
+                        <id>shade-sak</id>
                         <phase>package</phase>
                         <goals>
                             <goal>shade</goal>

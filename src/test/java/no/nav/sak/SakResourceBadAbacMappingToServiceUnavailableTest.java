@@ -1,6 +1,7 @@
 package no.nav.sak;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import jakarta.ws.rs.client.Entity;
@@ -10,6 +11,7 @@ import jakarta.ws.rs.core.Response;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Disabled
 public class SakResourceBadAbacMappingToServiceUnavailableTest extends AbstractSakResourceTest {
 
     @Test
