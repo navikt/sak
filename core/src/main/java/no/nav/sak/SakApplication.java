@@ -226,7 +226,7 @@ public class SakApplication extends ResourceConfig {
         final SwaggerConfiguration swaggerConfiguration = new SwaggerConfiguration()
                 .openAPI(openAPI)
                 .prettyPrint(true)
-                .resourcePackages(Stream.of("no.nav.sak").collect(Collectors.toSet()));
+                .resourceClasses(Stream.of("no.nav.sak.SakResource").collect(Collectors.toSet()));
 
         try {
             new JaxrsOpenApiContextBuilder<>()
