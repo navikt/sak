@@ -1,8 +1,7 @@
 package no.nav.sak.validering;
 
-import jakarta.validation.ConstraintValidator;
-import jakarta.validation.ConstraintValidatorContext;
-
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
 import java.util.Objects;
 
 import static no.nav.sak.validering.CountFieldsMatching.count;

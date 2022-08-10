@@ -58,9 +58,9 @@ import org.opensaml.core.config.InitializationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
-import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
+import javax.ws.rs.ApplicationPath;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -70,7 +70,7 @@ import java.util.logging.Level;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-@Component
+@ApplicationPath("/api")
 public class SakApplication extends ResourceConfig {
 
     private static final Logger log = LoggerFactory.getLogger(SakApplication.class);

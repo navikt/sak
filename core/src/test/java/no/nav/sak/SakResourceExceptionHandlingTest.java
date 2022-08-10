@@ -10,8 +10,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import jakarta.ws.rs.core.Application;
-import jakarta.ws.rs.core.Response;
+import javax.ws.rs.core.Application;
+import javax.ws.rs.core.Response;
 import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
 

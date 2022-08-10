@@ -1,8 +1,5 @@
 package no.nav.sak;
 
-import jakarta.ws.rs.client.Entity;
-import jakarta.ws.rs.client.WebTarget;
-import jakarta.ws.rs.core.Response;
 import no.nav.sak.infrastruktur.Database;
 import no.nav.sak.infrastruktur.JunitDatabase;
 import no.nav.sak.infrastruktur.JunitTransactionSupport;
@@ -12,6 +9,10 @@ import org.glassfish.jersey.test.JerseyTest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.Response;
 
 import static no.nav.sikkerhet.authentication.AuthenticationHeaderIdentifier.SAML;
 

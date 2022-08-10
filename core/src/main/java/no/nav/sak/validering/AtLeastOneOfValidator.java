@@ -1,7 +1,7 @@
 package no.nav.sak.validering;
 
-import jakarta.validation.ConstraintValidator;
-import jakarta.validation.ConstraintValidatorContext;
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
 
 import static org.apache.commons.lang3.math.NumberUtils.LONG_ONE;
 

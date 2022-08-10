@@ -38,16 +38,18 @@
         <commons.configuration.version>2.7</commons.configuration.version>
         <commons.beanutils.version>1.9.4</commons.beanutils.version>
         <nimbusds.version>9.27</nimbusds.version>
-        <swagger.version>2.1.13</swagger.version>
+        <swagger.version>2.0.7</swagger.version>
         <swagger-ui.version>4.5.2</swagger-ui.version>
-        <swagger-jaxrs2-jakarta.version>2.1.13</swagger-jaxrs2-jakarta.version>
+        <swagger-jaxrs2.version>2.1.13</swagger-jaxrs2.version>
         <ehcache.version>3.9.9</ehcache.version>
         <junit.platform.version>1.3.2</junit.platform.version>
-        <jakarta.servlet.version>5.0.0</jakarta.servlet.version>
-        <jakarta-annotations.version>2.0.0</jakarta-annotations.version>
-        <jersey.version>3.0.4</jersey.version>
-        <javax.ws.rs.version>3.0.0</javax.ws.rs.version>
-        <jakarta-validation.version>3.0.1</jakarta-validation.version>
+        <javax-validation.version>2.0.1.Final</javax-validation.version>
+        <javax-activation.version>1.2.0</javax-activation.version>
+        <javax.ws.rs-api.version>2.1.1</javax.ws.rs-api.version>
+        <javax.servlet.version>4.0.1</javax.servlet.version>
+        <javax.xml.bind.version>2.3.1</javax.xml.bind.version>
+        <jersey.version>2.36</jersey.version>
+        <gson.version>2.9.0</gson.version>
     </properties>
 
     <packaging>pom</packaging>
@@ -55,9 +57,21 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
+                <groupId>org.glassfish.jersey</groupId>
+                <artifactId>jersey-bom</artifactId>
+                <version>${jersey.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
                 <groupId>org.glassfish.jaxb</groupId>
                 <artifactId>jaxb-runtime</artifactId>
                 <version>${jaxb.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.xml.bind</groupId>
+                <artifactId>jaxb-api</artifactId>
+                <version>${javax.xml.bind.version}</version>
             </dependency>
             <dependency>
                 <groupId>no.nav.oppgavehandtering</groupId>
@@ -101,33 +115,13 @@
             </dependency>
             <dependency>
                 <groupId>io.swagger.core.v3</groupId>
-                <artifactId>swagger-jaxrs2-jakarta</artifactId>
+                <artifactId>swagger-jaxrs2</artifactId>
                 <version>${swagger.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.webjars</groupId>
                 <artifactId>swagger-ui</artifactId>
                 <version>${swagger-ui.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>jakarta.ws.rs</groupId>
-                <artifactId>jakarta.ws.rs-api</artifactId>
-                <version>${javax.ws.rs.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>jakarta.validation</groupId>
-                <artifactId>jakarta.validation-api</artifactId>
-                <version>${jakarta-validation.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>jakarta.annotation</groupId>
-                <artifactId>jakarta.annotation-api</artifactId>
-                <version>${jakarta-annotations.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>jakarta.servlet</groupId>
-                <artifactId>jakarta.servlet-api</artifactId>
-                <version>${jakarta.servlet.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
@@ -191,10 +185,9 @@
                 <scope>test</scope>
             </dependency>
             <dependency>
-                <groupId>jakarta.servlet</groupId>
-                <artifactId>jakarta.servlet-api</artifactId>
-                <version>${jakarta.servlet.version}</version>
-                <scope>test</scope>
+                <groupId>javax.ws.rs</groupId>
+                <artifactId>javax.ws.rs-api</artifactId>
+                <version>${javax.ws.rs-api.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
