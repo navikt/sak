@@ -78,7 +78,7 @@ public class SakApplication extends ResourceConfig {
     @SuppressWarnings("WeakerAccess") //Påkrevd public
     public SakApplication() {
         DefaultExports.initialize();
-        packages("no.nav.sak");
+        register(SakResource.class);
         final SakConfiguration sakConfiguration = new SakConfiguration();
         final DataSource sakDataSource = createSakDataSource(sakConfiguration);
 
