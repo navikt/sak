@@ -1,7 +1,5 @@
 package no.nav.sak;
 
-import static java.util.logging.Logger.getLogger;
-
 import com.zaxxer.hikari.HikariDataSource;
 import com.zaxxer.hikari.metrics.prometheus.PrometheusMetricsTrackerFactory;
 import io.prometheus.client.hotspot.DefaultExports;
@@ -69,6 +67,8 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static java.util.logging.Logger.getLogger;
 
 @ApplicationPath("/api")
 public class SakApplication extends ResourceConfig {
@@ -221,8 +221,7 @@ public class SakApplication extends ResourceConfig {
                 .title("Sak API")
                 .version("v1");
 
-        openAPI.info(info)
-                .addServersItem(new Server().url("/"));
+        openAPI.info(info);
 
         final SwaggerConfiguration swaggerConfiguration = new SwaggerConfiguration()
                 .openAPI(openAPI)

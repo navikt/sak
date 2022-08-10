@@ -9,7 +9,7 @@
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>2.7.2</version>
     </parent>
-    <groupId>no.nav</groupId>
+    <groupId>no.nav.sak</groupId>
     <artifactId>sak</artifactId>
     <version>1.0-SNAPSHOT</version>
 
@@ -38,9 +38,9 @@
         <commons.configuration.version>2.7</commons.configuration.version>
         <commons.beanutils.version>1.9.4</commons.beanutils.version>
         <nimbusds.version>9.27</nimbusds.version>
-        <swagger.version>2.0.7</swagger.version>
+        <swagger.version>2.1.13</swagger.version>
         <swagger-ui.version>4.5.2</swagger-ui.version>
-        <swagger-jaxrs2.version>2.1.13</swagger-jaxrs2.version>
+        <swagger.jersey2.version>2.2.1</swagger.jersey2.version>
         <ehcache.version>3.9.9</ehcache.version>
         <junit.platform.version>1.3.2</junit.platform.version>
         <javax-validation.version>2.0.1.Final</javax-validation.version>
@@ -349,44 +349,6 @@
                             <vendor>openjdk</vendor>
                         </jdk>
                     </toolchains>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>${maven-shade-plugin.version}</version>
-                <executions>
-                    <execution>
-                        <id>shade-sak</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                        <configuration>
-                            <transformers>
-                                <transformer
-                                    implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>no.nav.sak.server.StartJetty</mainClass>
-                                </transformer>
-                                <transformer
-                                    implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
-                            </transformers>
-                            <filters>
-                                <filter>
-                                    <artifact>*:*</artifact>
-                                    <excludes>
-                                        <exclude>module-info.class</exclude>
-                                        <exclude>META-INF/*.SF</exclude>
-                                        <exclude>META-INF/*.DSA</exclude>
-                                        <exclude>META-INF/*.RSA</exclude>
-                                    </excludes>
-                                </filter>
-                            </filters>
-                        </configuration>
-                    </execution>
-                </executions>
-                <configuration>
-                    <finalName>sak</finalName>
                 </configuration>
             </plugin>
         </plugins>
