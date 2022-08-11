@@ -1,6 +1,7 @@
 package no.nav.sak.app;
 
 import no.nav.sak.SakApplication;
+import no.nav.sak.infrastruktur.AliveCheckServlet;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Import;

@@ -25,18 +25,20 @@ spec:
           - {{this }}
         {{/each}}
   liveness:
-    path: internal/alive
+    path: /isAlive
     port: 8080
-    initialDelay: 20
+    initialDelay: 30
+    failureThreshold: 10
   port: 8080
   preStopHookPath: internal/prestop
   prometheus:
     enabled: true
     path: internal/metrics
   readiness:
-    path: internal/ready
+    path: /isReady
     port: 8080
-    initialDelay: 20
+    initialDelay: 30
+    timeout: 3
   replicas:
     min: {{ MIN_REPLICAS }}
     max: {{ MAX_REPLICAS }}
