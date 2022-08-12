@@ -28,7 +28,6 @@ import static org.apache.commons.lang3.StringUtils.*;
 
 public class SakPEP {
     private static final Logger securitylog = LoggerFactory.getLogger("securitylog");
-    private static final Logger log = LoggerFactory.getLogger(SakPEP.class);
 
     static final String RESOURCE_TYPE_SAK = "no.nav.abac.attributter.resource.sak.sak";
 
@@ -88,7 +87,6 @@ public class SakPEP {
         try {
             abacResult=resilienceExecutor.execute(abacRequest);
             if (ABACResult.Code.OK.equals(abacResult.getResultCode())) {
-                log.info("Decision: {}", abacResult.toString());
                 final String arcsightPreparedRequest = stripBrackets(abacRequest.getResources().get(0).getAttributes().toString()); //TODO Dette bør gjøres mer elegant, og robus + test av loggingen.
                 String arcsightPreparedResult = StringUtils.remove(stripBrackets(abacResult.toString()), "associatedAdvice=");
                 if (abacResult.getAssociatedAdvice().isEmpty()) {
