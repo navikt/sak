@@ -51,11 +51,11 @@ public class SakPEP {
         , final AuthorizationRequest authorizationRequest) {
 
         ABACCategory category = new ABACCategory()
-            .addAttribute(new ABACAttribute(RESOURCE_FELLES_DOMENE, "no/nav/sak"))
+            .addAttribute(new ABACAttribute(RESOURCE_FELLES_DOMENE, "sak"))
             .addAttribute(new ABACAttribute(RESOURCE_FELLES_RESOURCE_TYPE, RESOURCE_TYPE_SAK));
 
         final ABACRequest abacRequest = ABACRequest.newRequest()
-            .addEnvironment(new ABACAttribute(ENVIRONMENT_FELLES_PEP_ID, "no/nav/sak"))
+            .addEnvironment(new ABACAttribute(ENVIRONMENT_FELLES_PEP_ID, "sak"))
             .addResource(category);
 
         authorizationRequest.getAktoerId().ifPresent(aktoerId -> category.addAttribute(new ABACAttribute(RESOURCE_FELLES_PERSON_AKTOERID_RESOURCE, aktoerId)));
