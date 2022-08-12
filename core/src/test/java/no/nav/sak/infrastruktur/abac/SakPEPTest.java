@@ -37,8 +37,8 @@ class SakPEPTest {
 
         assertDefaulValuesSpecifiedCorrectly(req);
         assertThat(req.getAccessSubject().getAttributes()).containsOnly(
-            new ABACAttribute(StandardAttributter.SUBJECT_ID, username),
-            new ABACAttribute(NavAttributter.SUBJECT_FELLES_SUBJECTTYPE, SUBJECT_TYPE_SYSTEMBRUKER.getValue()));
+                new ABACAttribute(StandardAttributter.SUBJECT_ID, username),
+                new ABACAttribute(NavAttributter.SUBJECT_FELLES_SUBJECTTYPE, SUBJECT_TYPE_SYSTEMBRUKER.getValue()));
     }
 
     @Test
@@ -76,7 +76,7 @@ class SakPEPTest {
         ContainerRequestContext ctx = mock(ContainerRequestContext.class);
         when(ctx.getProperty(REQUEST_USERNAME)).thenReturn(username);
         when(ctx.getHeaderString("Authorization")).thenReturn(authHeaderContent);
-            when(ctx.getUriInfo()).thenReturn(mock(UriInfo.class));
+        when(ctx.getUriInfo()).thenReturn(mock(UriInfo.class));
         when(ctx.getRequest()).thenReturn(mock(Request.class));
         return ctx;
     }
@@ -92,9 +92,9 @@ class SakPEPTest {
     }
 
     private void assertDefaulValuesSpecifiedCorrectly(ABACRequest req) {
-        assertThat(req.getEnvironment().getAttributes()).contains(new ABACAttribute(ENVIRONMENT_FELLES_PEP_ID , "no/nav/sak"));
+        assertThat(req.getEnvironment().getAttributes()).contains(new ABACAttribute(ENVIRONMENT_FELLES_PEP_ID ,"sak"));
         assertThat(req.getResources().get(0).getAttributes()).contains(
-            new ABACAttribute(RESOURCE_FELLES_DOMENE, "no/nav/sak"),
-            new ABACAttribute(RESOURCE_FELLES_RESOURCE_TYPE, RESOURCE_TYPE_SAK));
+                new ABACAttribute(RESOURCE_FELLES_DOMENE, "sak"),
+                new ABACAttribute(RESOURCE_FELLES_RESOURCE_TYPE, RESOURCE_TYPE_SAK));
     }
 }
