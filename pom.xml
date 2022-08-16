@@ -19,8 +19,7 @@
     </modules>
 
     <properties>
-        <maven.compiler.target>17</maven.compiler.target>
-        <maven.compiler.source>17</maven.compiler.source>
+        <java.version>17</java.version>
         <maven.surefire.version>3.0.0-M2</maven.surefire.version>
         <maven-toolchains-plugin.version>3.0.0</maven-toolchains-plugin.version>
         <dependency-check-maven.version>6.0.5</dependency-check-maven.version>
@@ -29,9 +28,8 @@
         <oppgavehandtering-resilience.version>1.00.08</oppgavehandtering-resilience.version>
         <abac.attribute.version>3.3.13</abac.attribute.version>
 
-        <logstash-logback-encoder.version>6.6</logstash-logback-encoder.version>
         <logback-syslog4j.version>1.0.0</logback-syslog4j.version>
-        <logstash.encoder.version>7.0.1</logstash.encoder.version>
+        <logstash.encoder.version>7.2</logstash.encoder.version>
 
         <jaxb.version>3.0.2</jaxb.version>
         <prometheus.version>0.15.0</prometheus.version>
@@ -97,7 +95,7 @@
             <dependency>
                 <groupId>net.logstash.logback</groupId>
                 <artifactId>logstash-logback-encoder</artifactId>
-                <version>${logstash-logback-encoder.version}</version>
+                <version>${logstash.encoder.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.papertrailapp</groupId>
@@ -194,6 +192,11 @@
                 <groupId>javax.ws.rs</groupId>
                 <artifactId>javax.ws.rs-api</artifactId>
                 <version>${javax.ws.rs-api.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-ui</artifactId>
+                <version>1.2.18</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
