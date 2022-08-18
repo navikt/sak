@@ -20,7 +20,6 @@
 
     <properties>
         <java.version>17</java.version>
-        <maven.surefire.version>3.0.0-M2</maven.surefire.version>
         <maven-toolchains-plugin.version>3.0.0</maven-toolchains-plugin.version>
         <dependency-check-maven.version>6.0.5</dependency-check-maven.version>
 
@@ -32,7 +31,6 @@
         <logstash.encoder.version>7.2</logstash.encoder.version>
 
         <jaxb.version>3.0.2</jaxb.version>
-        <prometheus.version>0.15.0</prometheus.version>
         <commons.configuration.version>2.7</commons.configuration.version>
         <commons.beanutils.version>1.9.4</commons.beanutils.version>
         <nimbusds.version>9.27</nimbusds.version>
@@ -133,21 +131,6 @@
                 <version>${commons.configuration.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.prometheus</groupId>
-                <artifactId>simpleclient</artifactId>
-                <version>${prometheus.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.prometheus</groupId>
-                <artifactId>simpleclient_hotspot</artifactId>
-                <version>${prometheus.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.prometheus</groupId>
-                <artifactId>simpleclient_logback</artifactId>
-                <version>${prometheus.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>commons-beanutils</groupId>
                 <artifactId>commons-beanutils</artifactId>
                 <version>${commons.beanutils.version}</version>
@@ -236,7 +219,6 @@
                 <plugins>
                     <plugin>
                         <artifactId>maven-surefire-plugin</artifactId>
-                        <version>${maven.surefire.version}</version>
                         <executions>
                             <execution>
                                 <id>integration-tests</id>
@@ -283,7 +265,6 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>${maven.surefire.version}</version>
                     <dependencies>
                         <dependency>
                             <groupId>org.junit.platform</groupId>
