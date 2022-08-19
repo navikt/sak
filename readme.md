@@ -11,11 +11,11 @@ Sak er etablert som en erstatning for 'Sak-modulen' i GSAK, og tilbyr støttefun
 
 ### Oppstart
 
-Applikasjonen kjører opp lokalt ved å starte **DevJetty** i test-scope. 
+Spring boot applikasjon som kjøres opp ved å kjøre Application 
 
 ### Logging
 
-Ved kjøring av **DevJetty** benyttes **logback-test.xml** 
+Ved kjøring av **Spring Boot** benyttes **logback-test.xml** 
 
 ### Properties
 Ved lokal kjøring er properties definert i **sak.properties**. 
@@ -26,29 +26,14 @@ Enhetstester og api-tester (mot in memory-db) kjøres som standard ved **mvn tes
 av mutasjonstester som kan kjøres med mvn test -Pmutation-tests, og 
 
 ### Bygging
-
-Applikasjonen pakkes til en 'fat-jar' vha maven-shade-plugin. Applikasjonen kan deretter kjøres opp lokalt på følgende måte:
-
-1. i root folder til prosjektet kjør kommando `mvn package`, for å bygge Jar filen.
-2. i `./target` folder kjør kommando `java -jar <app>.jar`
-
-Merk at konfigurasjon må være satt enten i sak.properties, som system.properties (-D) eller som env-variabler for at applikasjonen skal
-starte. 
-
-Applikasjonen kan også kjøres opp i docker (PS - Docker må kjøres mot remote host dersom man benytter windows utvikler-image):
-
-docker build . 
-docker run <app> -p<fri port på host>:8080
-
-Her vil også properties enten måtte tilgjengeliggjøres i jar, eller det må sendes med env-variabler i run-kommando. 
-
+mvn clean install
 
 ### Swagger
 
 1. Åpne denne url `<ingress>` i en nettleser
 2. Når du kommer inn til nettleseren vil du se at du får feilmeldingen `Failed to load API definition`. Dette er fordi swagger pekker på en swagger.json konfigurasjon som er feil og ikke tilgjengelig.
 3. For å sette korrekt konfigurasjon så vil du gå til feltet `explore` på nettsiden.
-4. På dette feltet vil vi at swagger skal hente konfigurasjonen fra `sak`, dette gjøres med å skrive dette inn i feltet `<ingress>/api/swagger.json`.
+4. På dette feltet vil vi at swagger skal hente konfigurasjonen fra `sak`, dette gjøres med å skrive dette inn i feltet `<ingress>/api/openapi.json`.
 5. Når du har tryket på `explore` knappen vil swagger hente konfigurasjonen fra applikasjonen.
 
 ### Deploy
