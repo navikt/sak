@@ -9,7 +9,6 @@ import io.swagger.v3.oas.integration.OpenApiConfigurationException;
 import io.swagger.v3.oas.integration.SwaggerConfiguration;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
-import io.swagger.v3.oas.models.servers.Server;
 import no.nav.resilience.ResilienceConfig;
 import no.nav.sak.infrastruktur.CorrelationFilter;
 import no.nav.sak.infrastruktur.Database;
