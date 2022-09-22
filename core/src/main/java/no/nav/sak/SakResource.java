@@ -124,10 +124,7 @@ public class SakResource {
     private final SakRepository sakRepository;
     private final SakPEP sakPEP;
 
-    SakResource(
-        final SakRepository sakRepository
-        , final SakPEP sakPEP) {
-
+    SakResource(final SakRepository sakRepository, final SakPEP sakPEP) {
         this.sakRepository = sakRepository;
         this.sakPEP = sakPEP;
     }
@@ -151,7 +148,7 @@ public class SakResource {
         @PathParam("id") final Long id
         , @Context final ContainerRequestContext ctx) {
 
-        log.info("Henter sak med id: {}", id);
+        log.info("hentSak henter arkivsakId={}", id);
         final Optional<Sak> sak = sakRepository.hentSak(id);
 
         final Response response;
@@ -159,6 +156,7 @@ public class SakResource {
 
             final Sak eksisterendeSak = sak.get();
             response = checkUsersAccessToSak(ctx, eksisterendeSak);
+            log.info("hentSak har hentet arkivsakId={}", id);
         } else {
 
             log.warn("Mottatt oppslag på sak som ikke eksisterer, id: {}, consumer: {}", id, ctx.getProperty(REQUEST_CONSUMERID));
@@ -173,7 +171,6 @@ public class SakResource {
                     )
                     .build();
         }
-
         return response;
     }
 
@@ -193,7 +190,7 @@ public class SakResource {
         @Valid @BeanParam final SakSearchRequest sakSearchRequest
         , @Context final ContainerRequestContext ctx) {
 
-        log.info("Søker etter saker for: {}", sakSearchRequest);
+        log.info("finnSak Søker etter saker for: {}", sakSearchRequest);
         for (String aktoerId : sakSearchRequest.getAktoerId()) {
             final ABACResult abacResult =
                 sakPEP.autoriser(ctx, new AuthorizationRequest(aktoerId));
@@ -207,6 +204,7 @@ public class SakResource {
 
         final List<Sak> saker =
             sakRepository.finnSaker(sakSearchRequest.toCriteria());
+        log.info("finnSak hentet antall_arkivsaker={}", saker.size());
         return
             Response
                 .ok(
@@ -243,7 +241,7 @@ public class SakResource {
         final Sak innsendtSak = sakJson.toSak(user);
         final String aktoerId = innsendtSak.getAktoerId();
 
-        log.info("Oppretter sak for {}", aktoerId);
+        log.info("opprettSak for aktoerId={}", aktoerId);
 
         final ABACResult abacResult = sakPEP.autoriser(ctx, new AuthorizationRequest(aktoerId));
         final ABACResult.Code abacResultCode = abacResult.getResultCode();
@@ -265,7 +263,6 @@ public class SakResource {
 
             response = makeResponseUponAbacFailure(abacResultCode);
         }
-
         return response;
     }
 
@@ -303,8 +300,8 @@ public class SakResource {
                     )
                     .entity(new SakJson(opprettetSak))
                     .build();
+            log.info("opprettSak har opprettet arkivsakId={}", opprettetSak.getId());
         }
-
         return response;
     }
 
