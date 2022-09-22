@@ -4,6 +4,7 @@ package no.nav.sak.infrastruktur.authentication;
 import io.prometheus.client.Counter;
 import io.prometheus.client.Histogram;
 import io.vavr.CheckedFunction1;
+import lombok.extern.slf4j.Slf4j;
 import no.nav.resilience.ResilienceConfig;
 import no.nav.resilience.ResilienceExecutor;
 import no.nav.sak.infrastruktur.EnableApiFilters;
@@ -11,8 +12,6 @@ import no.nav.sak.infrastruktur.ErrorResponse;
 import no.nav.sikkerhet.authentication.AuthenticationResult;
 import no.nav.sikkerhet.authentication.Authenticator;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
 import javax.annotation.Priority;
@@ -28,13 +27,16 @@ import java.util.Objects;
 
 import static javax.ws.rs.core.HttpHeaders.AUTHORIZATION;
 import static no.nav.sak.infrastruktur.ContextExtractor.getSubjectType;
-import static no.nav.sikkerhet.authentication.AuthenticationHeaderIdentifier.*;
+import static no.nav.sikkerhet.authentication.AuthenticationHeaderIdentifier.BASIC;
+import static no.nav.sikkerhet.authentication.AuthenticationHeaderIdentifier.OIDC;
+import static no.nav.sikkerhet.authentication.AuthenticationHeaderIdentifier.SAML;
 import static org.apache.commons.lang3.StringUtils.defaultString;
 import static org.apache.commons.lang3.StringUtils.trim;
 
 @Provider
 @EnableApiFilters
 @Priority(Priorities.AUTHENTICATION)
+@Slf4j
 public class AuthenticationFilter implements ContainerRequestFilter, ContainerResponseFilter {
     public static final String REQUEST_USERNAME = "username";
     public static final String REQUEST_CONSUMERID = "consumerid";
@@ -45,8 +47,6 @@ public class AuthenticationFilter implements ContainerRequestFilter, ContainerRe
 
     private static final Counter authCounter = Counter.build("authentication_counter", "Antall autentiseringer")
         .labelNames("consumerid", "subjecttype", "valid", "authidentifier").register();
-
-    private static final Logger log = LoggerFactory.getLogger(AuthenticationFilter.class);
 
     private final Authenticator authenticator;
     private final ResilienceExecutor<String, AuthenticationResult> resilienceExecutor;

@@ -1,16 +1,15 @@
 package no.nav.sak.infrastruktur.rest;
 
+import lombok.extern.slf4j.Slf4j;
 import no.nav.sak.infrastruktur.ErrorResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 
 
+@Slf4j
 public class ExternalApiExceptionMapper implements ExceptionMapper<ExternalApiException> {
-    private static final Logger log = LoggerFactory.getLogger(ExternalApiException.class);
 
     @Override
     public Response toResponse(ExternalApiException e) {

@@ -9,6 +9,7 @@ import io.swagger.v3.oas.integration.OpenApiConfigurationException;
 import io.swagger.v3.oas.integration.SwaggerConfiguration;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
+import lombok.extern.slf4j.Slf4j;
 import no.nav.resilience.ResilienceConfig;
 import no.nav.sak.infrastruktur.CorrelationFilter;
 import no.nav.sak.infrastruktur.Database;
@@ -52,8 +53,6 @@ import org.jose4j.keys.resolvers.HttpsJwksVerificationKeyResolver;
 import org.jose4j.keys.resolvers.VerificationKeyResolver;
 import org.opensaml.core.config.InitializationException;
 import org.opensaml.core.config.InitializationService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import javax.sql.DataSource;
@@ -70,9 +69,8 @@ import java.util.stream.Stream;
 import static java.util.logging.Logger.getLogger;
 
 @ApplicationPath("/api")
+@Slf4j
 public class SakApplication extends ResourceConfig {
-
-    private static final Logger log = LoggerFactory.getLogger(SakApplication.class);
 
     @SuppressWarnings("WeakerAccess") //Påkrevd public
     public SakApplication() {
