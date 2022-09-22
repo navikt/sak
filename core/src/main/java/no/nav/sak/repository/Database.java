@@ -1,6 +1,8 @@
 package no.nav.sak.repository;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -16,11 +18,13 @@ import java.util.Optional;
 import static java.util.Arrays.asList;
 
 @Slf4j
+@Component
 public class Database {
 
     private final DataSource dataSource;
     private final ThreadLocal<Connection> threadConnection = new ThreadLocal<>();
 
+    @Autowired
     public Database(DataSource dataSource) {
         this.dataSource = dataSource;
     }

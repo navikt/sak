@@ -1,7 +1,5 @@
 package no.nav.sak;
 
-import com.zaxxer.hikari.HikariDataSource;
-import com.zaxxer.hikari.metrics.prometheus.PrometheusMetricsTrackerFactory;
 import io.prometheus.client.hotspot.DefaultExports;
 import io.swagger.v3.jaxrs2.integration.JaxrsOpenApiContextBuilder;
 import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
@@ -12,7 +10,6 @@ import io.swagger.v3.oas.models.info.Info;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.resilience.ResilienceConfig;
 import no.nav.sak.infrastruktur.CorrelationFilter;
-import no.nav.sak.repository.Database;
 import no.nav.sak.infrastruktur.DefaultExceptionMapper;
 import no.nav.sak.infrastruktur.MethodNotAllowedExceptionMapper;
 import no.nav.sak.infrastruktur.NotFoundExceptionMapper;
@@ -22,6 +19,7 @@ import no.nav.sak.infrastruktur.abac.SakPEP;
 import no.nav.sak.infrastruktur.authentication.AuthenticationFilter;
 import no.nav.sak.infrastruktur.rest.ExternalApiExceptionMapper;
 import no.nav.sak.infrastruktur.rest.ServiceUnavailableExceptionMapper;
+import no.nav.sak.repository.Database;
 import no.nav.sak.repository.SakRepository;
 import no.nav.sak.validering.ConstraintValidationExceptionMapper;
 import no.nav.sikkerhet.abac.ABACClient;
@@ -74,21 +72,17 @@ import static java.util.logging.Logger.getLogger;
 public class SakApplication extends ResourceConfig {
 
     @SuppressWarnings("WeakerAccess") //Påkrevd public
-    public SakApplication() {
+    public SakApplication(Database database) {
         DefaultExports.initialize();
         final SakConfiguration sakConfiguration = new SakConfiguration();
-        final DataSource sakDataSource = createSakDataSource(sakConfiguration);
 
-        final Database database = createDatabase(sakDataSource);
-
-        migrateSak(sakDataSource);
+        migrateSak(database.getDataSource());
         registerApiResources(database, sakConfiguration);
         registerFilters(sakConfiguration);
         registerExceptionmappers();
         registerFeatures();
         registerSwaggerResources();
         initSAML();
-
 
         log.info("Jersey-Application ferdig initialisert");
     }
@@ -243,20 +237,6 @@ public class SakApplication extends ResourceConfig {
         register(new LoggingFeature(getLogger(LoggingFeature.class.getName()), Level.INFO, LoggingFeature.Verbosity.PAYLOAD_TEXT, LoggingFeature.DEFAULT_MAX_ENTITY_SIZE));
     }
 
-
-    protected DataSource createSakDataSource(final SakConfiguration sakConfiguration) {
-
-        final HikariDataSource dataSource = new HikariDataSource();
-        dataSource.setSchema("JOARK");
-        dataSource.setMetricsTrackerFactory(new PrometheusMetricsTrackerFactory());
-
-        dataSource.setUsername(sakConfiguration.getRequiredString("SAKDS_USERNAME"));
-        dataSource.setPassword(sakConfiguration.getRequiredString("SAKDS_PASSWORD"));
-        dataSource.setJdbcUrl(sakConfiguration.getRequiredString("SAKDS_URL"));
-
-        log.info("Opprettet datasource: {}", dataSource.getJdbcUrl());
-        return dataSource;
-    }
 
     static class OIDCIssuer {
         private String issuer;

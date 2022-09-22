@@ -4,6 +4,7 @@ import io.prometheus.client.Counter;
 import io.prometheus.client.Histogram;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.MDC;
+import org.springframework.stereotype.Repository;
 
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -14,6 +15,7 @@ import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.StringUtils.defaultString;
 
+@Repository
 public class SakRepository {
     private static final Counter opprettedeSakerCounter = Counter.build("saker_opprettet_total", "Antall saker opprettet totalt")
         .labelNames("tema", "type", "applikasjon", "consumer").register();
