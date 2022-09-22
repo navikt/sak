@@ -1,7 +1,6 @@
 package no.nav.sak.infrastruktur;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -16,9 +15,8 @@ import java.util.Optional;
 
 import static java.util.Arrays.asList;
 
+@Slf4j
 public class Database {
-
-    private static final Logger log = LoggerFactory.getLogger(Database.class);
 
     private final DataSource dataSource;
     private final ThreadLocal<Connection> threadConnection = new ThreadLocal<>();

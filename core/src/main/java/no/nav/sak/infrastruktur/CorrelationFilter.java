@@ -1,8 +1,7 @@
 package no.nav.sak.infrastruktur;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
 import javax.annotation.Priority;
@@ -18,10 +17,9 @@ import java.util.UUID;
 @EnableApiFilters
 @Provider
 @Priority(0)
+@Slf4j
 public class CorrelationFilter implements ContainerRequestFilter, ContainerResponseFilter {
     private static final String CORRELATION_HEADER = "X-Correlation-ID";
-
-    private static final Logger log = LoggerFactory.getLogger(CorrelationFilter.class);
 
     @Override
     public void filter(ContainerRequestContext containerRequestContext) throws IOException {

@@ -1,14 +1,13 @@
 package no.nav.sak.infrastruktur;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 
+@Slf4j
 public class DefaultExceptionMapper implements ExceptionMapper<Exception> {
-    private static final Logger log = LoggerFactory.getLogger(DefaultExceptionMapper.class);
 
     @Override
     public Response toResponse(Exception e) {

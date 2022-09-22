@@ -1,18 +1,17 @@
 package no.nav.sak;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.configuration2.CompositeConfiguration;
 import org.apache.commons.configuration2.EnvironmentConfiguration;
 import org.apache.commons.configuration2.SystemConfiguration;
 import org.apache.commons.configuration2.builder.fluent.Configurations;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.lang3.Validate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 
+@Slf4j
 public class SakConfiguration {
-    private static final Logger log = LoggerFactory.getLogger(SakConfiguration.class);
     private final CompositeConfiguration compositeConfiguration = new CompositeConfiguration();
 
     public SakConfiguration() {
