@@ -1,6 +1,7 @@
 package no.nav.sak;
 
 import com.google.gson.JsonObject;
+import no.nav.sak.repository.Sak;
 
 public class SakJsonTestData {
     private Sak sak;

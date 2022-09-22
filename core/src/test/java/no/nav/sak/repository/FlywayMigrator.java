@@ -1,4 +1,4 @@
-package no.nav.sak.infrastruktur;
+package no.nav.sak.repository;
 
 import lombok.extern.slf4j.Slf4j;
 import org.flywaydb.core.Flyway;

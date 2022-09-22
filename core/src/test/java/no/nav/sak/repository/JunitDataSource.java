@@ -1,4 +1,4 @@
-package no.nav.sak.infrastruktur;
+package no.nav.sak.repository;
 
 import org.h2.jdbcx.JdbcDataSource;
 

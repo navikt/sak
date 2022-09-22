@@ -3,6 +3,8 @@ package no.nav.sak;
 import no.nav.sak.infrastruktur.authentication.saml.SAMLSupport;
 import no.nav.sak.infrastruktur.oicd.JwtClaimsTestData;
 import no.nav.sak.infrastruktur.oicd.JwtTestData;
+import no.nav.sak.repository.Sak;
+import no.nav.sak.repository.SakTestData;
 import org.glassfish.jersey.test.JerseyTest;
 import org.joda.time.DateTime;
 import org.jose4j.jwt.JwtClaims;

@@ -2,14 +2,14 @@
 
 if test -f /var/run/secrets/nais.io/sakDS/username;
 then
-    echo "Setting SAKDS_USERNAME"
-    export SAKDS_USERNAME=$(cat /var/run/secrets/nais.io/sakDS/username)
+    echo "Setting SPRING_DATASOURCE_USERNAME"
+    export SPRING_DATASOURCE_USERNAME=$(cat /var/run/secrets/nais.io/sakDS/username)
 fi
 
 if test -f /var/run/secrets/nais.io/sakDS/password;
 then
-    echo "Setting SAKDS_PASSWORD"
-    export SAKDS_PASSWORD=$(cat /var/run/secrets/nais.io/sakDS/password)
+    echo "Setting SPRING_DATASOURCE_PASSWORD"
+    export SPRING_DATASOURCE_PASSWORD=$(cat /var/run/secrets/nais.io/sakDS/password)
 fi
 
 if test -f /var/run/secrets/nais.io/ldap/username;

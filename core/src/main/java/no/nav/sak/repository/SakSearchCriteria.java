@@ -1,4 +1,4 @@
-package no.nav.sak;
+package no.nav.sak.repository;
 
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -22,27 +22,27 @@ public class SakSearchCriteria {
         return new SakSearchCriteria();
     }
 
-    SakSearchCriteria medAktoerId(List<String> aktoerId) {
+    public SakSearchCriteria medAktoerId(List<String> aktoerId) {
         this.aktoerId = aktoerId;
         return this;
     }
 
-    SakSearchCriteria medOrgnr(String orgnr) {
+    public SakSearchCriteria medOrgnr(String orgnr) {
         this.orgnr = orgnr;
         return this;
     }
 
-    SakSearchCriteria medTema(List<String> tema) {
+    public SakSearchCriteria medTema(List<String> tema) {
         this.tema = tema;
         return this;
     }
 
-    SakSearchCriteria medFagsakNr(String fagsakNr) {
+    public SakSearchCriteria medFagsakNr(String fagsakNr) {
         this.fagsakNr = fagsakNr;
         return this;
     }
 
-    SakSearchCriteria medApplikasjon(String applikasjon) {
+    public SakSearchCriteria medApplikasjon(String applikasjon) {
         this.applikasjon = applikasjon;
         return this;
     }

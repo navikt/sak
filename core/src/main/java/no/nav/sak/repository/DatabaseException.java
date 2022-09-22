@@ -1,4 +1,4 @@
-package no.nav.sak.infrastruktur;
+package no.nav.sak.repository;
 
 class DatabaseException extends RuntimeException {
     DatabaseException(Exception e) {

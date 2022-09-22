@@ -1,5 +1,7 @@
 package no.nav.sak;
 
+import no.nav.sak.repository.Sak;
+import no.nav.sak.repository.SakTestData;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;

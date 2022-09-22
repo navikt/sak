@@ -4,7 +4,7 @@
   "OPENIDCONNECT_ISSO_ISSUER": "https://isso-q.adeo.no:443/isso/oauth2",
   "STS_ISSUER": "https://security-token-service.nais.preprod.local",
   "STS_JWKS": "https://security-token-service.nais.preprod.local/rest/v1/sts/jwks",
-  "SAKDS_URL": "jdbc:oracle:thin:@a01dbfl032.adeo.no:1521/joark_q5",
+  "SPRING_DATASOURCE_URL": "jdbc:oracle:thin:@a01dbfl032.adeo.no:1521/joark_q5",
   "LDAP": "/serviceuser/data/dev/srvssolinux",
   "SRVSAK": "/serviceuser/data/dev/srvsak",
   "SAKDS": "/oracle/data/dev/creds/sak_q5-sak",
