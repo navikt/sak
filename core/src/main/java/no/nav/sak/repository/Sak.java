@@ -1,4 +1,4 @@
-package no.nav.sak;
+package no.nav.sak.repository;
 
 import no.nav.sak.validering.OrganisasjonsnummerValidator;
 import org.apache.commons.lang3.StringUtils;
@@ -32,7 +32,7 @@ public class Sak {
         this.opprettetTidspunkt = builder.opprettetTidspunkt;
     }
 
-    Long getId() {
+    public Long getId() {
         return id;
     }
 
@@ -44,11 +44,11 @@ public class Sak {
         return tema;
     }
 
-    String getApplikasjon() {
+    public String getApplikasjon() {
         return applikasjon;
     }
 
-    String getFagsakNr() {
+    public String getFagsakNr() {
         return fagsakNr;
     }
 
@@ -56,15 +56,15 @@ public class Sak {
         return aktoerId;
     }
 
-    String getOrgnr() {
+    public String getOrgnr() {
         return orgnr;
     }
 
-    String getOpprettetAv() {
+    public String getOpprettetAv() {
         return opprettetAv;
     }
 
-    LocalDateTime getOpprettetTidspunkt() {
+    public LocalDateTime getOpprettetTidspunkt() {
         return opprettetTidspunkt;
     }
 
@@ -99,7 +99,7 @@ public class Sak {
         private String opprettetAv;
         private LocalDateTime opprettetTidspunkt;
 
-        Builder() {
+        public Builder() {
         }
 
         public static Builder enSak() {
@@ -121,7 +121,7 @@ public class Sak {
             return this;
         }
 
-        Builder medFagsakNr(String fagsakNr) {
+        public Builder medFagsakNr(String fagsakNr) {
             this.fagsakNr = fagsakNr;
             return this;
         }

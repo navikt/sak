@@ -1,4 +1,4 @@
-package no.nav.sak.infrastruktur;
+package no.nav.sak.repository;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -70,12 +70,12 @@ public class Database {
         });
     }
 
-    void execute(String query, Object... parameters) {
+    public void execute(String query, Object... parameters) {
         executeDbOperation(query, asList(parameters), PreparedStatement::executeUpdate);
     }
 
 
-    ThreadLocal<Connection> getThreadConnection() {
+    public ThreadLocal<Connection> getThreadConnection() {
         return threadConnection;
     }
 
@@ -91,7 +91,7 @@ public class Database {
         }
     }
 
-    DataSource getDataSource() {
+    public DataSource getDataSource() {
         return dataSource;
     }
 

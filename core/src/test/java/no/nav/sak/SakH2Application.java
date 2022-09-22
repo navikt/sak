@@ -1,8 +1,8 @@
 package no.nav.sak;
 
 import no.nav.resilience.ResilienceConfig;
-import no.nav.sak.infrastruktur.FlywayMigrator;
-import no.nav.sak.infrastruktur.JunitDataSource;
+import no.nav.sak.repository.FlywayMigrator;
+import no.nav.sak.repository.JunitDataSource;
 import no.nav.sak.infrastruktur.abac.ABACJunitClient;
 import no.nav.sak.infrastruktur.authentication.basic.JunitBasicAuthenticator;
 import no.nav.sak.infrastruktur.oicd.JunitJsonWebKey;

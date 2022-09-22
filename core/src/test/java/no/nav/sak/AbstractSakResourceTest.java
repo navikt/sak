@@ -1,9 +1,13 @@
 package no.nav.sak;
 
-import no.nav.sak.infrastruktur.Database;
-import no.nav.sak.infrastruktur.JunitDatabase;
+import no.nav.sak.SakConfiguration;
 import no.nav.sak.infrastruktur.JunitTransactionSupport;
 import no.nav.sak.infrastruktur.authentication.saml.SAMLSupport;
+import no.nav.sak.repository.Database;
+import no.nav.sak.repository.JunitDatabase;
+import no.nav.sak.repository.Sak;
+import no.nav.sak.repository.SakRepository;
+import no.nav.sak.repository.SakTestData;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.glassfish.jersey.test.JerseyTest;
 import org.junit.jupiter.api.AfterEach;
@@ -16,11 +20,11 @@ import javax.ws.rs.core.Response;
 
 import static no.nav.sikkerhet.authentication.AuthenticationHeaderIdentifier.SAML;
 
-abstract class AbstractSakResourceTest extends JerseyTest {
+public abstract class AbstractSakResourceTest extends JerseyTest {
 
     private static final Database database = JunitDatabase.get();
 
-    static final SakRepository sakRepository = new SakRepository(database);
+    public static final SakRepository sakRepository = new SakRepository(database);
     static String authHeaderSaml;
     static String correlationId = "junit";
 

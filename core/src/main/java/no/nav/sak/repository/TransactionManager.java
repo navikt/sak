@@ -1,6 +1,8 @@
-package no.nav.sak.infrastruktur;
+package no.nav.sak.repository;
 
 import lombok.extern.slf4j.Slf4j;
+import no.nav.sak.repository.Database;
+import no.nav.sak.repository.DatabaseException;
 
 import java.sql.Connection;
 import java.sql.SQLException;

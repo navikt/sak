@@ -1,9 +1,6 @@
-package no.nav.sak;
+package no.nav.sak.repository;
 
-import no.nav.sak.infrastruktur.Database;
 import org.assertj.core.api.Assertions;
-import no.nav.sak.infrastruktur.FlywayMigrator;
-import no.nav.sak.infrastruktur.JunitDataSource;
 import no.nav.sak.infrastruktur.JunitTransactionSupport;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.AfterEach;

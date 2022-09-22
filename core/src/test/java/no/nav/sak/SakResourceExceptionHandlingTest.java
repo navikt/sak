@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import no.nav.sak.infrastruktur.DefaultExceptionMapper;
 import no.nav.sak.infrastruktur.abac.SakPEP;
+import no.nav.sak.repository.SakRepository;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
 import org.junit.jupiter.api.BeforeEach;

@@ -1,5 +1,7 @@
 package no.nav.sak.infrastruktur;
 
+import no.nav.sak.repository.Database;
+
 import java.sql.Connection;
 import java.sql.SQLException;
 

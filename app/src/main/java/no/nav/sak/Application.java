@@ -1,6 +1,5 @@
-package no.nav.sak.app;
+package no.nav.sak;
 
-import no.nav.sak.SakApplication;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Import;

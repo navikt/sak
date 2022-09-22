@@ -1,15 +1,16 @@
 package no.nav.sak;
 
 import no.nav.resilience.ResilienceConfig;
-import no.nav.sak.infrastruktur.Database;
-import no.nav.sak.infrastruktur.FlywayMigrator;
-import no.nav.sak.infrastruktur.JunitDataSource;
-import no.nav.sak.infrastruktur.JunitDatabase;
+import no.nav.sak.repository.Database;
+import no.nav.sak.repository.FlywayMigrator;
+import no.nav.sak.repository.JunitDataSource;
+import no.nav.sak.repository.JunitDatabase;
 import no.nav.sak.infrastruktur.authentication.basic.JunitBasicAuthenticator;
 import no.nav.sak.infrastruktur.oicd.JunitJsonWebKey;
 import no.nav.sak.infrastruktur.oicd.JwtClaimsTestData;
 import no.nav.sak.infrastruktur.abac.SakPEP;
 import no.nav.sak.infrastruktur.authentication.AuthenticationFilter;
+import no.nav.sak.repository.SakRepository;
 import no.nav.sikkerhet.abac.ABACClient;
 import no.nav.sikkerhet.authentication.Authenticator;
 import no.nav.sikkerhet.authentication.basic.LdapConfiguration;

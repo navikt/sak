@@ -1,6 +1,7 @@
 package no.nav.sak;
 
 import io.swagger.v3.oas.annotations.Parameter;
+import no.nav.sak.repository.SakSearchCriteria;
 import no.nav.sak.validering.AtLeastOneOf;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 

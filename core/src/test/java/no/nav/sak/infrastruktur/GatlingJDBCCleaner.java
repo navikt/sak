@@ -2,6 +2,7 @@ package no.nav.sak.infrastruktur;
 
 import com.zaxxer.hikari.HikariDataSource;
 import no.nav.sak.SakConfiguration;
+import no.nav.sak.repository.Database;
 
 import java.net.URI;
 import java.nio.file.Files;

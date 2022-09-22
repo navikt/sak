@@ -1,8 +1,5 @@
-package no.nav.sak.infrastruktur;
+package no.nav.sak.repository;
 
-import no.nav.sak.SakRepository;
-import no.nav.sak.SakSearchCriteria;
-import no.nav.sak.SakTestData;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;

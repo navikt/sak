@@ -1,4 +1,4 @@
-package no.nav.sak.infrastruktur;
+package no.nav.sak.repository;
 
 public class JunitDatabase {
     private static Database database;

@@ -1,8 +1,7 @@
-package no.nav.sak;
+package no.nav.sak.repository;
 
 import io.prometheus.client.Counter;
 import io.prometheus.client.Histogram;
-import no.nav.sak.infrastruktur.Database;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.MDC;
 
@@ -53,7 +52,7 @@ public class SakRepository {
         return sak;
     }
 
-    Optional<Sak> hentSak(Long id) {
+    public Optional<Sak> hentSak(Long id) {
         Histogram.Timer timer = startTimer("get");
         Optional<Sak> result;
         try {
