@@ -1,0 +1,13 @@
+name: Deploy release to prod
+
+on:
+  release:
+    types:
+      - published
+
+jobs:
+  deploy-prod:
+    uses: navikt/dok-workflows/.github/workflows/deploy-prod.yaml@main
+    with:
+      IMAGE: ghcr.io/${{ github.repository }}:${{ github.sha }}
+    secrets: inherit
