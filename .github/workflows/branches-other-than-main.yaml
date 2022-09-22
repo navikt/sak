@@ -3,7 +3,7 @@ name: Build and deploy to dev
 on:
   push:
     branches-ignore:
-      - main
+      - master
 
 jobs:
   build:

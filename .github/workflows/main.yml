@@ -3,7 +3,7 @@ name: Build and deploy to all dev environments, and create release draft
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   build-and-publish:
