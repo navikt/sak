@@ -156,7 +156,7 @@
 
             <dependency>
                 <groupId>no.nav.security</groupId>
-                <artifactId>token-validation-spring</artifactId>
+                <artifactId>token-validation-jaxrs</artifactId>
                 <version>${token-support.version}</version>
             </dependency>
 
