@@ -7,6 +7,7 @@ import io.vavr.CheckedFunction1;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.resilience.ResilienceConfig;
 import no.nav.resilience.ResilienceExecutor;
+import no.nav.sak.TokenUtils;
 import no.nav.sak.infrastruktur.EnableApiFilters;
 import no.nav.sak.infrastruktur.ErrorResponse;
 import no.nav.sikkerhet.authentication.AuthenticationResult;
@@ -59,6 +60,10 @@ public class AuthenticationFilter implements ContainerRequestFilter, ContainerRe
 
     @Override
     public void filter(ContainerRequestContext ctx) {
+
+        if (TokenUtils.hasTokenForIssuer(TokenUtils.ISSUER_AZUREAD)) {
+           return;
+        }
         String authHeader = ctx.getHeaderString(AUTHORIZATION);
         String authIdentifier = StringUtils.substringBefore(trim(authHeader), " ");
         if (!(Objects.equals(authIdentifier, SAML.getValue()) || Objects.equals(authIdentifier, OIDC.getValue()) || Objects.equals(authIdentifier, BASIC.getValue()))) {
