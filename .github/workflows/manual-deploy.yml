@@ -77,5 +77,5 @@ jobs:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: dev-fss
           RESOURCE: .nais/naiserator.yaml
-          VARS: .nais/q2-config.json
+          VARS: nais/q2-config.json
           VAR: image=${{ env.docker_image }}
