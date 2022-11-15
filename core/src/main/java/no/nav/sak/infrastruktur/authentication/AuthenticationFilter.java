@@ -60,7 +60,7 @@ public class AuthenticationFilter implements ContainerRequestFilter, ContainerRe
 
     @Override
     public void filter(ContainerRequestContext ctx) {
-
+        log.info("Authentication Filter is activated");
         if (TokenUtils.hasTokenForIssuer(TokenUtils.ISSUER_AZUREAD)) {
             log.info("Ecountered valid AzureAD token");
             return;
