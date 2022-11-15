@@ -59,6 +59,11 @@
         <appender-ref ref="METRICS"/>
     </logger>
 
+    <logger name="no.nav.security.token.support" level="DEBUG" additivity="false">
+        <appender-ref ref="STDOUT_JSON"/>
+        <appender-ref ref="METRICS"/>
+    </logger>
+
     <logger name="securitylog" level="INFO" additivity="false">
         <appender-ref ref="SECURITYLOG"/>
         <appender-ref ref="STDOUT_JSON_FILTERED"/>

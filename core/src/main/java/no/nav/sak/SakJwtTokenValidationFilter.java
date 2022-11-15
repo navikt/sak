@@ -1,5 +1,6 @@
 package no.nav.sak;
 
+import lombok.extern.slf4j.Slf4j;
 import no.nav.security.token.support.core.configuration.MultiIssuerConfiguration;
 import no.nav.security.token.support.core.validation.JwtTokenRetriever;
 import no.nav.security.token.support.core.validation.JwtTokenValidationHandler;
@@ -14,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+@Slf4j
 public class SakJwtTokenValidationFilter extends JwtTokenValidationFilter {
 
     public SakJwtTokenValidationFilter(MultiIssuerConfiguration oidcConfig) {
@@ -27,8 +29,9 @@ public class SakJwtTokenValidationFilter extends JwtTokenValidationFilter {
         if (request instanceof HttpServletRequest) {
 
             String authorizationType = ( (HttpServletRequest) request).getHeader("Authorization");
+            log.info("passing through JWT validation filter with authorization type " + authorizationType);
             if ("Bearer".equals(authorizationType)) {
-                    super.doFilter(request,response,chain);
+                super.doFilter(request,response,chain);
             }
         } else {
             chain.doFilter(request, response);

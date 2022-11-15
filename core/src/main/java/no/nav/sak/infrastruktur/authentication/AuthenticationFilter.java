@@ -62,7 +62,8 @@ public class AuthenticationFilter implements ContainerRequestFilter, ContainerRe
     public void filter(ContainerRequestContext ctx) {
 
         if (TokenUtils.hasTokenForIssuer(TokenUtils.ISSUER_AZUREAD)) {
-           return;
+            log.info("Ecountered valid AzureAD token");
+            return;
         }
         String authHeader = ctx.getHeaderString(AUTHORIZATION);
         String authIdentifier = StringUtils.substringBefore(trim(authHeader), " ");

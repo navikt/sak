@@ -24,7 +24,7 @@ public class TokenSupportConfig {
     @Bean
     public FilterRegistrationBean<JwtTokenValidationFilter> oidcTokenValidationFilterBean(
             MultiIssuerConfiguration config) {
-        return new FilterRegistrationBean<>(new JaxrsJwtTokenValidationFilter(config));
+        return new FilterRegistrationBean<>(new SakJwtTokenValidationFilter(config));
     }
 
 
