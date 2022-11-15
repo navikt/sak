@@ -76,6 +76,7 @@ public class AuthenticationFilter implements ContainerRequestFilter, ContainerRe
             .startTimer();
 
         try {
+            log.info("Encounterd legacy authorization " + authHeader);
             AuthenticationResult result=resilienceExecutor.execute(authHeader);
             if (!result.isValid()) {
                 log.warn("Autentisering feilet: {}", result.getErrorMessage());
