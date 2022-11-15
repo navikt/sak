@@ -6,6 +6,7 @@ import no.nav.security.token.support.core.validation.JwtTokenRetriever;
 import no.nav.security.token.support.core.validation.JwtTokenValidationHandler;
 import no.nav.security.token.support.filter.JwtTokenValidationFilter;
 import no.nav.security.token.support.jaxrs.JaxrsTokenValidationContextHolder;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -14,6 +15,8 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+
+import static org.apache.commons.lang3.StringUtils.trim;
 
 @Slf4j
 public class SakJwtTokenValidationFilter extends JwtTokenValidationFilter {
@@ -27,8 +30,9 @@ public class SakJwtTokenValidationFilter extends JwtTokenValidationFilter {
             throws IOException, ServletException {
 
         if (request instanceof HttpServletRequest) {
+            String authorizationHeader = ( (HttpServletRequest) request).getHeader("Authorization");
+            String authorizationType = StringUtils.substringBefore(trim(authorizationHeader), " ");
 
-            String authorizationType = ( (HttpServletRequest) request).getHeader("Authorization");
             log.info("passing through JWT validation filter with authorization type " + authorizationType);
             if ("Bearer".equals(authorizationType)) {
                 super.doFilter(request,response,chain);
