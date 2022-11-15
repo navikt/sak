@@ -33,6 +33,9 @@ public class SakJwtTokenValidationFilter extends JwtTokenValidationFilter {
             if ("Bearer".equals(authorizationType)) {
                 super.doFilter(request,response,chain);
             }
+            else {
+                chain.doFilter(request,response);
+            }
         } else {
             chain.doFilter(request, response);
         }
