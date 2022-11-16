@@ -50,6 +50,8 @@ spec:
   accessPolicy:
     inbound:
       rules:
+        - application: gosys-q1
+          namespace: isa
         - application: gosys-q2
           namespace: isa
   azure:
