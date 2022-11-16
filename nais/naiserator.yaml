@@ -53,7 +53,7 @@ spec:
         {{#INBOUND}}
         - application: {{application}}
         - namespace: {{namespace}}
-        {{/each}}
+        {{/INBOUND}}
   azure:
     application:
       enabled: true
