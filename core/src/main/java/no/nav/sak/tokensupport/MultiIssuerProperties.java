@@ -1,4 +1,4 @@
-package no.nav.sak;
+package no.nav.sak.tokensupport;
 
 import java.util.HashMap;
 import java.util.Map;

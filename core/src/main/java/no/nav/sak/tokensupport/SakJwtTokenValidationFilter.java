@@ -1,4 +1,4 @@
-package no.nav.sak;
+package no.nav.sak.tokensupport;
 
 import lombok.extern.slf4j.Slf4j;
 import no.nav.security.token.support.core.configuration.MultiIssuerConfiguration;
@@ -7,6 +7,8 @@ import no.nav.security.token.support.core.validation.JwtTokenValidationHandler;
 import no.nav.security.token.support.filter.JwtTokenValidationFilter;
 import no.nav.security.token.support.jaxrs.JaxrsTokenValidationContextHolder;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.http.HttpHeaders;
+
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -21,6 +23,8 @@ import static org.apache.commons.lang3.StringUtils.trim;
 @Slf4j
 public class SakJwtTokenValidationFilter extends JwtTokenValidationFilter {
 
+    private static String AUTORIZATION_BEARER = "Bearer";
+
     public SakJwtTokenValidationFilter(MultiIssuerConfiguration oidcConfig) {
         super(new JwtTokenValidationHandler(oidcConfig), JaxrsTokenValidationContextHolder.getHolder());
     }
@@ -30,10 +34,10 @@ public class SakJwtTokenValidationFilter extends JwtTokenValidationFilter {
             throws IOException, ServletException {
 
         if (request instanceof HttpServletRequest) {
-            String authorizationHeader = ( (HttpServletRequest) request).getHeader("Authorization");
+            String authorizationHeader = ( (HttpServletRequest) request).getHeader(HttpHeaders.AUTHORIZATION);
             String authorizationType = StringUtils.substringBefore(trim(authorizationHeader), " ");
 
-            if ("Bearer".equals(authorizationType)) {
+            if (AUTORIZATION_BEARER.equals(authorizationType)) {
                 super.doFilter(request,response,chain);
             }
             else {

@@ -1,4 +1,4 @@
-package no.nav.sak;
+package no.nav.sak.tokensupport;
 
 
 import no.nav.security.token.support.core.configuration.MultiIssuerConfiguration;
@@ -6,7 +6,6 @@ import no.nav.security.token.support.core.configuration.ProxyAwareResourceRetrie
 import no.nav.security.token.support.core.context.TokenValidationContextHolder;
 import no.nav.security.token.support.filter.JwtTokenValidationFilter;
 import no.nav.security.token.support.jaxrs.JaxrsTokenValidationContextHolder;
-import no.nav.security.token.support.jaxrs.servlet.JaxrsJwtTokenValidationFilter;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
