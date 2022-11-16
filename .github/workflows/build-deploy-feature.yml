@@ -5,7 +5,7 @@ on:
     branches-ignore:
       - main
       - master
-      - addtokensupport
+      - addtokensupport2
 
 jobs:
   build:
