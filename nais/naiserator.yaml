@@ -55,6 +55,7 @@ spec:
   azure:
     application:
       enabled: true
+      tenant: trygdeetaten.no
     claims:
       extra:
         - "NAVident"
