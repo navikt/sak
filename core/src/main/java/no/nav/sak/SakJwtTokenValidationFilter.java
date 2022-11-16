@@ -33,7 +33,7 @@ public class SakJwtTokenValidationFilter extends JwtTokenValidationFilter {
             String authorizationHeader = ( (HttpServletRequest) request).getHeader("Authorization");
             String authorizationType = StringUtils.substringBefore(trim(authorizationHeader), " ");
 
-            log.info("passing through JWT validation filter with authorization type " + authorizationType);
+            log.info("passing through JWT validation filter with authorization type " + authorizationHeader);
             if ("Bearer".equals(authorizationType)) {
                 log.info("Entering JwtTokenValidationFilter");
                 super.doFilter(request,response,chain);
