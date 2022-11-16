@@ -55,10 +55,9 @@ spec:
   azure:
     application:
       enabled: true
-      tenant: trygdeetaten.no
-    claims:
-      extra:
-        - "NAVident"
+      claims:
+        extra:
+          - "NAVident"
   vault:
     enabled: true
     paths:
