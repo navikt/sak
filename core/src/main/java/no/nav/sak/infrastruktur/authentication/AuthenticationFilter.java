@@ -70,6 +70,10 @@ public class AuthenticationFilter implements ContainerRequestFilter, ContainerRe
                             defaultString(TokenUtils.ISSUER_AZUREAD, "N/A"))
                     .startTimer();
             timer.observeDuration();
+            authCounter.labels(defaultString("azureConsumer", "N/A"),
+                    getSubjectType(ctx).getValue(),
+                    "YES",
+                    defaultString(authIdentifier, "N/A")).inc();
             log.info("Ecountered valid AzureAD token");
             return;
         }
