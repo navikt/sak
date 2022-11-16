@@ -74,6 +74,9 @@ public class AuthenticationFilter implements ContainerRequestFilter, ContainerRe
                     getSubjectType(ctx).getValue(),
                     "YES",
                     defaultString(authIdentifier, "N/A")).inc();
+            MDC.put(REQUEST_CONSUMERID, "azureConsumer");
+            ctx.setProperty(REQUEST_CONSUMERID, "azureConsumerId");
+            ctx.setProperty(REQUEST_USERNAME, "user");
             log.info("Ecountered valid AzureAD token");
             return;
         }
