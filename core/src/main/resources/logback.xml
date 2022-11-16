@@ -59,7 +59,7 @@
         <appender-ref ref="METRICS"/>
     </logger>
 
-    <logger name="no.nav.security.token.support" level="DEBUG" additivity="false">
+    <logger name="no.nav.security.token.support" level="ERROR" additivity="false">
         <appender-ref ref="STDOUT_JSON"/>
         <appender-ref ref="METRICS"/>
     </logger>

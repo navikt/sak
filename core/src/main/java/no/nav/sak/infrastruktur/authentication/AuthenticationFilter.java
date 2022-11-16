@@ -60,7 +60,6 @@ public class AuthenticationFilter implements ContainerRequestFilter, ContainerRe
 
     @Override
     public void filter(ContainerRequestContext ctx) {
-        log.info("Authentication Filter is activated");
         String authHeader = ctx.getHeaderString(AUTHORIZATION);
         String authIdentifier = StringUtils.substringBefore(trim(authHeader), " ");
         Histogram.Timer timer;
@@ -77,7 +76,6 @@ public class AuthenticationFilter implements ContainerRequestFilter, ContainerRe
             MDC.put(REQUEST_CONSUMERID, "azureConsumer");
             ctx.setProperty(REQUEST_CONSUMERID, "azureConsumerId");
             ctx.setProperty(REQUEST_USERNAME, "user");
-            log.info("Ecountered valid AzureAD token");
             return;
         }
 
@@ -90,7 +88,6 @@ public class AuthenticationFilter implements ContainerRequestFilter, ContainerRe
             .startTimer();
 
         try {
-            log.info("Encounterd legacy authorization " + authHeader);
             AuthenticationResult result=resilienceExecutor.execute(authHeader);
             if (!result.isValid()) {
                 log.warn("Autentisering feilet: {}", result.getErrorMessage());
