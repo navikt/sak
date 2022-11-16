@@ -17,7 +17,7 @@
     "https://sak-q2.dev.intern.nav.no",
     "https://sak.dev.intern.nav.no"
   ],
-  "INNBOUND": [
+  "INBOUND": [
 	{
       "application": "gosys-q2",
       "namespace": "isa"
