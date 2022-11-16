@@ -50,8 +50,8 @@ spec:
   accessPolicy:
     inbound:
       rules:
-        {{ #each INBOUND}}
-        - application: {{this.application }}
+        {{#each INBOUND}}
+        - application: {{this.application}}
         - namespace: {{this.namespace}}
         {{/each }}
   azure:
