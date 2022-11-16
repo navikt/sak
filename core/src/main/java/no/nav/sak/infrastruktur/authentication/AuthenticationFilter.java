@@ -61,16 +61,23 @@ public class AuthenticationFilter implements ContainerRequestFilter, ContainerRe
     @Override
     public void filter(ContainerRequestContext ctx) {
         log.info("Authentication Filter is activated");
+        String authHeader = ctx.getHeaderString(AUTHORIZATION);
+        String authIdentifier = StringUtils.substringBefore(trim(authHeader), " ");
+        Histogram.Timer timer;
         if (TokenUtils.hasTokenForIssuer(TokenUtils.ISSUER_AZUREAD)) {
+            timer = authenticationHistogram
+                    .labels(
+                            defaultString(TokenUtils.ISSUER_AZUREAD, "N/A"))
+                    .startTimer();
+            timer.observeDuration();
             log.info("Ecountered valid AzureAD token");
             return;
         }
-        String authHeader = ctx.getHeaderString(AUTHORIZATION);
-        String authIdentifier = StringUtils.substringBefore(trim(authHeader), " ");
+
         if (!(Objects.equals(authIdentifier, SAML.getValue()) || Objects.equals(authIdentifier, OIDC.getValue()) || Objects.equals(authIdentifier, BASIC.getValue()))) {
             authIdentifier = "N/A";
         }
-        Histogram.Timer timer = authenticationHistogram
+        timer = authenticationHistogram
             .labels(
                 defaultString(authIdentifier, "N/A"))
             .startTimer();
