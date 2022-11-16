@@ -35,6 +35,7 @@ public class SakJwtTokenValidationFilter extends JwtTokenValidationFilter {
 
             log.info("passing through JWT validation filter with authorization type " + authorizationType);
             if ("Bearer".equals(authorizationType)) {
+                log.info("Entering JwtTokenValidationFilter");
                 super.doFilter(request,response,chain);
             }
             else {
