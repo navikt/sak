@@ -16,5 +16,11 @@
     "https://sak-q1.nais.preprod.local",
     "https://sak-q1.dev.adeo.no",
     "https://sak-q1.dev.intern.nav.no"
+  ],
+  "INBOUND": [
+    {
+      "application": "gosys-q1",
+      "namespace": "isa"
+    }
   ]
 }
