@@ -43,9 +43,9 @@ public class TokenUtils {
         JwtToken token = contextHolder.getTokenValidationContext().getJwtToken(ISSUER_AZUREAD);
         JwtTokenClaims claims = token.getJwtTokenClaims();
 
-        Optional<String> fnr = Optional.of(claims.getStringClaim("aud"));
+        Optional<String> aud = claims.getAsList("aud").stream().findAny();
 
-        return fnr.orElseThrow(() -> new RuntimeException("Missing consumer id"));
+        return aud.orElseThrow(() -> new RuntimeException("Missing consumer id"));
     }
 
 
