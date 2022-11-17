@@ -73,6 +73,7 @@ public class SakApplication extends ResourceConfig {
 
     @SuppressWarnings("WeakerAccess") //Påkrevd public
     public SakApplication(Database database) {
+        log.info("Initializing SAK Jersey application");
         DefaultExports.initialize();
         final SakConfiguration sakConfiguration = new SakConfiguration();
 

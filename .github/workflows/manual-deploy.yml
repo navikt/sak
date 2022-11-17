@@ -10,6 +10,7 @@ on:
         type: choice
         options:
           - none
+          - q1
           - q2
 
 env:
@@ -58,7 +59,7 @@ jobs:
         env:
           GITHUB_USERNAME: x-access-token
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: mvn install --file pom.xml
+        run: mvn --batch-mode --update-snapshots -s settings.xml --file pom.xml verify
       - uses: docker/build-push-action@v3
         with:
           context: .
@@ -76,6 +77,20 @@ jobs:
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: dev-fss
-          RESOURCE: .nais/naiserator.yaml
-          VARS: .nais/q2-config.json
+          RESOURCE: nais/naiserator.yaml
+          VARS: nais/q2-config.json
+          VAR: image=${{ env.docker_image }}
+  deploy-q1:
+    name: Deploy to preprod
+    needs: build
+    if: github.event.inputs.environment == 'q1'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: nais/deploy/actions/deploy@v1
+        env:
+          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+          CLUSTER: dev-fss
+          RESOURCE: nais/naiserator.yaml
+          VARS: nais/q1-config.json
           VAR: image=${{ env.docker_image }}

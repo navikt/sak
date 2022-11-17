@@ -15,5 +15,8 @@
     "https://sak-t4.nais.preprod.local",
     "https://sak-t4.dev.adeo.no",
     "https://sak-t4.dev.intern.nav.no"
+  ],
+  "INBOUND": [
+
   ]
 }
