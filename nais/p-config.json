@@ -14,5 +14,11 @@
   "INGRESSES": [
     "https://sak.nais.adeo.no",
     "https://sak.intern.nav.no"
+  ],
+  "INBOUND": [
+    {
+      "application": "gosys",
+      "namespace": "isa"
+    }
   ]
 }
