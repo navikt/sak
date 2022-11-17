@@ -14,52 +14,56 @@ import no.nav.security.token.support.core.jwt.JwtTokenClaims;
 import no.nav.security.token.support.jaxrs.JaxrsTokenValidationContextHolder;
 
 public class TokenUtils {
-    
-        private static TokenValidationContextHolder contextHolder = JaxrsTokenValidationContextHolder.getHolder();
 
-        public static final String ISSUER_AZUREAD = "azuread";
+    private static TokenValidationContextHolder contextHolder = JaxrsTokenValidationContextHolder.getHolder();
 
-        public static boolean hasTokenForIssuer(String issuer) {
-           
-           return contextHolder.getTokenValidationContext() != null ? contextHolder.getTokenValidationContext().hasTokenFor(issuer) : false; 
+    public static final String ISSUER_AZUREAD = "azuread";
+
+    public static boolean hasTokenForIssuer(String issuer) {
+
+        return contextHolder.getTokenValidationContext() != null ? contextHolder.getTokenValidationContext().hasTokenFor(issuer) : false;
+    }
+
+    public static String getNavIdent(String issuer) {
+        if (!hasTokenForIssuer(issuer)) {
+            throw new RuntimeException("No token for issuer");
         }
-        
-        private static String getSubject(JwtToken token) {
-             JwtTokenClaims claims = token.getJwtTokenClaims();
-            
-             Optional<String> fnr = Optional.of( claims.getStringClaim("pid") != null ? claims.getStringClaim("pid") : claims.getStringClaim("sub"));
-             
-             return fnr.orElseThrow(() -> new RuntimeException("Missing user claim"));
+        JwtToken token = contextHolder.getTokenValidationContext().getJwtToken(ISSUER_AZUREAD);
+        JwtTokenClaims claims = token.getJwtTokenClaims();
+
+        Optional<String> fnr = Optional.of(claims.getStringClaim("NAVident"));
+
+        return fnr.orElseThrow(() -> new RuntimeException("Missing NAVident claim"));
+    }
+
+    public static String getConsumerId(String issuer) {
+        if (!hasTokenForIssuer(issuer)) {
+            throw new RuntimeException("No token for issuer");
         }
-        
-        public static String getSubject() {
-            
-            TokenValidationContext context = contextHolder.getTokenValidationContext();
-            if (context==null) {
-                return null;
+        JwtToken token = contextHolder.getTokenValidationContext().getJwtToken(ISSUER_AZUREAD);
+        JwtTokenClaims claims = token.getJwtTokenClaims();
+
+        Optional<String> fnr = Optional.of(claims.getStringClaim("aud"));
+
+        return fnr.orElseThrow(() -> new RuntimeException("Missing consumer id"));
+    }
+
+
+    public static String getTokenAsString(String issuer) {
+        TokenValidationContext context = contextHolder.getTokenValidationContext();
+
+        switch (issuer) {
+            case ISSUER_AZUREAD: {
+                if (!context.hasTokenFor(issuer)) {
+                    throw new RuntimeException("No valid token for issuer: " + issuer);
+                }
+                return context.getJwtToken(issuer).getTokenAsString();
             }
-            else if (context.hasTokenFor(ISSUER_AZUREAD)) {
-                return getSubject( context.getJwtToken(ISSUER_AZUREAD) );
-            }
-            else {
-                return null;
-            }
+
+            default:
+                throw new RuntimeException("Unknown issuer:" + issuer);
         }
-        
-        public static String getTokenAsString(String issuer) {
-            TokenValidationContext context = contextHolder.getTokenValidationContext();
-            
-            switch (issuer) {
-                case  ISSUER_AZUREAD : {
-                                        if (!context.hasTokenFor(issuer)) {
-                                            throw  new RuntimeException("No valid token for issuer: " + issuer );
-                                        }
-                                        return context.getJwtToken(issuer).getTokenAsString() ;
-                                      }
-            
-             default: throw new RuntimeException("Unknown issuer:" + issuer);
-            }
-            
-        }
+
+    }
 
 }

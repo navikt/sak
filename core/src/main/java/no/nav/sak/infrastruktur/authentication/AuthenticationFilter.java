@@ -13,6 +13,7 @@ import no.nav.sak.infrastruktur.ErrorResponse;
 import no.nav.sikkerhet.authentication.AuthenticationResult;
 import no.nav.sikkerhet.authentication.Authenticator;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.el.parser.Token;
 import org.slf4j.MDC;
 
 import javax.annotation.Priority;
@@ -73,9 +74,9 @@ public class AuthenticationFilter implements ContainerRequestFilter, ContainerRe
                     getSubjectType(ctx).getValue(),
                     "YES",
                     defaultString(authIdentifier, "N/A")).inc();
-            MDC.put(REQUEST_CONSUMERID, "azureConsumer");
-            ctx.setProperty(REQUEST_CONSUMERID, "azureConsumerId");
-            ctx.setProperty(REQUEST_USERNAME, "user");
+            MDC.put(REQUEST_CONSUMERID, TokenUtils.getConsumerId(TokenUtils.ISSUER_AZUREAD));
+            ctx.setProperty(REQUEST_CONSUMERID, TokenUtils.getConsumerId(TokenUtils.ISSUER_AZUREAD));
+            ctx.setProperty(REQUEST_USERNAME, TokenUtils.getNavIdent(TokenUtils.ISSUER_AZUREAD));
             return;
         }
 
