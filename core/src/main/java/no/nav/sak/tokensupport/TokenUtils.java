@@ -1,13 +1,7 @@
 package no.nav.sak.tokensupport;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.function.Supplier;
 
-import no.nav.security.token.support.core.context.TokenValidationContext;
 import no.nav.security.token.support.core.context.TokenValidationContextHolder;
 import no.nav.security.token.support.core.jwt.JwtToken;
 import no.nav.security.token.support.core.jwt.JwtTokenClaims;
@@ -24,29 +18,29 @@ public class TokenUtils {
 		return contextHolder.getTokenValidationContext() != null ? contextHolder.getTokenValidationContext().hasTokenFor(issuer) : false;
 	}
 
-	public static String getNavIdent(String issuer) {
+	public static Optional<String> getNavIdent(String issuer) {
 		if (!hasTokenForIssuer(issuer)) {
 			throw new RuntimeException("No token for issuer");
 		}
 		JwtToken token = contextHolder.getTokenValidationContext().getJwtToken(ISSUER_AZUREAD);
 		JwtTokenClaims claims = token.getJwtTokenClaims();
 
-		Optional<String> fnr = Optional.of(claims.getStringClaim("NAVident"));
+		Optional<String> navIdent = Optional.of(claims.getStringClaim("NAVident"));
 
-		return fnr.orElseThrow(() -> new RuntimeException("Missing NAVident claim"));
+		return navIdent;
 	}
 
-	public static String getConsumerId(String issuer) {
+	public static Optional<String> getClientConsumerId(String issuer) {
 		if (!hasTokenForIssuer(issuer)) {
 			throw new RuntimeException("No token for issuer");
 		}
 		JwtToken token = contextHolder.getTokenValidationContext().getJwtToken(ISSUER_AZUREAD);
 		JwtTokenClaims claims = token.getJwtTokenClaims();
 
-		Optional<String> aud = claims.getAsList("aud").stream().findAny();
+		Optional<String> clientConsumer = Optional.of(claims.getStringClaim("azp_name"));
 
-		return aud.orElseThrow(() -> new RuntimeException("Missing consumer id"));
+		return clientConsumer;
 	}
-    
+
 
 }

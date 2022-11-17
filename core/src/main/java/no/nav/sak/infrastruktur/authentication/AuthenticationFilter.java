@@ -73,9 +73,10 @@ public class AuthenticationFilter implements ContainerRequestFilter, ContainerRe
 					getSubjectType(ctx).getValue(),
 					"YES",
 					defaultString(authIdentifier, "N/A")).inc();
-			MDC.put(REQUEST_CONSUMERID, TokenUtils.getConsumerId(TokenUtils.ISSUER_AZUREAD));
-			ctx.setProperty(REQUEST_CONSUMERID, TokenUtils.getConsumerId(TokenUtils.ISSUER_AZUREAD));
-			ctx.setProperty(REQUEST_USERNAME, TokenUtils.getNavIdent(TokenUtils.ISSUER_AZUREAD));
+			TokenUtils.getClientConsumerId(TokenUtils.ISSUER_AZUREAD).ifPresentOrElse(t -> MDC.put(REQUEST_CONSUMERID, t), () -> abortAsUnauthorized(ctx));
+			TokenUtils.getClientConsumerId(TokenUtils.ISSUER_AZUREAD).ifPresentOrElse(t -> ctx.setProperty(REQUEST_CONSUMERID, t), () -> abortAsUnauthorized(ctx));
+			TokenUtils.getNavIdent(TokenUtils.ISSUER_AZUREAD).ifPresentOrElse(t -> ctx.setProperty(REQUEST_USERNAME, t), () -> abortAsUnauthorized(ctx));
+
 			return;
 		}
 
