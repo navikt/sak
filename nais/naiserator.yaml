@@ -54,6 +54,7 @@ spec:
         - application: {{this.application}}
           namespace: {{this.namespace}}
         {{/each}}
+  webproxy: true
   azure:
     application:
       enabled: true

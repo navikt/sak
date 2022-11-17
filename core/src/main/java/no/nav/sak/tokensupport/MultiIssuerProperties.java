@@ -13,13 +13,14 @@ import org.springframework.validation.annotation.Validated;
 import no.nav.security.token.support.core.configuration.IssuerProperties;
 
 
+//tatt ut av token-support-spring
 @ConfigurationProperties(prefix = "no.nav.security.jwt")
 public class MultiIssuerProperties {
-	
-	
+
+
 	private final Map<String, IssuerProperties> issuer = new HashMap<>();
 
-	public Map<String, IssuerProperties> getIssuer(){
+	public Map<String, IssuerProperties> getIssuer() {
 		return issuer;
 	}
 

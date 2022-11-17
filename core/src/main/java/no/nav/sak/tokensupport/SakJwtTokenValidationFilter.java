@@ -23,28 +23,27 @@ import static org.apache.commons.lang3.StringUtils.trim;
 @Slf4j
 public class SakJwtTokenValidationFilter extends JwtTokenValidationFilter {
 
-    private static String AUTORIZATION_BEARER = "Bearer";
+	private static String AUTORIZATION_BEARER = "Bearer";
 
-    public SakJwtTokenValidationFilter(MultiIssuerConfiguration oidcConfig) {
-        super(new JwtTokenValidationHandler(oidcConfig), JaxrsTokenValidationContextHolder.getHolder());
-    }
+	public SakJwtTokenValidationFilter(MultiIssuerConfiguration oidcConfig) {
+		super(new JwtTokenValidationHandler(oidcConfig), JaxrsTokenValidationContextHolder.getHolder());
+	}
 
-    @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-            throws IOException, ServletException {
+	@Override
+	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+			throws IOException, ServletException {
 
-        if (request instanceof HttpServletRequest) {
-            String authorizationHeader = ( (HttpServletRequest) request).getHeader(HttpHeaders.AUTHORIZATION);
-            String authorizationType = StringUtils.substringBefore(trim(authorizationHeader), " ");
+		if (request instanceof HttpServletRequest) {
+			String authorizationHeader = ((HttpServletRequest) request).getHeader(HttpHeaders.AUTHORIZATION);
+			String authorizationType = StringUtils.substringBefore(trim(authorizationHeader), " ");
 
-            if (AUTORIZATION_BEARER.equals(authorizationType)) {
-                super.doFilter(request,response,chain);
-            }
-            else {
-                chain.doFilter(request,response);
-            }
-        } else {
-            chain.doFilter(request, response);
-        }
-    }
+			if (AUTORIZATION_BEARER.equals(authorizationType)) {
+				super.doFilter(request, response, chain);
+			} else {
+				chain.doFilter(request, response);
+			}
+		} else {
+			chain.doFilter(request, response);
+		}
+	}
 }

@@ -15,38 +15,38 @@ import org.springframework.web.context.request.RequestContextListener;
 public class TokenSupportConfig {
 
 
-    @Bean
-    public MultiIssuerProperties multiIssuerProperties () {
-        return new MultiIssuerProperties();
-    }
+	@Bean
+	public MultiIssuerProperties multiIssuerProperties() {
+		return new MultiIssuerProperties();
+	}
 
-    @Bean
-    public FilterRegistrationBean<JwtTokenValidationFilter> oidcTokenValidationFilterBean(
-            MultiIssuerConfiguration config) {
-        return new FilterRegistrationBean<>(new SakJwtTokenValidationFilter(config));
-    }
-
-
-    @Bean
-    public MultiIssuerConfiguration multiIssuerConfiguration(MultiIssuerProperties issuerProperties,ProxyAwareResourceRetriever resourceRetriever) {
-        return new MultiIssuerConfiguration(issuerProperties.getIssuer(), resourceRetriever);
-    }
+	@Bean
+	public FilterRegistrationBean<JwtTokenValidationFilter> oidcTokenValidationFilterBean(
+			MultiIssuerConfiguration config) {
+		return new FilterRegistrationBean<>(new SakJwtTokenValidationFilter(config));
+	}
 
 
-    @Bean
-    public ProxyAwareResourceRetriever oidcResourceRetriever() {
-        return new ProxyAwareResourceRetriever();
-    }
+	@Bean
+	public MultiIssuerConfiguration multiIssuerConfiguration(MultiIssuerProperties issuerProperties, ProxyAwareResourceRetriever resourceRetriever) {
+		return new MultiIssuerConfiguration(issuerProperties.getIssuer(), resourceRetriever);
+	}
 
 
-    @Bean
-    public RequestContextListener requestContextListener() {
-        return new RequestContextListener();
-    }
+	@Bean
+	public ProxyAwareResourceRetriever oidcResourceRetriever() {
+		return new ProxyAwareResourceRetriever();
+	}
 
-    @Bean
-    public TokenValidationContextHolder jaxrsContextHolder() {
-        return JaxrsTokenValidationContextHolder.getHolder();
-    }
+
+	@Bean
+	public RequestContextListener requestContextListener() {
+		return new RequestContextListener();
+	}
+
+	@Bean
+	public TokenValidationContextHolder jaxrsContextHolder() {
+		return JaxrsTokenValidationContextHolder.getHolder();
+	}
 
 }

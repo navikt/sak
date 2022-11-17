@@ -47,7 +47,7 @@
         <ojdbc.version>21.7.0.0</ojdbc.version>
 
         <maven-toolchains-plugin.version>3.1.0</maven-toolchains-plugin.version>
-        <token-support.version>1.3.7</token-support.version>
+        <token-support.version>2.1.7</token-support.version>
     </properties>
 
     <dependencyManagement>
@@ -148,12 +148,6 @@
                 <version>${ehcache.version}</version>
             </dependency>
             <!-- Security -->
-            <dependency>
-                <groupId>no.nav.security</groupId>
-                <artifactId>token-client-spring</artifactId>
-                <version>${token-support.version}</version>
-            </dependency>
-
             <dependency>
                 <groupId>no.nav.security</groupId>
                 <artifactId>token-validation-jaxrs</artifactId>
