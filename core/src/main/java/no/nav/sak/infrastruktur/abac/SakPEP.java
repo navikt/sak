@@ -3,6 +3,7 @@ package no.nav.sak.infrastruktur.abac;
 import io.prometheus.client.Counter;
 import io.prometheus.client.Histogram;
 import io.vavr.CheckedFunction1;
+import lombok.extern.slf4j.Slf4j;
 import no.nav.abac.xacml.NavAttributter;
 import no.nav.abac.xacml.StandardAttributter;
 import no.nav.resilience.ResilienceConfig;
@@ -24,6 +25,7 @@ import static no.nav.sak.infrastruktur.abac.AbacExceptionTranslator.identifyExce
 import static no.nav.sikkerhet.authentication.AuthenticationHeaderIdentifier.*;
 import static org.apache.commons.lang3.StringUtils.*;
 
+@Slf4j
 public class SakPEP {
     private static final Logger securitylog = LoggerFactory.getLogger("securitylog");
 
@@ -91,6 +93,7 @@ public class SakPEP {
                     arcsightPreparedResult = StringUtils.remove(arcsightPreparedResult, ",");
                 }
                 if (abacResult.hasAccess()) {
+                    log.info("Bruker fikk permit + ConsumerID: {}; User: {}; Endpoint: {}; Method: {}; Authorization Request: {}; Authorization Response: {}");
                     securitylog.info("ConsumerID: {}; User: {}; Endpoint: {}; Method: {}; Authorization Request: {}; Authorization Response: {}",
                         ctx.getProperty(AuthenticationFilter.REQUEST_CONSUMERID),
                         ctx.getProperty(AuthenticationFilter.REQUEST_USERNAME),
@@ -99,6 +102,7 @@ public class SakPEP {
                         arcsightPreparedRequest,
                         arcsightPreparedResult);
                 } else {
+                    log.info("Bruker fikk deny + ConsumerID: {}; User: {}; Endpoint: {}; Method: {}; Authorization Request: {}; Authorization Response: {}");
                     securitylog.warn("ConsumerID: {}; User: {}; Endpoint: {}; Method: {}; Authorization Request: {}; Authorization Response: {}",
                         ctx.getProperty(AuthenticationFilter.REQUEST_CONSUMERID),
                         ctx.getProperty(AuthenticationFilter.REQUEST_USERNAME),
