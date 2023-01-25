@@ -93,7 +93,12 @@ public class SakPEP {
                     arcsightPreparedResult = StringUtils.remove(arcsightPreparedResult, ",");
                 }
                 if (abacResult.hasAccess()) {
-                    log.info("Bruker fikk permit + ConsumerID: {}; User: {}; Endpoint: {}; Method: {}; Authorization Request: {}; Authorization Response: {}");
+                    log.info("Bruker fikk permit + ConsumerID: {}; User: {}; Endpoint: {}; Method: {}; Authorization Request: {}; Authorization Response: {}", ctx.getProperty(AuthenticationFilter.REQUEST_CONSUMERID),
+                            ctx.getProperty(AuthenticationFilter.REQUEST_USERNAME),
+                            ctx.getUriInfo().getAbsolutePath(),
+                            ctx.getRequest().getMethod(),
+                            arcsightPreparedRequest,
+                            arcsightPreparedResult);
                     securitylog.info("ConsumerID: {}; User: {}; Endpoint: {}; Method: {}; Authorization Request: {}; Authorization Response: {}",
                         ctx.getProperty(AuthenticationFilter.REQUEST_CONSUMERID),
                         ctx.getProperty(AuthenticationFilter.REQUEST_USERNAME),
@@ -102,7 +107,12 @@ public class SakPEP {
                         arcsightPreparedRequest,
                         arcsightPreparedResult);
                 } else {
-                    log.info("Bruker fikk deny + ConsumerID: {}; User: {}; Endpoint: {}; Method: {}; Authorization Request: {}; Authorization Response: {}");
+                    log.info("Bruker fikk deny + ConsumerID: {}; User: {}; Endpoint: {}; Method: {}; Authorization Request: {}; Authorization Response: {}", ctx.getProperty(AuthenticationFilter.REQUEST_CONSUMERID),
+                            ctx.getProperty(AuthenticationFilter.REQUEST_USERNAME),
+                            ctx.getUriInfo().getAbsolutePath(),
+                            ctx.getRequest().getMethod(),
+                            arcsightPreparedRequest,
+                            arcsightPreparedResult);
                     securitylog.warn("ConsumerID: {}; User: {}; Endpoint: {}; Method: {}; Authorization Request: {}; Authorization Response: {}",
                         ctx.getProperty(AuthenticationFilter.REQUEST_CONSUMERID),
                         ctx.getProperty(AuthenticationFilter.REQUEST_USERNAME),
