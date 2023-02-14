@@ -153,20 +153,26 @@ class SakResourceTest extends AbstractSakResourceTest {
 
     @Test
     void oppretter_ny_sak_dersom_fagsak_finnes_fra_foer_men_med_annet_tema() {
+        final String AKTOER_ID = "123";
+        final String FAGSAK_NR = "321";
+        final String APPLIKASJON = "Gosys";
+        final String TEMA_1 = "TEMA1";
+        final String TEMA_2 = "TEMA2";
+
         Sak sak1 = new SakTestData()
-                .aktoerId("123")
-                .fagsakNr("321")
-                .applikasjon("Gosys")
-                .tema("ABC")
+                .aktoerId(AKTOER_ID)
+                .fagsakNr(FAGSAK_NR)
+                .applikasjon(APPLIKASJON)
+                .tema(TEMA_1)
                 .build();
         Entity<String> jsonSak1 = Entity.json(
                 new SakJsonTestData(sak1).buildJsonString());
 
         Sak sak2 = new SakTestData()
-                .aktoerId("123")
-                .fagsakNr("321")
-                .applikasjon("Gosys")
-                .tema("CBA")
+                .aktoerId(AKTOER_ID)
+                .fagsakNr(FAGSAK_NR)
+                .applikasjon(APPLIKASJON)
+                .tema(TEMA_2)
                 .build();
         Entity<String> jsonSak2 = Entity.json(
                 new SakJsonTestData(sak2).buildJsonString());
@@ -181,7 +187,12 @@ class SakResourceTest extends AbstractSakResourceTest {
         assertThat(secondResponse.getStatus()).isEqualTo(Response.Status.CREATED.getStatusCode());
         assertThat(secondResponse.getHeaderString("Content-Type")).isEqualTo("application/json");
 
-        assertThat(sakRepository.finnSaker(SakSearchCriteria.create())).hasSize(2);
+        assertThat(sakRepository.finnSaker(SakSearchCriteria.create()))
+                .hasSize(2)
+                .allMatch(sak -> sak.getFagsakNr().equals(FAGSAK_NR))
+                .allMatch(sak -> sak.getAktoerId().equals(AKTOER_ID))
+                .allMatch(sak -> sak.getApplikasjon().equals(APPLIKASJON))
+                .extracting(Sak::getTema).containsOnly(TEMA_1, TEMA_2);
     }
 
     @Test
