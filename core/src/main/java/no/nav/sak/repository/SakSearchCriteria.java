@@ -4,14 +4,15 @@ package no.nav.sak.repository;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static java.util.Collections.emptyList;
+
 public class SakSearchCriteria {
-    private List<String> aktoerId = new ArrayList<>();
+    private List<String> aktoerId = emptyList();
     private String orgnr;
-    private List<String> tema = new ArrayList<>();
+    private List<String> tema = emptyList();
     private String fagsakNr;
     private String applikasjon;
 

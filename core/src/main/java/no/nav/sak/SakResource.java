@@ -42,12 +42,13 @@ import javax.ws.rs.core.UriInfo;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
 import static io.swagger.v3.oas.annotations.enums.SecuritySchemeIn.HEADER;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 import static no.nav.sak.infrastruktur.ContextExtractor.getSubjectType;
@@ -324,8 +325,9 @@ public class SakResource {
             SakSearchCriteria
                 .create()
                 .medOrgnr(sak.getOrgnr())
-                .medAktoerId(sak.getAktoerId() != null ? Arrays.asList(sak.getAktoerId()) : null)
+                .medAktoerId(sak.getAktoerId() != null ? singletonList(sak.getAktoerId()) : emptyList())
                 .medFagsakNr(sak.getFagsakNr())
+				.medTema(sak.getTema() != null ? singletonList(sak.getTema()) : emptyList())
                 .medApplikasjon(sak.getApplikasjon());
 
         return sak.getFagsakNr() != null &&
