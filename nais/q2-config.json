@@ -1,7 +1,5 @@
 {
   "ABAC_PDP_ENDPOINT": "https://abac-sak-q2.dev.intern.nav.no/application/asm-pdp/authorize",
-  "OPENIDCONNECT_ISSO_JWKS": "https://isso-q.adeo.no/isso/oauth2/connect/jwk_uri",
-  "OPENIDCONNECT_ISSO_ISSUER": "https://isso-q.adeo.no:443/isso/oauth2",
   "STS_ISSUER": "https://security-token-service.nais.preprod.local",
   "STS_JWKS": "https://security-token-service.nais.preprod.local/rest/v1/sts/jwks",
   "SPRING_DATASOURCE_URL": "jdbc:oracle:thin:@a01dbfl033.adeo.no:1521/joark_q2",

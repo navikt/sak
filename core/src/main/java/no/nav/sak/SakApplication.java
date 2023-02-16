@@ -57,7 +57,6 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
 import javax.sql.DataSource;
 import javax.ws.rs.ApplicationPath;
 import java.time.Duration;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -102,15 +101,13 @@ public class SakApplication extends ResourceConfig {
 
     void registerAuthenticationFilter(final SakConfiguration sakConfiguration) {
         Map<String, VerificationKeyResolver> resolvers = new HashMap<>();
-        List<OIDCIssuer> supportedIssuers = Arrays.asList(
-            new OIDCIssuer(sakConfiguration.getRequiredString("OPENIDCONNECT_ISSO_ISSUER"), sakConfiguration.getRequiredString("OPENIDCONNECT_ISSO_JWKS")),
-            new OIDCIssuer(sakConfiguration.getRequiredString("STS_ISSUER"), sakConfiguration.getRequiredString("STS_JWKS"))
+        List<OIDCIssuer> supportedIssuers = List.of(
+                new OIDCIssuer(sakConfiguration.getRequiredString("STS_ISSUER"), sakConfiguration.getRequiredString("STS_JWKS"))
         );
 
         for(OIDCIssuer issuer: supportedIssuers) {
             resolvers.put(issuer.issuer, new HttpsJwksVerificationKeyResolver(new HttpsJwks(issuer.jwks)));
         }
-
 
         final OidcTokenValidator oidcTokenValidator = new OidcTokenValidator(resolvers);
 
