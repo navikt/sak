@@ -27,7 +27,6 @@
         <oppgavehandtering-resilience.version>1.00.08</oppgavehandtering-resilience.version>
         <abac.attribute.version>3.3.13</abac.attribute.version>
 
-        <logback-syslog4j.version>1.0.0</logback-syslog4j.version>
         <logstash.encoder.version>7.2</logstash.encoder.version>
 
         <jaxb.version>3.0.2</jaxb.version>
@@ -101,21 +100,6 @@
                 <groupId>net.logstash.logback</groupId>
                 <artifactId>logstash-logback-encoder</artifactId>
                 <version>${logstash.encoder.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.papertrailapp</groupId>
-                <artifactId>logback-syslog4j</artifactId>
-                <version>${logback-syslog4j.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>ch.qos.logback</groupId>
-                        <artifactId>logback-core</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>ch.qos.logback</groupId>
-                        <artifactId>logback-classic</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
             <dependency>
                 <groupId>io.swagger.core.v3</groupId>
@@ -195,7 +179,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
             </plugin>
-            <!--plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-toolchains-plugin</artifactId>
                 <version>${maven-toolchains-plugin.version}</version>
@@ -214,7 +198,7 @@
                         </jdk>
                     </toolchains>
                 </configuration>
-            </plugin-->
+            </plugin>
         </plugins>
     </build>
 </project>

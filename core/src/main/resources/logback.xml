@@ -5,43 +5,6 @@
         <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
     </appender>
 
-    <appender name="STDOUT_JSON_FILTERED" class="ch.qos.logback.core.ConsoleAppender">
-        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-            <level>warn</level>
-        </filter>
-        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
-            <providers>
-                <timestamp/>
-                <version/>
-                <loggerName/>
-                <logLevel/>
-                <logLevelValue/>
-                <stackTrace/>
-                <pattern>
-                    <pattern>
-                        {
-                        "message": "%replace(%msg){'User:\\s\\d+', 'User: *******'}"
-                        }
-                    </pattern>
-                </pattern>
-                <mdc/>
-            </providers>
-        </encoder>
-    </appender>
-
-    <appender name="SECURITYLOG" class="com.papertrailapp.logback.Syslog4jAppender">
-        <layout class="ch.qos.logback.classic.PatternLayout">
-            <pattern>%level %mdc{correlation-id} %m%n%xEx</pattern>
-        </layout>
-
-        <syslogConfig class="org.productivity.java.syslog4j.impl.net.tcp.TCPNetSyslogConfig">
-            <host>audit.nais</host>
-            <port>6514</port>
-            <ident>sak</ident>
-            <maxMessageLength>128000</maxMessageLength>
-        </syslogConfig>
-    </appender>
-
     <appender name="METRICS" class="io.prometheus.client.logback.InstrumentedAppender"/>
 
     <logger name="no.nav" level="INFO" additivity="false">
@@ -62,11 +25,6 @@
     <logger name="no.nav.security.token.support" level="ERROR" additivity="false">
         <appender-ref ref="STDOUT_JSON"/>
         <appender-ref ref="METRICS"/>
-    </logger>
-
-    <logger name="securitylog" level="INFO" additivity="false">
-        <appender-ref ref="SECURITYLOG"/>
-        <appender-ref ref="STDOUT_JSON_FILTERED"/>
     </logger>
 
     <root level="WARN">
