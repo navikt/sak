@@ -43,10 +43,6 @@
         <appender-ref ref="STDOUT"/>
     </logger>
 
-    <logger name="securitylog" level="OFF" additivity="false">
-        <appender-ref ref="STDOUT"/>
-    </logger>
-
     <root level="OFF">
         <appender-ref ref="STDOUT"/>
         <appender-ref ref="METRICS"/>
