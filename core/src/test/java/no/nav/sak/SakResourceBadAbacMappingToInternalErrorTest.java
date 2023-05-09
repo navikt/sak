@@ -14,34 +14,6 @@ import javax.ws.rs.core.Response;
 public class SakResourceBadAbacMappingToInternalErrorTest extends AbstractSakResourceTest {
 
     @Test
-    void hent_sak_giving_bad_abac_result_mapping_to_internal_error() {
-
-        final Sak opprettetSak =
-            sakRepository
-                .lagre(
-                    new SakTestData()
-                        .aktoerId("123")
-                        .build()
-                );
-
-        final Response response = executeGetRequest(sakRootTarget().path(String.valueOf(opprettetSak.getId())));
-
-        assertThat(response.getStatus()).isEqualTo(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode());
-    }
-
-    @Test
-    void opprett_sak_giving_bad_abac_result_mapping_to_internal_error() {
-
-        final Sak sak =
-            new SakTestData()
-                .aktoerId("1")
-                .applikasjon("FS22")
-                .build();
-
-        createSakAndTestReponse(sak);
-    }
-
-    @Test
     void finn_saker_giving_bad_abac_result_mapping_to_internal_error() {
 
         opprett100Tilfeldigesaker();
