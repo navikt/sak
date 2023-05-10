@@ -19,6 +19,11 @@
 	{
       "application": "gosys-q2",
       "namespace": "isa"
+    },
+    {
+      "app": "ida",
+      "namespace": "traktor",
+      "cluster": "prod-fss"
     }
   ]
 }

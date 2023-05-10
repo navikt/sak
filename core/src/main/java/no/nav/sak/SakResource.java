@@ -159,7 +159,6 @@ public class SakResource {
 					new SakJson(eksisterendeSak)).build();
 			log.info("hentSak har hentet arkivsakId={}", id);
 		} else {
-
 			log.warn("Mottatt oppslag på sak som ikke eksisterer, id: {}, consumer: {}", id, ctx.getProperty(REQUEST_CONSUMERID));
 			response = Response
 					.status(NOT_FOUND)
