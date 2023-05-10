@@ -21,9 +21,8 @@
       "namespace": "isa"
     },
     {
-      "app": "ida",
-      "namespace": "traktor",
-      "cluster": "prod-fss"
+      "application": "ida",
+      "namespace": "traktor"
     }
   ]
 }
