@@ -18,7 +18,8 @@
   "INBOUND": [
     {
       "application": "gosys-q1",
-      "namespace": "isa"
+      "namespace": "isa",
+      "cluster": "dev-fss"
     }
   ]
 }

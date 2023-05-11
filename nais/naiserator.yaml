@@ -49,6 +49,7 @@ spec:
         {{#each INBOUND}}
         - application: {{this.application}}
           namespace: {{this.namespace}}
+          cluster: {{cluster}}
         {{/each}}
   webproxy: true
   azure:
