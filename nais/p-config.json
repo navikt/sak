@@ -11,13 +11,20 @@
   "MAX_REPLICAS": 12,
   "INGRESSES": [
     "https://sak.nais.adeo.no",
-    "https://sak.intern.nav.no"
+    "https://sak.intern.nav.no",
+    "https://sak.prod-fss-pub.nais.io"
   ],
   "INBOUND": [
     {
       "application": "gosys",
       "namespace": "isa",
       "cluster": "prod-fss"
+    },
+    {
+      "application": "eux-neessi",
+      "namespace": "eessibasis",
+      "cluster": "prod-gcp"
     }
+
   ]
 }
