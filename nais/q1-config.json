@@ -13,13 +13,19 @@
     "https://sak.nais.preprod.local",
     "https://sak-q1.nais.preprod.local",
     "https://sak-q1.dev.adeo.no",
-    "https://sak-q1.dev.intern.nav.no"
+    "https://sak-q1.dev.intern.nav.no",
+    "https://sak-q1.dev-fss-pub.nais.io"
   ],
   "INBOUND": [
     {
       "application": "gosys-q1",
       "namespace": "isa",
       "cluster": "dev-fss"
+    },
+    {
+      "application": "eux-neessi-q1",
+      "namespace": "eessibasis",
+      "cluster": "dev-gcp"
     }
   ]
 }

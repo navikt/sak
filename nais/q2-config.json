@@ -13,7 +13,8 @@
     "https://sak-q2.nais.preprod.local",
     "https://sak-q2.dev.adeo.no",
     "https://sak-q2.dev.intern.nav.no",
-    "https://sak.dev.intern.nav.no"
+    "https://sak.dev.intern.nav.no",
+    "https://sak-q2.dev-fss-pub.nais.io"
   ],
   "INBOUND": [
 	{
@@ -25,6 +26,11 @@
       "application": "ida",
       "namespace": "traktor",
       "cluster": "prod-fss"
+    },
+    {
+      "application": "eux-neessi-q2",
+      "namespace": "eessibasis",
+      "cluster": "dev-gcp"
     }
   ]
 }
