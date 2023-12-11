@@ -1,15 +1,13 @@
 package no.nav.sak.repository;
 
-import org.assertj.core.api.Assertions;
-import no.nav.sak.infrastruktur.JunitTransactionSupport;
+import no.nav.sak.SakTestConfiguration;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.sql.DataSource;
-import java.sql.SQLException;
+import javax.annotation.Resource;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -17,21 +15,14 @@ import java.util.Optional;
 import static org.apache.commons.lang3.RandomStringUtils.randomNumeric;
 import static org.assertj.core.api.Assertions.assertThat;
 
+@SpringBootTest(
+        classes = SakTestConfiguration.class,
+        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
+)
+@Transactional
 class SakRepositoryTest {
-    private static final DataSource dataSource = JunitDataSource.get();
-    private final Database database = new Database(dataSource);
-    private final SakRepository sakRepository = new SakRepository(database);
-    private final JunitTransactionSupport junitTransactionSupport = new JunitTransactionSupport(database);
-
-    @BeforeAll
-    static void migrate() {
-        new FlywayMigrator(dataSource, "classpath:db/migration", "classpath:db/h2/migration").migrate();
-    }
-
-    @BeforeEach
-    void setup() throws SQLException {
-        junitTransactionSupport.initTransaction();
-    }
+    @Resource
+    SakRepository sakRepository;
 
     @Test
     void henter_sak_med_en_gitt_id() {
@@ -73,10 +64,5 @@ class SakRepositoryTest {
 
         List<Sak> saker = sakRepository.finnSaker(SakSearchCriteria.create().medTema(Collections.singletonList(tema)).medOrgnr(orgnr));
         Assertions.assertThat(saker).containsOnly(sak1, sak2);
-    }
-
-    @AfterEach
-    void tearDown() throws SQLException {
-        junitTransactionSupport.rollback();
     }
 }

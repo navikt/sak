@@ -27,12 +27,7 @@ public class ABACJunitClientAlwaysGivingBadAbacMappingToInternalError {
 
         final ABACClient abacClient = mock(ABACClient.class);
         final ABACResult abacResult = mock(ABACResult.class);
-        final ABACResult.Code[] arrayOfAbacResultCodesExcludedOk = new ABACResult.Code[abacResultCodesMappingToInternalError.size()];
-
-        final Iterator<ABACResult.Code> it = abacResultCodesMappingToInternalError.iterator();
-        for (int i = 0; i < abacResultCodesMappingToInternalError.size(); i++) {
-            arrayOfAbacResultCodesExcludedOk[i++] = it.next();
-        }
+        final ABACResult.Code[] arrayOfAbacResultCodesExcludedOk = abacResultCodesMappingToInternalError.toArray(ABACResult.Code[]::new);
         when(abacResult.getResultCode()).thenReturn(arrayOfAbacResultCodesExcludedOk[0], arrayOfAbacResultCodesExcludedOk);
         when(abacClient.execute(Mockito.any(ABACRequest.class))).thenReturn(abacResult);
         when(abacResult.hasAccess()).thenReturn(false);

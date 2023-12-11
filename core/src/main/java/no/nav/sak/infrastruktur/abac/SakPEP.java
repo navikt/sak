@@ -37,11 +37,9 @@ import static org.apache.commons.lang3.StringUtils.trim;
 public class SakPEP {
 	static final String RESOURCE_TYPE_SAK = "no.nav.abac.attributter.resource.sak.sak";
 
-	private final ABACClient abacClient;
 	private final ResilienceExecutor<ABACRequest, ABACResult> resilienceExecutor;
 
     public SakPEP(ABACClient abacClient, ResilienceConfig resilienceConfig) {
-		this.abacClient = abacClient;
 		final CheckedFunction1<ABACRequest, ABACResult> abacClientFunction = abacClient::execute;
 		this.resilienceExecutor = new ResilienceExecutor<>(abacClientFunction, resilienceConfig);
 	}
@@ -77,7 +75,7 @@ public class SakPEP {
 
 		final ABACResult abacResult;
 		try {
-			abacResult = resilienceExecutor.execute(abacRequest);
+			abacResult = executeAbacRequest(abacRequest);
 			if (ABACResult.Code.OK.equals(abacResult.getResultCode())) {
 				if (abacResult.hasAccess()) {
 					log.info("Bruker fikk permit. ConsumerID: {}; User: {};",
@@ -93,5 +91,9 @@ public class SakPEP {
 			throw identifyException(t);
 		}
 		return abacResult;
+	}
+
+	protected ABACResult executeAbacRequest(ABACRequest abacRequest) {
+		return resilienceExecutor.execute(abacRequest);
 	}
 }

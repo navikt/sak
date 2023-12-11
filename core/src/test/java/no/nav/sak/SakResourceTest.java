@@ -14,11 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
 
 import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Response;
-import java.io.ByteArrayInputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
@@ -39,7 +35,7 @@ class SakResourceTest extends AbstractSakResourceTest {
     void henter_sak_for_gitt_id() {
 
         final Sak opprettetSak =
-            sakRepository
+            testUtilityRepository
                 .lagre(
                     new SakTestData()
                         .aktoerId("123")
@@ -53,7 +49,7 @@ class SakResourceTest extends AbstractSakResourceTest {
 
         SakJson sakJson =  new GsonBuilder()
             .registerTypeAdapter(LocalDateTime.class, (JsonDeserializer<LocalDateTime>) (jsonElement, type, jsonDeserializationContext) -> ZonedDateTime.parse(jsonElement.getAsJsonPrimitive().getAsString()).toLocalDateTime())
-            .create().fromJson(stream(response.getEntity()), SakJson.class);
+            .create().fromJson(response.readEntity(String.class), SakJson.class);
         verifyEqual(sakJson, opprettetSak);
     }
 
@@ -61,20 +57,20 @@ class SakResourceTest extends AbstractSakResourceTest {
     void gir_404_naar_sak_ikke_finnes_for_gitt_id() {
         Response response = executeGetRequest(sakRootTarget().path("1"));
 
-        JsonObject jsonObject = new JsonParser().parse(stream(response.getEntity())).getAsJsonObject();
+        JsonObject jsonObject = JsonParser.parseString(response.readEntity(String.class)).getAsJsonObject();
         assertThat(jsonObject.get("feilmelding").getAsString()).isNotBlank();
         assertThat(response.getStatus()).isEqualTo(Response.Status.NOT_FOUND.getStatusCode());
     }
 
     @Test
     void gir_404_naar_ressurs_ikke_finnes() {
-        Response response = executeGetRequest(target("/v1/finnesikke").path("1"));
+        Response response = executeGetRequest(sakRootTarget().path("/v1/finnesikke/1"));
         assertThat(response.getStatus()).isEqualTo(Response.Status.NOT_FOUND.getStatusCode());
     }
 
     @Test
     void gir_405_naar_operasjon_ikke_tillatt() {
-        Response response = target("/v1/saker").path("1")
+        Response response = sakRootTarget().path("1")
             .request()
             .header("Authorization", authHeaderSaml)
             .header("X-Correlation-ID", correlationId)
@@ -236,8 +232,8 @@ class SakResourceTest extends AbstractSakResourceTest {
     void soeker_opp_saker_for_aktoer_id() {
         opprett100Tilfeldigesaker();
         String aktoerId = RandomStringUtils.randomNumeric(9);
-        Sak sak1 = sakRepository.lagre(new SakTestData().aktoerId(aktoerId).build());
-        Sak sak2 = sakRepository.lagre(new SakTestData().aktoerId(aktoerId).build());
+        Sak sak1 = testUtilityRepository.lagre(new SakTestData().aktoerId(aktoerId).build());
+        Sak sak2 = testUtilityRepository.lagre(new SakTestData().aktoerId(aktoerId).build());
 
         Response response = executeGetRequest(sakRootTarget().queryParam("aktoerId", aktoerId));
 
@@ -248,7 +244,7 @@ class SakResourceTest extends AbstractSakResourceTest {
     void soeker_opp_saker_for_tema() {
         opprett100Tilfeldigesaker();
         String tema = RandomStringUtils.randomAlphabetic(4);
-        Sak sak = sakRepository.lagre(new SakTestData().tema(tema).build());
+        Sak sak = testUtilityRepository.lagre(new SakTestData().tema(tema).build());
 
         Response response = executeGetRequest(sakRootTarget()
             .queryParam("tema", sak.getTema())
@@ -262,8 +258,8 @@ class SakResourceTest extends AbstractSakResourceTest {
         opprett100Tilfeldigesaker();
         String tema1 = RandomStringUtils.randomAlphabetic(4);
         String tema2 = RandomStringUtils.randomAlphabetic(4);
-        Sak sak1 = sakRepository.lagre(new SakTestData().tema(tema1).build());
-        Sak sak2 = sakRepository.lagre(new SakTestData().tema(tema2)
+        Sak sak1 = testUtilityRepository.lagre(new SakTestData().tema(tema1).build());
+        Sak sak2 = testUtilityRepository.lagre(new SakTestData().tema(tema2)
             .aktoerId(sak1.getAktoerId())
             .build());
 
@@ -279,7 +275,7 @@ class SakResourceTest extends AbstractSakResourceTest {
     void soeker_opp_saker_for_fagsaknr() {
         opprett100Tilfeldigesaker();
         String fagsaknr = RandomStringUtils.randomNumeric(9);
-        Sak sak = sakRepository.lagre(new SakTestData().
+        Sak sak = testUtilityRepository.lagre(new SakTestData().
             applikasjon(RandomStringUtils.randomAlphabetic(3)).
             fagsakNr(fagsaknr).build());
 
@@ -292,7 +288,7 @@ class SakResourceTest extends AbstractSakResourceTest {
     void soeker_opp_saker_for_orgnr() {
         opprett100Tilfeldigesaker();
         String orgnr = "974652250";
-        Sak sak = sakRepository.lagre(new SakTestData().orgnr(orgnr).build());
+        Sak sak = testUtilityRepository.lagre(new SakTestData().orgnr(orgnr).build());
 
         Response response = sakRootTarget()
             .queryParam("orgnr", sak.getOrgnr())
@@ -308,7 +304,7 @@ class SakResourceTest extends AbstractSakResourceTest {
     void soeker_opp_saker_for_applikasjon() {
         opprett100Tilfeldigesaker();
         String applikasjon = RandomStringUtils.randomAlphabetic(9);
-        Sak sak = sakRepository.lagre(new SakTestData().applikasjon(applikasjon).build());
+        Sak sak = testUtilityRepository.lagre(new SakTestData().applikasjon(applikasjon).build());
 
         Response response = executeGetRequest(
             sakRootTarget()
@@ -326,31 +322,31 @@ class SakResourceTest extends AbstractSakResourceTest {
         String orgnr = SakTestData.generateValidOrgnr();
         String tema = RandomStringUtils.randomAlphabetic(4);
 
-        sakRepository.lagre(new SakTestData()
+        testUtilityRepository.lagre(new SakTestData()
             .applikasjon(applikasjon)
             .orgnr(orgnr)
             .tema(tema)
             .build());
 
-        sakRepository.lagre(new SakTestData()
+        testUtilityRepository.lagre(new SakTestData()
             .fagsakNr(fagsaknr)
             .orgnr(orgnr)
             .tema(tema)
             .build());
 
-        sakRepository.lagre(new SakTestData()
+        testUtilityRepository.lagre(new SakTestData()
             .fagsakNr(fagsaknr)
             .applikasjon(applikasjon)
             .tema(tema)
             .build());
 
-        sakRepository.lagre(new SakTestData()
+        testUtilityRepository.lagre(new SakTestData()
             .fagsakNr(fagsaknr)
             .applikasjon(applikasjon)
             .orgnr(orgnr)
             .build());
 
-        Sak enesteGyldigeTreff = sakRepository.lagre(new SakTestData()
+        Sak enesteGyldigeTreff = testUtilityRepository.lagre(new SakTestData()
             .fagsakNr(fagsaknr)
             .applikasjon(applikasjon)
             .orgnr(orgnr)
@@ -379,21 +375,16 @@ class SakResourceTest extends AbstractSakResourceTest {
     void soeker_opp_saker_for_flere_aktoerId() {
         opprett100Tilfeldigesaker();
         String aktoerId1 = RandomStringUtils.randomNumeric(11);
-        Sak sak1 = sakRepository.lagre(new SakTestData().aktoerId(aktoerId1).build());
+        Sak sak1 = testUtilityRepository.lagre(new SakTestData().aktoerId(aktoerId1).build());
 
         String aktoerId2 = RandomStringUtils.randomNumeric(11);
-        Sak sak2 = sakRepository.lagre(new SakTestData().aktoerId(aktoerId2).build());
+        Sak sak2 = testUtilityRepository.lagre(new SakTestData().aktoerId(aktoerId2).build());
         Response response = executeGetRequest(
             sakRootTarget()
                 .queryParam("aktoerId", sak1.getAktoerId())
                 .queryParam("aktoerId", sak2.getAktoerId()));
 
         verifySearchResponseMatching(response, asList(sak1, sak2));
-    }
-
-    @Override
-    protected Application configure() {
-        return new SakJunitApplication();
     }
 
     @Override
@@ -424,21 +415,17 @@ class SakResourceTest extends AbstractSakResourceTest {
         assertThat(response.getHeaderString("Content-Type")).isEqualTo("application/json");
         List<SakJson> sakJsons = new GsonBuilder()
             .registerTypeAdapter(LocalDateTime.class, (JsonDeserializer<LocalDateTime>) (jsonElement, type, jsonDeserializationContext) -> ZonedDateTime.parse(jsonElement.getAsJsonPrimitive().getAsString()).toLocalDateTime())
-            .create().fromJson(stream(response.getEntity()), new TypeToken<List<SakJson>>() {}.getType());
+            .create().fromJson(response.readEntity(String.class), new TypeToken<List<SakJson>>() {}.getType());
         assertThat(sakJsons.size()).isEqualTo(expectedSize);
         return sakJsons;
     }
 
     private void verify400(Response response) {
-        JsonObject jsonObject = new JsonParser().parse(stream(response.getEntity())).getAsJsonObject();
+        JsonObject jsonObject = JsonParser.parseString(response.readEntity(String.class)).getAsJsonObject();
         assertThat(response.getStatus()).isEqualTo(Response.Status.BAD_REQUEST.getStatusCode());
         assertThat(response.getHeaderString("Content-Type")).isEqualTo("application/json");
         assertThat(jsonObject.get("uuid")).isNotNull();
         assertThat(jsonObject.get("feilmelding")).isNotNull();
-    }
-
-    private Reader stream(Object entity) {
-        return new InputStreamReader((ByteArrayInputStream) entity);
     }
 
     private void verifyEqual(SakJson sakJson, Sak sak) {
@@ -463,13 +450,13 @@ class SakResourceTest extends AbstractSakResourceTest {
 
         final Response getResponse =
             executeGetRequest(
-                client()
+                client
                     .target(createdResponse.getHeaderString("location"))
             );
 
         assertThat(getResponse.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
 
-        return new JsonParser().parse(stream(getResponse.getEntity())).getAsJsonObject();
+        return JsonParser.parseString(getResponse.readEntity(String.class)).getAsJsonObject();
     }
 
     private void verifyBeskyttedeRessurserTilgjengelig(String header) {
@@ -493,7 +480,7 @@ class SakResourceTest extends AbstractSakResourceTest {
             .get();
         assertThat(searchResponse.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
 
-        Sak opprettetSak = sakRepository.lagre(new SakTestData().aktoerId("123").build());
+        Sak opprettetSak = testUtilityRepository.lagre(new SakTestData().aktoerId("123").build());
 
         Response getResponse = sakRootTarget().path(String.valueOf(opprettetSak.getId()))
             .request()

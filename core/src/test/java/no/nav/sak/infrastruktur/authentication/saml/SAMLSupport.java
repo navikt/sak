@@ -1,6 +1,7 @@
 package no.nav.sak.infrastruktur.authentication.saml;
 
 import no.nav.sak.SakConfiguration;
+import no.nav.sak.SakTestTruststoreProperties;
 import no.nav.sikkerhet.authentication.saml.KeyStore;
 import org.apache.commons.codec.binary.Base64;
 import org.joda.time.DateTime;
@@ -41,10 +42,10 @@ import java.security.cert.X509Certificate;
 public class SAMLSupport {
     private final KeyStore keyStore;
 
-    public SAMLSupport(SakConfiguration sakConfiguration) {
-        keyStore = new KeyStore(sakConfiguration.getRequiredString("sak.junit-truststore.path"),
-            sakConfiguration.getRequiredString("sak.junit-truststore.password"),
-            sakConfiguration.getRequiredString("sak.junit-keystore.privatekey.password"));
+    public SAMLSupport(SakTestTruststoreProperties truststoreProperties, String keystorePrivateKeyPassword) {
+        keyStore = new KeyStore(truststoreProperties.path(),
+            truststoreProperties.password(),
+            keystorePrivateKeyPassword); // sakConfiguration.getRequiredString("sak.junit-keystore.privatekey.password"));
 
         try {
             InitializationService.initialize();

@@ -14,6 +14,8 @@ import no.nav.sikkerhet.authentication.AuthenticationResult;
 import no.nav.sikkerhet.authentication.Authenticator;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.MDC;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.Priority;
 import javax.ws.rs.Priorities;
@@ -34,6 +36,7 @@ import static no.nav.sikkerhet.authentication.AuthenticationHeaderIdentifier.SAM
 import static org.apache.commons.lang3.StringUtils.defaultString;
 import static org.apache.commons.lang3.StringUtils.trim;
 
+@Component
 @Provider
 @EnableApiFilters
 @Priority(Priorities.AUTHENTICATION)
@@ -49,14 +52,14 @@ public class AuthenticationFilter implements ContainerRequestFilter, ContainerRe
 	private static final Counter authCounter = Counter.build("authentication_counter", "Antall autentiseringer")
 			.labelNames("consumerid", "subjecttype", "valid", "authidentifier").register();
 
-	private final Authenticator authenticator;
-	private final ResilienceExecutor<String, AuthenticationResult> resilienceExecutor;
+	@Autowired
+	private Authenticator authenticator;
+	@Autowired
+	private ResilienceConfig resilienceConfig;
 
-	public AuthenticationFilter(Authenticator authenticator, ResilienceConfig resilienceConfig) {
-		this.authenticator = authenticator;
-		final CheckedFunction1<String, AuthenticationResult> filterFunction = authenticator::authenticate;
-		this.resilienceExecutor = new ResilienceExecutor<>(filterFunction, resilienceConfig);
-	}
+	private ResilienceExecutor<String, AuthenticationResult> resilienceExecutor;
+
+	public AuthenticationFilter() {}
 
 	@Override
 	public void filter(ContainerRequestContext ctx) {
@@ -89,7 +92,7 @@ public class AuthenticationFilter implements ContainerRequestFilter, ContainerRe
 				.startTimer();
 
 		try {
-			AuthenticationResult result = resilienceExecutor.execute(authHeader);
+			AuthenticationResult result = getAuthenticationResilienceExecutor().execute(authHeader);
 			if (!result.isValid()) {
 				log.warn("Autentisering feilet: {}", result.getErrorMessage());
 				abortAsUnauthorized(ctx);
@@ -109,6 +112,14 @@ public class AuthenticationFilter implements ContainerRequestFilter, ContainerRe
 		} finally {
 			timer.observeDuration();
 		}
+	}
+
+	private ResilienceExecutor<String, AuthenticationResult> getAuthenticationResilienceExecutor() {
+		if (this.resilienceExecutor == null) {
+			final CheckedFunction1<String, AuthenticationResult> filterFunction = authenticator::authenticate;
+			this.resilienceExecutor = new ResilienceExecutor<>(filterFunction, resilienceConfig);
+		}
+		return resilienceExecutor;
 	}
 
 	private void abortAsUnauthorized(ContainerRequestContext ctx) {

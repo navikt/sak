@@ -1,51 +1,156 @@
 package no.nav.sak;
 
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Info;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.configuration2.CompositeConfiguration;
-import org.apache.commons.configuration2.EnvironmentConfiguration;
-import org.apache.commons.configuration2.SystemConfiguration;
-import org.apache.commons.configuration2.builder.fluent.Configurations;
-import org.apache.commons.configuration2.ex.ConfigurationException;
-import org.apache.commons.lang3.Validate;
+import no.nav.resilience.ResilienceConfig;
+import no.nav.sak.configuration.AbacProperties;
+import no.nav.sak.configuration.LdapProperties;
+import no.nav.sak.configuration.ServiceuserProperties;
+import no.nav.sak.configuration.StsProperties;
+import no.nav.sak.infrastruktur.abac.SakPEP;
+import no.nav.sak.repository.Database;
+import no.nav.sikkerhet.abac.ABACClient;
+import no.nav.sikkerhet.authentication.AuthenticationResult;
+import no.nav.sikkerhet.authentication.Authenticator;
+import no.nav.sikkerhet.authentication.basic.BasicAuthenticator;
+import no.nav.sikkerhet.authentication.basic.LdapConfiguration;
+import no.nav.sikkerhet.authentication.oidc.OidcTokenValidator;
+import no.nav.sikkerhet.authentication.saml.SAMLValidator;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.ehcache.Cache;
+import org.ehcache.CacheManager;
+import org.ehcache.config.builders.CacheConfigurationBuilder;
+import org.ehcache.config.builders.CacheManagerBuilder;
+import org.ehcache.config.builders.ExpiryPolicyBuilder;
+import org.ehcache.config.builders.ResourcePoolsBuilder;
+import org.jose4j.jwk.HttpsJwks;
+import org.jose4j.keys.resolvers.HttpsJwksVerificationKeyResolver;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
-import java.io.File;
+import javax.sql.DataSource;
+import java.time.Duration;
+import java.util.Map;
 
 @Slf4j
+@EnableAutoConfiguration
+@Configuration
+@EnableConfigurationProperties({
+		AbacProperties.class,
+		LdapProperties.class,
+		ServiceuserProperties.class,
+		StsProperties.class
+})
 public class SakConfiguration {
-    private final CompositeConfiguration compositeConfiguration = new CompositeConfiguration();
+	@Bean
+	public SakPEP sakPEP(ABACClient abacClient, ResilienceConfig resilienceConfig) {
+		return new SakPEP(abacClient, resilienceConfig);
+	}
 
-    public SakConfiguration() {
-        compositeConfiguration.addConfiguration(new SystemConfiguration());
-        compositeConfiguration.addConfiguration(new EnvironmentConfiguration());
-        log.info("Konfigurasjon lastet fra system- og miljøvariabler");
-        addProperties("sak.properties");
-        addProperties("/var/run/secrets/nais.io/vault/secrets.properties");
-    }
+	@Bean
+	public ABACClient createAbacClient(ServiceuserProperties serviceuserProperties, AbacProperties abacProperties) {
+		return new ABACClient(
+				abacProperties.endpoint(),
+				createHttpClient(serviceuserProperties, abacProperties));
+	}
 
-    private void addProperties(String path) {
-        try {
-            compositeConfiguration.addConfiguration(new Configurations().properties(new File(path)));
-            log.info("Konfigurasjon lastet fra {}", path);
-        } catch (ConfigurationException e) {
-            log.info("Fant ikke {}", path);
-        }
-    }
+	private HttpClient createHttpClient(ServiceuserProperties serviceuserProperties, AbacProperties abacProperties) {
 
+		final int timeout = abacProperties.readTimeout();
+		final RequestConfig requestConfig = RequestConfig
+				.custom()
+				.setConnectionRequestTimeout(timeout)
+				.setSocketTimeout(timeout)
+				.setConnectTimeout(timeout)
+				.build();
 
-    boolean getBoolean(String key, boolean defaultValue) {
-        return compositeConfiguration.getBoolean(key, defaultValue);
-    }
+		final HttpClientBuilder httpClientBuilder = HttpClientBuilder
+				.create()
+				.setDefaultRequestConfig(requestConfig);
 
-    public String getRequiredString(String key) {
-        checkRequired(key);
-        return compositeConfiguration.getString(key);
-    }
+		final UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(
+				serviceuserProperties.username(),
+				serviceuserProperties.password());
 
-    String getString(String key, String defaultValue) {
-        return compositeConfiguration.getString(key, defaultValue);
-    }
+		final CredentialsProvider provider = new BasicCredentialsProvider();
+		provider.setCredentials(AuthScope.ANY, credentials);
+		httpClientBuilder.setDefaultCredentialsProvider(provider);
 
-    private void checkRequired(String key) {
-        Validate.validState(compositeConfiguration.containsKey(key), "Fant ikke konfigurasjonsnøkkel %s", key);
-    }
+		return httpClientBuilder.build();
+	}
+
+	@Bean
+	public OidcTokenValidator oidcTokenValidator(StsProperties stsProperties) {
+		return new OidcTokenValidator(Map.of(stsProperties.issuer(), new HttpsJwksVerificationKeyResolver(new HttpsJwks(stsProperties.jwks()))));
+	}
+
+	@Bean
+	public SAMLValidator samlValidator(
+			@Value("${javax.net.ssl.trustStore}") String truststorePath,
+			@Value("${javax.net.ssl.trustStorePassword}") String truststorePassword
+	) {
+		return new SAMLValidator(truststorePath, truststorePassword);
+	}
+
+	@Bean
+	public LdapConfiguration ldapConfiguration(LdapProperties ldapProperties) {
+		return LdapConfiguration.builder()
+				.withUrl(ldapProperties.url())
+				.withBindUser(ldapProperties.username())
+				.withBindPassword(ldapProperties.password())
+				.withServiceUserBaseDN(ldapProperties.serviceuserBasedn())
+				.build();
+	}
+
+	@Bean
+	public Cache<String, AuthenticationResult> cache() {
+		final CacheManager cacheManager = CacheManagerBuilder.newCacheManagerBuilder()
+				.withCache("basicAuth",
+						CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, AuthenticationResult.class, ResourcePoolsBuilder.heap(100))
+								.withExpiry(ExpiryPolicyBuilder.timeToLiveExpiration(Duration.ofMinutes(5))))
+				.build();
+
+		cacheManager.init();
+		return cacheManager.getCache("basicAuth", String.class, AuthenticationResult.class);
+	}
+
+	@Bean
+	public BasicAuthenticator basicAuthenticator(LdapConfiguration ldapConfiguration, Cache<String, AuthenticationResult> cache) {
+		return new BasicAuthenticator(ldapConfiguration, cache);
+	}
+
+	@Bean
+	public Authenticator authenticator(OidcTokenValidator oidcTokenValidator, SAMLValidator samlValidator, BasicAuthenticator basicAuthenticator) {
+		return new Authenticator(oidcTokenValidator, samlValidator, basicAuthenticator);
+	}
+
+	@Bean
+	public Database createDatabase(DataSource dataSource) {
+		return new Database(dataSource);
+	}
+
+	@Bean
+	public OpenAPI configureOpenApi() {
+		return new OpenAPI()
+				.info(
+						new Info()
+								.title("Sak API")
+								.version("v1")
+				);
+	}
+
+	@Bean
+	public ResilienceConfig resilienceConfig() {
+		return ResilienceConfig.ofDefaults();
+	}
 }
