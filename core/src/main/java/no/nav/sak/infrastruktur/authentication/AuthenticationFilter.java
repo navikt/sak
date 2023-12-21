@@ -3,7 +3,6 @@ package no.nav.sak.infrastruktur.authentication;
 
 import io.prometheus.client.Counter;
 import io.prometheus.client.Histogram;
-import io.vavr.CheckedFunction1;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.resilience.ResilienceConfig;
 import no.nav.resilience.ResilienceExecutor;
@@ -52,14 +51,12 @@ public class AuthenticationFilter implements ContainerRequestFilter, ContainerRe
 	private static final Counter authCounter = Counter.build("authentication_counter", "Antall autentiseringer")
 			.labelNames("consumerid", "subjecttype", "valid", "authidentifier").register();
 
-	@Autowired
-	private Authenticator authenticator;
-	@Autowired
-	private ResilienceConfig resilienceConfig;
+	private final ResilienceExecutor<String, AuthenticationResult> resilienceExecutor;
 
-	private ResilienceExecutor<String, AuthenticationResult> resilienceExecutor;
-
-	public AuthenticationFilter() {}
+	@Autowired
+	public AuthenticationFilter(Authenticator authenticator, ResilienceConfig resilienceConfig) {
+		this.resilienceExecutor = new ResilienceExecutor<>(authenticator::authenticate, resilienceConfig);
+	}
 
 	@Override
 	public void filter(ContainerRequestContext ctx) {
@@ -92,7 +89,7 @@ public class AuthenticationFilter implements ContainerRequestFilter, ContainerRe
 				.startTimer();
 
 		try {
-			AuthenticationResult result = getAuthenticationResilienceExecutor().execute(authHeader);
+			AuthenticationResult result = resilienceExecutor.execute(authHeader);
 			if (!result.isValid()) {
 				log.warn("Autentisering feilet: {}", result.getErrorMessage());
 				abortAsUnauthorized(ctx);
@@ -112,14 +109,6 @@ public class AuthenticationFilter implements ContainerRequestFilter, ContainerRe
 		} finally {
 			timer.observeDuration();
 		}
-	}
-
-	private ResilienceExecutor<String, AuthenticationResult> getAuthenticationResilienceExecutor() {
-		if (this.resilienceExecutor == null) {
-			final CheckedFunction1<String, AuthenticationResult> filterFunction = authenticator::authenticate;
-			this.resilienceExecutor = new ResilienceExecutor<>(filterFunction, resilienceConfig);
-		}
-		return resilienceExecutor;
 	}
 
 	private void abortAsUnauthorized(ContainerRequestContext ctx) {
