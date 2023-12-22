@@ -10,6 +10,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.test.context.ActiveProfiles;
 
 import javax.annotation.Resource;
 import javax.ws.rs.client.Client;
@@ -20,6 +21,7 @@ import javax.ws.rs.core.Response;
 
 import static no.nav.sikkerhet.authentication.AuthenticationHeaderIdentifier.SAML;
 
+@ActiveProfiles("itest")
 @SpringBootTest(
 		classes = SakTestConfiguration.class,
 		webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT

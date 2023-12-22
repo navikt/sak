@@ -2,7 +2,6 @@ package no.nav.sak;
 
 import no.nav.resilience.ResilienceConfig;
 import no.nav.sak.configuration.AbacProperties;
-import no.nav.sak.configuration.DatasourceProperties;
 import no.nav.sak.configuration.LdapProperties;
 import no.nav.sak.configuration.ServiceuserProperties;
 import no.nav.sak.configuration.StsProperties;
@@ -11,6 +10,7 @@ import no.nav.sak.infrastruktur.abac.MockableSakPEP;
 import no.nav.sak.infrastruktur.authentication.basic.JunitBasicAuthenticator;
 import no.nav.sak.infrastruktur.oicd.JunitJsonWebKey;
 import no.nav.sak.infrastruktur.oicd.JwtClaimsTestData;
+import no.nav.security.token.support.core.configuration.MultiIssuerConfiguration;
 import no.nav.sikkerhet.abac.ABACClient;
 import no.nav.sikkerhet.authentication.Authenticator;
 import no.nav.sikkerhet.authentication.basic.LdapConfiguration;
@@ -31,11 +31,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static java.util.Collections.singletonList;
+import static org.mockito.Mockito.mock;
 
 @Configuration
 @EnableConfigurationProperties({
 		AbacProperties.class,
-		DatasourceProperties.class,
 		LdapProperties.class,
 		ServiceuserProperties.class,
 		StsProperties.class,
@@ -61,6 +61,11 @@ public class SakTestConfiguration {
 		return ABACJunitClient.create();
 	}
 
+	@Bean
+	@Primary
+	public MultiIssuerConfiguration multiIssuerConfiguration() {
+		return mock(MultiIssuerConfiguration.class);
+	}
 
 	@Bean
 	@Primary

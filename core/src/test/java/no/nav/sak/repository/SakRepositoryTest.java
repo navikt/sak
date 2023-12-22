@@ -5,6 +5,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
@@ -15,6 +16,7 @@ import java.util.Optional;
 import static org.apache.commons.lang3.RandomStringUtils.randomNumeric;
 import static org.assertj.core.api.Assertions.assertThat;
 
+@ActiveProfiles("itest")
 @SpringBootTest(
         classes = SakTestConfiguration.class,
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
