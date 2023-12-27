@@ -3,17 +3,19 @@ package no.nav.sak.infrastruktur;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.ext.ExceptionMapper;
+import org.springframework.http.ResponseEntity;
+
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 
 @Slf4j
-public class DefaultExceptionMapper implements ExceptionMapper<Exception> {
+public class DefaultExceptionMapper {
 
-    @Override
-    public Response toResponse(Exception e) {
+    public ResponseEntity<ErrorResponse> toResponse(Exception e) {
         log.error("Det oppstod en ukjent feilsituasjon", e);
-        return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-            .entity(new ErrorResponse(MDC.get("uuid"), "Det oppstod en ukjent feilsituasjon - se Kibana for årsak"))
-            .build();
+        return new ResponseEntity<>(
+				new ErrorResponse(MDC.get("uuid"), "Det oppstod en ukjent feilsituasjon - se Kibana for årsak"),
+				INTERNAL_SERVER_ERROR);
+            //.entity(
+            //.build();
     }
 }

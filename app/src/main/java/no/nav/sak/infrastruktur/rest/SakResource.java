@@ -1,4 +1,4 @@
-package no.nav.sak;
+package no.nav.sak.infrastruktur.rest;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
@@ -14,8 +14,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import io.swagger.v3.oas.annotations.security.SecuritySchemes;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import no.nav.sak.infrastruktur.EnableApiFilters;
 import no.nav.sak.infrastruktur.ErrorResponse;
 import no.nav.sak.infrastruktur.abac.ABACResult;
 import no.nav.sak.infrastruktur.abac.AuthorizationRequest;
@@ -24,44 +25,41 @@ import no.nav.sak.infrastruktur.authentication.AuthenticationFilter;
 import no.nav.sak.repository.Sak;
 import no.nav.sak.repository.SakRepository;
 import no.nav.sak.repository.SakSearchCriteria;
+import no.nav.security.token.support.core.api.Protected;
 import org.slf4j.MDC;
-import org.springframework.stereotype.Component;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import jakarta.validation.Valid;
-import jakarta.ws.rs.BeanParam;
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.container.ContainerRequestContext;
-import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.UriInfo;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
 import static io.swagger.v3.oas.annotations.enums.SecuritySchemeIn.HEADER;
+import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
-import static jakarta.ws.rs.core.Response.Status.NOT_FOUND;
 import static no.nav.sak.infrastruktur.ContextExtractor.getSubjectType;
 import static no.nav.sak.infrastruktur.SubjectType.SUBJECT_TYPE_EKSTERNBRUKER;
 import static no.nav.sak.infrastruktur.authentication.AuthenticationFilter.REQUEST_CONSUMERID;
+import static org.springframework.http.HttpStatus.CONFLICT;
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.OK;
 
-@Component
-@Produces(MediaType.APPLICATION_JSON)
-@Consumes(MediaType.APPLICATION_JSON)
-@EnableApiFilters
-@Path("/v1/saker")
-@Tag(name = "v1/saker")
+@Protected
+@RestController
+@RequestMapping(SakResource.API_V1_SAKER)
+@Tag(name = "/api/v1/saker")
 @OpenAPIDefinition(
 		info = @Info(
 				title = "Sak API",
@@ -124,6 +122,8 @@ import static no.nav.sak.infrastruktur.authentication.AuthenticationFilter.REQUE
 @Slf4j
 public class SakResource {
 
+	public static final String API_V1_SAKER_PATH_SEGMENT = "api/v1/saker";
+	public static final String API_V1_SAKER = "/" + API_V1_SAKER_PATH_SEGMENT + "/";
 	private final SakRepository sakRepository;
 	private final SakPEP sakPEP;
 
@@ -132,8 +132,7 @@ public class SakResource {
 		this.sakPEP = sakPEP;
 	}
 
-	@GET
-	@Path("/{id}")
+	@GetMapping(path = "/{id}", produces = APPLICATION_JSON)
 	@Operation(summary = "Henter sak for en gitt id",
 			parameters = {@Parameter(name = "X-Correlation-ID", required = true, in = ParameterIn.HEADER)},
 			responses = {
@@ -147,32 +146,29 @@ public class SakResource {
 					@ApiResponse(responseCode = "503", description = "En eller flere tjenester som sak er avhengig av er ikke tilgjengelige eller svarer ikke.")
 
 			})
-	public Response hentSak(
-			@PathParam("id") final Long id
-			, @Context final ContainerRequestContext ctx) {
+	public ResponseEntity<?> hentSak(
+			@PathVariable("id") final Long id
+			, HttpServletRequest ctx) {
 
 		log.info("hentSak henter arkivsakId={}", id);
 		final Optional<Sak> sak = sakRepository.hentSak(id);
-		final Response response;
 
 		if (sak.isPresent()) {
 			final Sak eksisterendeSak = sak.get();
-			response = Response.ok(
-					new SakJson(eksisterendeSak)).build();
 			log.info("hentSak har hentet arkivsakId={}", id);
+			return ResponseEntity.ok().body(
+					new SakJson(eksisterendeSak));
 		} else {
-			log.warn("Mottatt oppslag på sak som ikke eksisterer, id: {}, consumer: {}", id, ctx.getProperty(REQUEST_CONSUMERID));
-			response = Response
+			log.warn("Mottatt oppslag på sak som ikke eksisterer, id: {}, consumer: {}", id, ctx.getAttribute(REQUEST_CONSUMERID));
+			return ResponseEntity
 					.status(NOT_FOUND)
-					.entity(new ErrorResponse(
+					.body(new ErrorResponse(
 							MDC.get("uuid"),
-							String.format("Fant ingen sak med id: %s", id)))
-					.build();
+							String.format("Fant ingen sak med id: %s", id)));
 		}
-		return response;
 	}
 
-	@GET
+	@GetMapping(produces = APPLICATION_JSON)
 	@Operation(summary = "Finner saker for angitte søkekriterier",
 			parameters = {@Parameter(name = "X-Correlation-ID", required = true, in = ParameterIn.HEADER)},
 			responses = {
@@ -184,9 +180,10 @@ public class SakResource {
 					@ApiResponse(responseCode = "500", description = "Ukjent feilsituasjon har oppstått i Sak"),
 					@ApiResponse(responseCode = "503", description = "En eller flere tjenester som sak er avhengig av er ikke tilgjengelige eller svarer ikke.")
 			})
-	public Response finnSaker(
-			@Valid @BeanParam final SakSearchRequest sakSearchRequest
-			, @Context final ContainerRequestContext ctx) {
+	public ResponseEntity<?> finnSaker(
+			@Valid
+			final SakSearchRequest sakSearchRequest
+			, HttpServletRequest ctx) {
 
 		log.info("finnSak Søker etter saker for: {}", sakSearchRequest);
 		for (String aktoerId : sakSearchRequest.getAktoerId()) {
@@ -196,21 +193,21 @@ public class SakResource {
 			if (!ABACResult.Code.OK.equals(abacResultCode)) {
 				return makeResponseUponAbacFailure(abacResultCode);
 			} else if (!abacResult.hasAccess()) {
-				return Response.ok(new ArrayList<>()).build();
+				return ResponseEntity.ok(new ArrayList<>());
 			}
 		}
 
 		final List<Sak> saker =
 				sakRepository.finnSaker(sakSearchRequest.toCriteria());
 		log.info("finnSak hentet antall_arkivsaker={}", saker.size());
-		return Response.ok(
+		return ResponseEntity.ok(
 				saker.stream()
 						.filter(s -> harTilgangTilSakInterneRegler(ctx, s))
 						.map(SakJson::new)
-						.collect(toList())).build();
+						.collect(toList()));
 	}
 
-	@POST
+	@PostMapping(produces = APPLICATION_JSON, consumes = APPLICATION_JSON)
 	@Operation(summary = "Oppretter en ny sak",
 			description = "Merk at en sak enten skal tilhøre en aktør <b>eller</b> et foretak. Begge er p.t. ikke tillatt. ",
 			responses = {
@@ -224,48 +221,47 @@ public class SakResource {
 					@ApiResponse(responseCode = "500", description = "Ukjent feilsituasjon har oppstått i Sak"),
 					@ApiResponse(responseCode = "503", description = "En eller flere tjenester som sak er avhengig av er ikke tilgjengelige eller svarer ikke.")
 			})
-	public Response opprettSak(
-			@Valid @Parameter(name = "Saken som skal opprettes", required = true) final SakJson sakJson
-			, @Context final UriInfo uriInfo
-			, @Context final ContainerRequestContext ctx
-	) throws URISyntaxException {
+	public ResponseEntity<?> opprettSak(
+			@RequestBody @Valid @Parameter(name = "Saken som skal opprettes", required = true) SakJson sakJson
+			, ServletUriComponentsBuilder servletUriComponentsBuilder
+			, HttpServletRequest ctx
+	) {
 
-		final String user = (String) ctx.getProperty(AuthenticationFilter.REQUEST_USERNAME);
+		final String user = (String) ctx.getAttribute(AuthenticationFilter.REQUEST_USERNAME);
 		final Sak innsendtSak = sakJson.toSak(user);
 		final String aktoerId = innsendtSak.getAktoerId();
 
 		log.info("opprettSak for aktoerId={}", aktoerId);
 
-		final Response response;
 		if (fagSakFinnesFraFoer(innsendtSak)) {
-			response = Response
-					.status(Response.Status.CONFLICT)
-					.entity(new ErrorResponse(
+			return ResponseEntity
+					.status(CONFLICT)
+					.body(new ErrorResponse(
 							MDC.get("uuid"),
 							String.format(
 									"Det finnes allerede en sak for fagsaksnr: %s, applikasjon: %s, aktør: %s orgnr: %s",
 									innsendtSak.getFagsakNr(),
 									innsendtSak.getApplikasjon(),
 									innsendtSak.getAktoerId(),
-									innsendtSak.getOrgnr()))).build();
+									innsendtSak.getOrgnr())));
 		} else {
 
 			final Sak opprettetSak = sakRepository.lagre(innsendtSak);
 			log.info("Opprettet: {}", opprettetSak);
-			response = Response.created(
-							new URI(uriInfo.getAbsolutePathBuilder()
-									.path(String.valueOf(opprettetSak.getId()))
-									.build()
-									.getPath()))
-					.entity(new SakJson(opprettetSak))
-					.build();
 			log.info("opprettSak har opprettet arkivsakId={}", opprettetSak.getId());
+			URI path = servletUriComponentsBuilder
+					.pathSegment(API_V1_SAKER_PATH_SEGMENT)
+					.pathSegment(String.valueOf(opprettetSak.getId()))
+					.build()
+					.toUri();
+			return ResponseEntity
+					.created(path)
+					.body(new SakJson(opprettetSak));
 		}
-		return response;
 	}
 
 	private boolean harTilgangTilSakInterneRegler(
-			final ContainerRequestContext ctx
+			final HttpServletRequest ctx
 			, final Sak sak) {
 
 		final boolean temaKontroll = Objects.equals("KTR", sak.getTema());
@@ -292,30 +288,23 @@ public class SakResource {
 				!sakRepository.finnSaker(sakSearchCriteria).isEmpty();
 	}
 
-	private Response makeResponseUponAbacFailure(final ABACResult.Code abacResultCode) {
-
-		final Response.Status responseStatus =
-				mapABACResultCodeToResponseStatus(abacResultCode);
-		return Response
-				.status(responseStatus)
-				.entity(
+	private ResponseEntity<?> makeResponseUponAbacFailure(ABACResult.Code abacResultCode) {
+		return ResponseEntity
+				.status(mapABACResultCodeToResponseStatus(abacResultCode))
+				.body(
 						new ErrorResponse(
 								MDC.get("uuid"),
 								abacResultCode.getDescription()
 						)
-				)
-				.build();
+				);
 	}
 
-	private Response.Status mapABACResultCodeToResponseStatus(final ABACResult.Code abacResultCode) {
-
-		final Response.Status responseStatus;
+	private HttpStatus mapABACResultCodeToResponseStatus(ABACResult.Code abacResultCode) {
 		if (ABACResult.Code.OK.equals(abacResultCode)) {
-			responseStatus = Response.Status.OK;
+			return OK;
 		} else {
-			responseStatus = Response.Status.INTERNAL_SERVER_ERROR;
+			return INTERNAL_SERVER_ERROR;
 		}
 
-		return responseStatus;
 	}
 }

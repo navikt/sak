@@ -9,11 +9,10 @@ import jakarta.ws.rs.NotAllowedException;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.ExceptionMapper;
 
-public class MethodNotAllowedExceptionMapper implements ExceptionMapper<NotAllowedException> {
+public class MethodNotAllowedExceptionMapper {
     private static Logger log = LoggerFactory.getLogger(MethodNotAllowedExceptionMapper.class);
 
-    @Override
-    public Response toResponse(NotAllowedException e) {
+    public Response toResponse() {
         log.warn("Mottatt kall mot ressurs som ikke støttes");
         return Response.status(Response.Status.METHOD_NOT_ALLOWED).entity(
             new ErrorResponse(MDC.get("uuid"), "Angitt operasjon er ikke tillatt"))

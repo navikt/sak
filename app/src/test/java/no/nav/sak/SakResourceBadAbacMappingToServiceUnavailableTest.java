@@ -6,10 +6,15 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.Response;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.util.UriBuilder;
+import org.springframework.web.util.UriComponentsBuilder;
+
+import java.net.URI;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.http.HttpStatus.SERVICE_UNAVAILABLE;
 
 @Disabled
 public class SakResourceBadAbacMappingToServiceUnavailableTest extends AbstractSakResourceTest {
@@ -25,9 +30,9 @@ public class SakResourceBadAbacMappingToServiceUnavailableTest extends AbstractS
                         .build()
                 );
 
-        final Response response = executeGetRequest(sakRootTarget().path(String.valueOf(opprettetSak.getId())));
+        final ResponseEntity<?> response = executeGetRequestWithSaml(URI.create(String.valueOf(opprettetSak.getId())));
 
-        assertThat(response.getStatus()).isEqualTo(Response.Status.SERVICE_UNAVAILABLE.getStatusCode());
+        assertThat(response.getStatusCode()).isEqualTo(SERVICE_UNAVAILABLE);
     }
 
     @Test
@@ -49,23 +54,22 @@ public class SakResourceBadAbacMappingToServiceUnavailableTest extends AbstractS
         final String tema = RandomStringUtils.randomAlphabetic(4);
         final Sak sak = testUtilityRepository.lagre(new SakTestData().tema(tema).build());
 
-        final Response response = executeGetRequest(sakRootTarget()
+        final ResponseEntity<?> response = executeGetRequestWithSaml(UriComponentsBuilder.newInstance()
             .queryParam("tema", sak.getTema())
-            .queryParam("aktoerId", sak.getAktoerId()));
+            .queryParam("aktoerId", sak.getAktoerId()).build().toUri());
 
-        assertThat(response.getStatus()).isEqualTo(Response.Status.SERVICE_UNAVAILABLE.getStatusCode());
+        assertThat(response.getStatusCode()).isEqualTo(SERVICE_UNAVAILABLE);
     }
 
     @Override
-    protected Response createSakAndTestReponse(final Sak sak) {
+    protected ResponseEntity<Object> createSakAndTestReponse(final Sak sak) {
 
-        final Response createdResponse =
-            executePost(
-                Entity
-                    .json(new SakJsonTestData(sak).buildJsonString())
+        final ResponseEntity<Object> createdResponse =
+            executePostWithSaml(
+                    new SakJsonTestData(sak).buildJsonString()
             );
 
-        assertThat(createdResponse.getStatus()).isEqualTo(Response.Status.SERVICE_UNAVAILABLE.getStatusCode());
+        assertThat(createdResponse.getStatusCode()).isEqualTo(SERVICE_UNAVAILABLE);
 
         return createdResponse;
     }

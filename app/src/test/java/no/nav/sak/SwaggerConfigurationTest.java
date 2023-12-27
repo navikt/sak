@@ -1,11 +1,14 @@
 package no.nav.sak;
 
-import jakarta.ws.rs.core.Response;
 import no.nav.sak.repository.Sak;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.springframework.http.ResponseEntity;
+
+import java.net.URI;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.http.HttpStatus.OK;
 
 public class SwaggerConfigurationTest extends AbstractSakResourceTest {
 
@@ -16,15 +19,15 @@ public class SwaggerConfigurationTest extends AbstractSakResourceTest {
 			"/swagger-ui/index.html,text/html,Swagger UI"
 	})
 	void sjekk_at_swagger_er_riktig_konfigurert(String path, String contentType, String title) {
-		Response response = executeGetRequest(client.target("http://localhost:" + port).path(path));
+		ResponseEntity<String> response = executeGetRequestWithSaml(URI.create(path), String.class);
 
-		assertThat(response.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
-		assertThat(response.getHeaderString("Content-Type")).isEqualTo(contentType);
-		assertThat(response.readEntity(String.class)).contains(title);
+		assertThat(response.getStatusCode()).isEqualTo(OK);
+		assertThat(response.getHeaders().getContentType().toString()).isEqualTo(contentType);
+		assertThat(response.getBody()).contains(title);
 	}
 
 	@Override
-	protected Response createSakAndTestReponse(Sak sak) {
+	protected ResponseEntity<Object> createSakAndTestReponse(Sak sak) {
 		return null;
 	}
 }

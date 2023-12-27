@@ -10,9 +10,9 @@ import java.util.Optional;
 import static java.util.Collections.emptyList;
 
 public class SakSearchCriteria {
-    private List<String> aktoerId = emptyList();
+    private List<String> aktoerId;
     private String orgnr;
-    private List<String> tema = emptyList();
+    private List<String> tema;
     private String fagsakNr;
     private String applikasjon;
 
@@ -50,7 +50,10 @@ public class SakSearchCriteria {
 
 
     public List<String> getAktoerId() {
-        return aktoerId;
+		if (aktoerId != null) {
+			return aktoerId;
+		}
+		return emptyList();
     }
 
     public Optional<String> getOrgnr() {
@@ -58,7 +61,10 @@ public class SakSearchCriteria {
     }
 
     List<String> getTema() {
-        return tema;
+		if (tema != null) {
+			return tema;
+		}
+		return emptyList();
     }
 
     Optional<String> getFagsakNr() {

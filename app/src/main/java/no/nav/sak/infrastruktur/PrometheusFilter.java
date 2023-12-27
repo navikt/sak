@@ -1,22 +1,22 @@
 package no.nav.sak.infrastruktur;
 
 import io.prometheus.client.Histogram;
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import no.nav.sak.infrastruktur.authentication.AuthenticationFilter;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.HandlerMapping;
 
-
-import jakarta.ws.rs.container.ContainerRequestContext;
-import jakarta.ws.rs.container.ContainerRequestFilter;
-import jakarta.ws.rs.container.ContainerResponseContext;
-import jakarta.ws.rs.container.ContainerResponseFilter;
-import jakarta.ws.rs.core.MultivaluedMap;
-import jakarta.ws.rs.core.UriInfo;
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 
-@EnableApiFilters
-public class PrometheusFilter implements ContainerRequestFilter, ContainerResponseFilter {
+@Component
+public class PrometheusFilter implements Filter {
     private static final Histogram requestsHistogram = Histogram.build("requests_duration_seconds", "Request duration in seconds")
         .labelNames("path", "queryparams", "method", "consumer")
         .register();
@@ -24,49 +24,49 @@ public class PrometheusFilter implements ContainerRequestFilter, ContainerRespon
     private static final String PROMETHEUS_TIMER = "prometheus_timer";
 
     @Override
-    public void filter(ContainerRequestContext containerRequestContext) throws IOException {
-        UriInfo uriInfo = containerRequestContext.getUriInfo();
-        String path = uriInfo.getRequestUri().getPath();
-        MultivaluedMap<String, String> pathParameters = uriInfo.getPathParameters();
+    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
+		Histogram.Timer timer = null;
+		if (servletRequest instanceof HttpServletRequest httpRequest) {
+			String path = httpRequest.getRequestURI();// .getPath();
+			Map<String, String> pathParameters = (Map<String, String>) httpRequest.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
 
-        String sanitizedPath;
-        String jerseyApiPrefix = "/api/v1";
-        if (path.startsWith(jerseyApiPrefix)) {
-            sanitizedPath = jerseyApiPrefix + replacePathparams(StringUtils.remove(path, jerseyApiPrefix), pathParameters);
-        } else {
-            sanitizedPath = path;
-        }
-        String queryparams = "N/A";
-        if (!uriInfo.getQueryParameters().isEmpty()) {
-            queryparams = uriInfo.getQueryParameters().keySet().toString();
-        }
+			String sanitizedPath;
+			String jerseyApiPrefix = "/api/v1";
+			if (path.startsWith(jerseyApiPrefix)) {
+				sanitizedPath = jerseyApiPrefix + replacePathparams(StringUtils.remove(path, jerseyApiPrefix), pathParameters);
+			} else {
+				sanitizedPath = path;
+			}
+			String queryparams = "N/A";
+			if (httpRequest.getQueryString() != null && !httpRequest.getQueryString().isEmpty()) {
+				queryparams = httpRequest.getQueryString();
+			}
 
-        Histogram.Timer timer = requestsHistogram
-            .labels(
-                sanitizedPath,
-                queryparams,
-                containerRequestContext.getMethod(),
-                (String) containerRequestContext.getProperty(AuthenticationFilter.REQUEST_CONSUMERID)).startTimer();
-        containerRequestContext.setProperty(PROMETHEUS_TIMER, timer);
+			timer = requestsHistogram
+					.labels(
+							sanitizedPath,
+							queryparams,
+							httpRequest.getMethod(),
+							(String) httpRequest.getAttribute(AuthenticationFilter.REQUEST_CONSUMERID))
+					.startTimer();
+		}
+
+		filterChain.doFilter(servletRequest, servletResponse);
+
+		if (timer != null) {
+			timer.observeDuration();
+		}
     }
 
-    private String replacePathparams(String path, MultivaluedMap<String, String> pathParameters) {
+    private static String replacePathparams(String path, Map<String, String> pathParameters) {
         String modifiedPath = path;
-        for (Map.Entry<String, List<String>> entry : pathParameters.entrySet()) {
+		if (pathParameters != null)
+        for (Map.Entry<String, String> entry : pathParameters.entrySet()) {
             String originalPathFragment = String.format("{%s}", entry.getKey());
-            modifiedPath = StringUtils.replaceEach(path, entry.getValue().toArray(new String[0]), new String[]{originalPathFragment});
+            modifiedPath = StringUtils.replace(path, entry.getValue(), originalPathFragment);
         }
 
         return modifiedPath;
     }
 
-    @Override
-    public void filter(ContainerRequestContext containerRequestContext, ContainerResponseContext containerResponseContext) throws IOException {
-        Histogram.Timer timer = Histogram.Timer.class.cast(containerRequestContext.getProperty(PROMETHEUS_TIMER));
-        if (timer != null) {
-            timer.observeDuration();
-        }
-
-
-    }
 }

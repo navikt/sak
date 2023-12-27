@@ -1,4 +1,4 @@
-package no.nav.sak;
+package no.nav.sak.infrastruktur.rest;
 
 import io.swagger.v3.oas.annotations.Parameter;
 import no.nav.sak.repository.SakSearchCriteria;
@@ -6,6 +6,8 @@ import no.nav.sak.validering.AtLeastOneOf;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import jakarta.ws.rs.QueryParam;
+
+import java.util.Collections;
 import java.util.List;
 
 import static org.apache.commons.lang3.builder.ToStringStyle.SHORT_PREFIX_STYLE;
@@ -33,6 +35,9 @@ public class SakSearchRequest {
     }
 
     public List<String> getAktoerId() {
+		if (aktoerId == null) {
+			return Collections.emptyList();
+		}
         return aktoerId;
     }
 
