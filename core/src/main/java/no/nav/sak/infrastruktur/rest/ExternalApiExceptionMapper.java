@@ -4,8 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.sak.infrastruktur.ErrorResponse;
 import org.slf4j.MDC;
 
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.ExceptionMapper;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.ext.ExceptionMapper;
 
 
 @Slf4j

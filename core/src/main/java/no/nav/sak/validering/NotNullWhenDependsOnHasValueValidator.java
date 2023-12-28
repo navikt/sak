@@ -3,8 +3,8 @@ package no.nav.sak.validering;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 
 
 public class NotNullWhenDependsOnHasValueValidator implements ConstraintValidator<NotNullWhenDependsOnHasValue, Object> {

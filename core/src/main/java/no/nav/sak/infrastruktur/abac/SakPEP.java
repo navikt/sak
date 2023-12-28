@@ -14,10 +14,10 @@ import no.nav.sikkerhet.abac.ABACClient;
 import no.nav.sikkerhet.abac.ABACRequest;
 import no.nav.sikkerhet.abac.ABACResult;
 
-import javax.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.container.ContainerRequestContext;
 import java.util.Objects;
 
-import static javax.ws.rs.core.HttpHeaders.AUTHORIZATION;
+import static jakarta.ws.rs.core.HttpHeaders.AUTHORIZATION;
 import static no.nav.abac.xacml.NavAttributter.ENVIRONMENT_FELLES_OIDC_TOKEN_BODY;
 import static no.nav.abac.xacml.NavAttributter.ENVIRONMENT_FELLES_PEP_ID;
 import static no.nav.abac.xacml.NavAttributter.ENVIRONMENT_FELLES_SAML_TOKEN;

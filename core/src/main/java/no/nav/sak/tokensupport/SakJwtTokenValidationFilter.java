@@ -2,7 +2,6 @@ package no.nav.sak.tokensupport;
 
 import lombok.extern.slf4j.Slf4j;
 import no.nav.security.token.support.core.configuration.MultiIssuerConfiguration;
-import no.nav.security.token.support.core.validation.JwtTokenRetriever;
 import no.nav.security.token.support.core.validation.JwtTokenValidationHandler;
 import no.nav.security.token.support.filter.JwtTokenValidationFilter;
 import no.nav.security.token.support.jaxrs.JaxrsTokenValidationContextHolder;
@@ -10,12 +9,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpHeaders;
 
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
 import static org.apache.commons.lang3.StringUtils.trim;

@@ -3,7 +3,7 @@ package no.nav.sak.tokensupport;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;

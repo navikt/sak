@@ -22,7 +22,7 @@ import org.opensaml.core.config.InitializationService;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.springframework.stereotype.Component;
 
-import javax.ws.rs.ApplicationPath;
+import jakarta.ws.rs.ApplicationPath;
 import java.util.logging.Level;
 
 import static java.util.logging.Logger.getLogger;

@@ -1,6 +1,5 @@
 package no.nav.sak.infrastruktur.authentication.saml;
 
-import no.nav.sak.SakConfiguration;
 import no.nav.sak.SakTestTruststoreProperties;
 import no.nav.sikkerhet.authentication.saml.KeyStore;
 import org.apache.commons.codec.binary.Base64;
@@ -34,6 +33,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.PrivateKey;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
@@ -177,7 +177,7 @@ public class SAMLSupport {
         } catch (TransformerException e) {
             throw new RuntimeException("Failed while parsing SAML assertion element", e);
         }
-        return writer.toString().getBytes(Charset.forName("UTF-8"));
+        return writer.toString().getBytes(StandardCharsets.UTF_8);
     }
 }
 
