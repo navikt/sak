@@ -31,7 +31,7 @@
 
         <commons.configuration.version>2.9.0</commons.configuration.version>
         <commons.beanutils.version>1.9.4</commons.beanutils.version>
-        <nimbusds.version>11.8</nimbusds.version>
+        <nimbusds.version>11.7</nimbusds.version>
 
         <swagger.version>2.2.19</swagger.version>
         <swagger-ui.version>5.10.3</swagger-ui.version>
