@@ -6,19 +6,17 @@ import no.nav.security.token.support.core.configuration.ProxyAwareResourceRetrie
 import no.nav.security.token.support.core.context.TokenValidationContextHolder;
 import no.nav.security.token.support.filter.JwtTokenValidationFilter;
 import no.nav.security.token.support.jaxrs.JaxrsTokenValidationContextHolder;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.context.request.RequestContextListener;
 
 @Configuration
+@EnableConfigurationProperties({
+		MultiIssuerProperties.class
+})
 public class TokenSupportConfig {
-
-
-	@Bean
-	public MultiIssuerProperties multiIssuerProperties() {
-		return new MultiIssuerProperties();
-	}
 
 	@Bean
 	public FilterRegistrationBean<JwtTokenValidationFilter> oidcTokenValidationFilterBean(

@@ -25,6 +25,7 @@ import no.nav.sak.repository.SakRepository;
 import no.nav.sak.repository.SakSearchCriteria;
 import no.nav.sikkerhet.abac.ABACResult;
 import org.slf4j.MDC;
+import org.springframework.stereotype.Component;
 
 import javax.validation.Valid;
 import javax.ws.rs.BeanParam;
@@ -55,6 +56,7 @@ import static no.nav.sak.infrastruktur.ContextExtractor.getSubjectType;
 import static no.nav.sak.infrastruktur.SubjectType.SUBJECT_TYPE_EKSTERNBRUKER;
 import static no.nav.sak.infrastruktur.authentication.AuthenticationFilter.REQUEST_CONSUMERID;
 
+@Component
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 @EnableApiFilters

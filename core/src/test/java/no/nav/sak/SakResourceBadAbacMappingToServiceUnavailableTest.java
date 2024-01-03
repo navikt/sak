@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Response;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -19,7 +18,7 @@ public class SakResourceBadAbacMappingToServiceUnavailableTest extends AbstractS
     void hent_sak_giving_bad_abac_result_mapping_to_service_unavailable() {
 
         final Sak opprettetSak =
-            sakRepository
+            testUtilityRepository
                 .lagre(
                     new SakTestData()
                         .aktoerId("123")
@@ -48,18 +47,13 @@ public class SakResourceBadAbacMappingToServiceUnavailableTest extends AbstractS
 
         opprett100Tilfeldigesaker();
         final String tema = RandomStringUtils.randomAlphabetic(4);
-        final Sak sak = sakRepository.lagre(new SakTestData().tema(tema).build());
+        final Sak sak = testUtilityRepository.lagre(new SakTestData().tema(tema).build());
 
         final Response response = executeGetRequest(sakRootTarget()
             .queryParam("tema", sak.getTema())
             .queryParam("aktoerId", sak.getAktoerId()));
 
         assertThat(response.getStatus()).isEqualTo(Response.Status.SERVICE_UNAVAILABLE.getStatusCode());
-    }
-
-    @Override
-    protected Application configure() {
-        return new SakJunitApplicationAlwaysGivingBadAbacMappingToServiceUnavailable();
     }
 
     @Override

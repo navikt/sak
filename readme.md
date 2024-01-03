@@ -15,7 +15,7 @@ Spring boot applikasjon som kjøres opp ved å kjøre Application
 Ved kjøring av **Spring Boot** benyttes **logback-test.xml** 
 
 ### Properties
-Ved lokal kjøring er properties definert i **sak.properties**. 
+Ved lokal kjøring er properties definert i **application.properties**. 
 
 ### Testing
 Enhetstester og api-tester (mot in memory-db) kjøres som standard ved **mvn test**. Det er i tillegg satt opp kjøring

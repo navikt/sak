@@ -3,7 +3,6 @@ package no.nav.sak.infrastruktur.authentication;
 
 import io.prometheus.client.Counter;
 import io.prometheus.client.Histogram;
-import io.vavr.CheckedFunction1;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.resilience.ResilienceConfig;
 import no.nav.resilience.ResilienceExecutor;
@@ -14,6 +13,8 @@ import no.nav.sikkerhet.authentication.AuthenticationResult;
 import no.nav.sikkerhet.authentication.Authenticator;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.MDC;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.Priority;
 import javax.ws.rs.Priorities;
@@ -34,6 +35,7 @@ import static no.nav.sikkerhet.authentication.AuthenticationHeaderIdentifier.SAM
 import static org.apache.commons.lang3.StringUtils.defaultString;
 import static org.apache.commons.lang3.StringUtils.trim;
 
+@Component
 @Provider
 @EnableApiFilters
 @Priority(Priorities.AUTHENTICATION)
@@ -49,13 +51,11 @@ public class AuthenticationFilter implements ContainerRequestFilter, ContainerRe
 	private static final Counter authCounter = Counter.build("authentication_counter", "Antall autentiseringer")
 			.labelNames("consumerid", "subjecttype", "valid", "authidentifier").register();
 
-	private final Authenticator authenticator;
 	private final ResilienceExecutor<String, AuthenticationResult> resilienceExecutor;
 
+	@Autowired
 	public AuthenticationFilter(Authenticator authenticator, ResilienceConfig resilienceConfig) {
-		this.authenticator = authenticator;
-		final CheckedFunction1<String, AuthenticationResult> filterFunction = authenticator::authenticate;
-		this.resilienceExecutor = new ResilienceExecutor<>(filterFunction, resilienceConfig);
+		this.resilienceExecutor = new ResilienceExecutor<>(authenticator::authenticate, resilienceConfig);
 	}
 
 	@Override
