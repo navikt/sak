@@ -9,8 +9,6 @@ import no.nav.resilience.ResilienceExecutor;
 import no.nav.sak.tokensupport.TokenUtils;
 import no.nav.sak.infrastruktur.EnableApiFilters;
 import no.nav.sak.infrastruktur.ErrorResponse;
-import no.nav.sikkerhet.authentication.AuthenticationResult;
-import no.nav.sikkerhet.authentication.Authenticator;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,9 +27,9 @@ import java.util.Objects;
 
 import static jakarta.ws.rs.core.HttpHeaders.AUTHORIZATION;
 import static no.nav.sak.infrastruktur.ContextExtractor.getSubjectType;
-import static no.nav.sikkerhet.authentication.AuthenticationHeaderIdentifier.BASIC;
-import static no.nav.sikkerhet.authentication.AuthenticationHeaderIdentifier.OIDC;
-import static no.nav.sikkerhet.authentication.AuthenticationHeaderIdentifier.SAML;
+import static no.nav.sak.infrastruktur.authentication.AuthenticationHeaderIdentifier.BASIC;
+import static no.nav.sak.infrastruktur.authentication.AuthenticationHeaderIdentifier.OIDC;
+import static no.nav.sak.infrastruktur.authentication.AuthenticationHeaderIdentifier.SAML;
 import static org.apache.commons.lang3.StringUtils.defaultString;
 import static org.apache.commons.lang3.StringUtils.trim;
 

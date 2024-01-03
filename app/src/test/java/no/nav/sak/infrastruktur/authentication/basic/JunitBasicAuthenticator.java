@@ -1,8 +1,8 @@
 package no.nav.sak.infrastruktur.authentication.basic;
 
-import no.nav.sikkerhet.authentication.AuthenticationResult;
-import no.nav.sikkerhet.authentication.basic.BasicAuthenticator;
-import no.nav.sikkerhet.authentication.basic.LdapConfiguration;
+import no.nav.sak.infrastruktur.authentication.AuthenticationResult;
+import no.nav.sak.infrastruktur.authentication.LdapConfiguration;
+import no.nav.sak.infrastruktur.authentication.BasicAuthenticator;
 import org.ehcache.Cache;
 
 import java.util.Objects;

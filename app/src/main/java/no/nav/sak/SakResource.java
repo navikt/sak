@@ -17,13 +17,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.sak.infrastruktur.EnableApiFilters;
 import no.nav.sak.infrastruktur.ErrorResponse;
+import no.nav.sak.infrastruktur.abac.ABACResult;
 import no.nav.sak.infrastruktur.abac.AuthorizationRequest;
 import no.nav.sak.infrastruktur.abac.SakPEP;
 import no.nav.sak.infrastruktur.authentication.AuthenticationFilter;
 import no.nav.sak.repository.Sak;
 import no.nav.sak.repository.SakRepository;
 import no.nav.sak.repository.SakSearchCriteria;
-import no.nav.sikkerhet.abac.ABACResult;
 import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 

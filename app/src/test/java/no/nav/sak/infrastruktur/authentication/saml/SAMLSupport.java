@@ -1,9 +1,8 @@
 package no.nav.sak.infrastruktur.authentication.saml;
 
 import no.nav.sak.SakTestTruststoreProperties;
-import no.nav.sikkerhet.authentication.saml.KeyStore;
+import no.nav.sak.infrastruktur.authentication.KeyStore;
 import org.apache.commons.codec.binary.Base64;
-import org.joda.time.DateTime;
 import org.opensaml.core.config.InitializationException;
 import org.opensaml.core.config.InitializationService;
 import org.opensaml.core.xml.io.MarshallingException;
@@ -11,8 +10,22 @@ import org.opensaml.core.xml.schema.XSString;
 import org.opensaml.core.xml.schema.impl.XSStringBuilder;
 import org.opensaml.saml.common.SAMLObjectContentReference;
 import org.opensaml.saml.common.SAMLVersion;
-import org.opensaml.saml.saml2.core.*;
-import org.opensaml.saml.saml2.core.impl.*;
+import org.opensaml.saml.saml2.core.Assertion;
+import org.opensaml.saml.saml2.core.Attribute;
+import org.opensaml.saml.saml2.core.AttributeStatement;
+import org.opensaml.saml.saml2.core.AttributeValue;
+import org.opensaml.saml.saml2.core.Conditions;
+import org.opensaml.saml.saml2.core.Issuer;
+import org.opensaml.saml.saml2.core.NameID;
+import org.opensaml.saml.saml2.core.Subject;
+import org.opensaml.saml.saml2.core.impl.AssertionBuilder;
+import org.opensaml.saml.saml2.core.impl.AssertionMarshaller;
+import org.opensaml.saml.saml2.core.impl.AttributeBuilder;
+import org.opensaml.saml.saml2.core.impl.AttributeStatementBuilder;
+import org.opensaml.saml.saml2.core.impl.ConditionsBuilder;
+import org.opensaml.saml.saml2.core.impl.IssuerBuilder;
+import org.opensaml.saml.saml2.core.impl.NameIDBuilder;
+import org.opensaml.saml.saml2.core.impl.SubjectBuilder;
 import org.opensaml.security.x509.BasicX509Credential;
 import org.opensaml.xmlsec.signature.KeyInfo;
 import org.opensaml.xmlsec.signature.Signature;
@@ -32,18 +45,22 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.StringWriter;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.PrivateKey;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
+import java.time.Clock;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 
 
 public class SAMLSupport {
     private final KeyStore keyStore;
+	private final Clock clock;
 
-    public SAMLSupport(SakTestTruststoreProperties truststoreProperties, String keystorePrivateKeyPassword) {
-        keyStore = new KeyStore(truststoreProperties.path(),
+    public SAMLSupport(SakTestTruststoreProperties truststoreProperties, String keystorePrivateKeyPassword, Clock clock) {
+		this.clock = clock;
+		keyStore = new KeyStore(truststoreProperties.path(),
             truststoreProperties.password(),
             keystorePrivateKeyPassword); // sakConfiguration.getRequiredString("sak.junit-keystore.privatekey.password"));
 
@@ -55,10 +72,10 @@ public class SAMLSupport {
     }
 
     public String createNewToken() {
-        return createNewToken(DateTime.now(), DateTime.now().plusDays(1));
+        return createNewToken(clock.instant(), clock.instant().plus(24, ChronoUnit.HOURS));
     }
 
-    public String createNewToken(DateTime notBefore, DateTime notOnOrAfter) {
+    public String createNewToken(Instant notBefore, Instant notOnOrAfter) {
         ConditionsBuilder cb = new ConditionsBuilder();
         Conditions conditions = cb.buildObject();
         conditions.setNotBefore(notBefore);
@@ -87,7 +104,7 @@ public class SAMLSupport {
 
         AssertionBuilder ab = new AssertionBuilder();
         Assertion assertion = ab.buildObject();
-        assertion.setIssueInstant(DateTime.now());
+        assertion.setIssueInstant(clock.instant());
         assertion.setID("123");
         assertion.setVersion(SAMLVersion.VERSION_20);
         assertion.setSubject(sub);

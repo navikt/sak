@@ -3,10 +3,6 @@ package no.nav.sak.infrastruktur.abac;
 import no.nav.abac.xacml.NavAttributter;
 import no.nav.abac.xacml.StandardAttributter;
 import no.nav.resilience.ResilienceConfig;
-import no.nav.sikkerhet.abac.ABACAttribute;
-import no.nav.sikkerhet.abac.ABACClient;
-import no.nav.sikkerhet.abac.ABACRequest;
-import no.nav.sikkerhet.abac.ABACResult;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -16,12 +12,19 @@ import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.core.Request;
 import jakarta.ws.rs.core.UriInfo;
 
-import static no.nav.abac.xacml.NavAttributter.*;
+import static no.nav.abac.xacml.NavAttributter.ENVIRONMENT_FELLES_OIDC_TOKEN_BODY;
+import static no.nav.abac.xacml.NavAttributter.ENVIRONMENT_FELLES_PEP_ID;
+import static no.nav.abac.xacml.NavAttributter.ENVIRONMENT_FELLES_SAML_TOKEN;
+import static no.nav.abac.xacml.NavAttributter.RESOURCE_FELLES_DOMENE;
+import static no.nav.abac.xacml.NavAttributter.RESOURCE_FELLES_PERSON_AKTOERID_RESOURCE;
+import static no.nav.abac.xacml.NavAttributter.RESOURCE_FELLES_RESOURCE_TYPE;
 import static no.nav.sak.infrastruktur.SubjectType.SUBJECT_TYPE_SYSTEMBRUKER;
 import static no.nav.sak.infrastruktur.abac.SakPEP.RESOURCE_TYPE_SAK;
 import static no.nav.sak.infrastruktur.authentication.AuthenticationFilter.REQUEST_USERNAME;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 class SakPEPTest {
     private ABACClient abacClient = mock(ABACClient.class);

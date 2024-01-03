@@ -2,9 +2,6 @@ package no.nav.sak.infrastruktur.abac;
 
 import io.github.resilience4j.circuitbreaker.CircuitBreakerOpenException;
 import no.nav.resilience.ResilienceExecutor;
-import no.nav.sikkerhet.abac.ABACClient;
-import no.nav.sikkerhet.abac.ABACRequest;
-import no.nav.sikkerhet.abac.ABACResult;
 import org.mockito.Mockito;
 
 import java.net.SocketTimeoutException;

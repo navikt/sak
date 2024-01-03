@@ -8,15 +8,15 @@ import no.nav.sak.configuration.AbacProperties;
 import no.nav.sak.configuration.LdapProperties;
 import no.nav.sak.configuration.ServiceuserProperties;
 import no.nav.sak.configuration.StsProperties;
+import no.nav.sak.infrastruktur.abac.ABACClient;
 import no.nav.sak.infrastruktur.abac.SakPEP;
+import no.nav.sak.infrastruktur.authentication.AuthenticationResult;
+import no.nav.sak.infrastruktur.authentication.Authenticator;
+import no.nav.sak.infrastruktur.authentication.LdapConfiguration;
+import no.nav.sak.infrastruktur.authentication.OidcTokenValidator;
+import no.nav.sak.infrastruktur.authentication.SAMLValidator;
+import no.nav.sak.infrastruktur.authentication.BasicAuthenticator;
 import no.nav.sak.repository.Database;
-import no.nav.sikkerhet.abac.ABACClient;
-import no.nav.sikkerhet.authentication.AuthenticationResult;
-import no.nav.sikkerhet.authentication.Authenticator;
-import no.nav.sikkerhet.authentication.basic.BasicAuthenticator;
-import no.nav.sikkerhet.authentication.basic.LdapConfiguration;
-import no.nav.sikkerhet.authentication.oidc.OidcTokenValidator;
-import no.nav.sikkerhet.authentication.saml.SAMLValidator;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
@@ -39,7 +39,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import javax.sql.DataSource;
+import java.time.Clock;
 import java.time.Duration;
+import java.time.ZoneId;
 import java.util.Map;
 
 @Slf4j
@@ -52,6 +54,14 @@ import java.util.Map;
 		StsProperties.class
 })
 public class SakConfiguration {
+
+	public static final ZoneId NORWAY_TIME = ZoneId.of("Europe/Oslo");
+
+	@Bean
+	public Clock clock() {
+		return Clock.system(NORWAY_TIME);
+	}
+
 	@Bean
 	public SakPEP sakPEP(ABACClient abacClient, ResilienceConfig resilienceConfig) {
 		return new SakPEP(abacClient, resilienceConfig);
@@ -97,9 +107,10 @@ public class SakConfiguration {
 	@Bean
 	public SAMLValidator samlValidator(
 			@Value("${javax.net.ssl.trustStore}") String truststorePath,
-			@Value("${javax.net.ssl.trustStorePassword}") String truststorePassword
+			@Value("${javax.net.ssl.trustStorePassword}") String truststorePassword,
+			Clock clock
 	) {
-		return new SAMLValidator(truststorePath, truststorePassword);
+		return new SAMLValidator(truststorePath, truststorePassword, clock);
 	}
 
 	@Bean

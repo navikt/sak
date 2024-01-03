@@ -5,17 +5,17 @@ import no.nav.sak.configuration.AbacProperties;
 import no.nav.sak.configuration.LdapProperties;
 import no.nav.sak.configuration.ServiceuserProperties;
 import no.nav.sak.configuration.StsProperties;
+import no.nav.sak.infrastruktur.abac.ABACClient;
 import no.nav.sak.infrastruktur.abac.ABACJunitClient;
 import no.nav.sak.infrastruktur.abac.MockableSakPEP;
+import no.nav.sak.infrastruktur.authentication.Authenticator;
+import no.nav.sak.infrastruktur.authentication.LdapConfiguration;
+import no.nav.sak.infrastruktur.authentication.OidcTokenValidator;
+import no.nav.sak.infrastruktur.authentication.SAMLValidator;
 import no.nav.sak.infrastruktur.authentication.basic.JunitBasicAuthenticator;
 import no.nav.sak.infrastruktur.oicd.JunitJsonWebKey;
 import no.nav.sak.infrastruktur.oicd.JwtClaimsTestData;
 import no.nav.security.token.support.core.configuration.MultiIssuerConfiguration;
-import no.nav.sikkerhet.abac.ABACClient;
-import no.nav.sikkerhet.authentication.Authenticator;
-import no.nav.sikkerhet.authentication.basic.LdapConfiguration;
-import no.nav.sikkerhet.authentication.oidc.OidcTokenValidator;
-import no.nav.sikkerhet.authentication.saml.SAMLValidator;
 import org.jose4j.keys.resolvers.JwksVerificationKeyResolver;
 import org.jose4j.keys.resolvers.VerificationKeyResolver;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -27,6 +27,7 @@ import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.sql.DataSource;
+import java.time.Clock;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -69,7 +70,7 @@ public class SakTestConfiguration {
 
 	@Bean
 	@Primary
-	public Authenticator testAuthenticator(LdapProperties ldapProperties, SakTestTruststoreProperties truststoreProperties) {
+	public Authenticator testAuthenticator(LdapProperties ldapProperties, SakTestTruststoreProperties truststoreProperties, Clock clock) {
 		Map<String, VerificationKeyResolver> verificationKeyResolverMap = new HashMap<>();
 		verificationKeyResolverMap.put(JwtClaimsTestData.ISSUER, new JwksVerificationKeyResolver(
 				singletonList(JunitJsonWebKey.get())));
@@ -77,7 +78,7 @@ public class SakTestConfiguration {
 
 		SAMLValidator samlValidator = new SAMLValidator(
 				truststoreProperties.path(),
-				truststoreProperties.password());
+				truststoreProperties.password(), clock);
 
 		LdapConfiguration ldapConfiguration = LdapConfiguration.builder()
 				.withUrl(ldapProperties.url())

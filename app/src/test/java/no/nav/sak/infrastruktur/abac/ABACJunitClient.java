@@ -1,8 +1,5 @@
 package no.nav.sak.infrastruktur.abac;
 
-import no.nav.sikkerhet.abac.ABACClient;
-import no.nav.sikkerhet.abac.ABACRequest;
-import no.nav.sikkerhet.abac.ABACResult;
 import org.mockito.Mockito;
 
 import static org.mockito.Mockito.mock;

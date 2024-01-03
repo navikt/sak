@@ -18,7 +18,9 @@ import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.WebTarget;
 import jakarta.ws.rs.core.Response;
 
-import static no.nav.sikkerhet.authentication.AuthenticationHeaderIdentifier.SAML;
+import java.time.Clock;
+
+import static no.nav.sak.infrastruktur.authentication.AuthenticationHeaderIdentifier.SAML;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ActiveProfiles("itest")
@@ -34,6 +36,8 @@ public class SakResourceExceptionHandlingTest {
 	private int port;
 	@Resource
 	SakTestTruststoreProperties sakTestTruststoreProperties;
+	@Resource
+	Clock clock;
 
 	@MockBean
 	SakRepository sakRepository;
@@ -41,7 +45,7 @@ public class SakResourceExceptionHandlingTest {
 	@BeforeEach
 	void before() {
 		client = ClientBuilder.newClient();
-		SAMLSupport samlSupport = new SAMLSupport(sakTestTruststoreProperties, "123456789");
+		SAMLSupport samlSupport = new SAMLSupport(sakTestTruststoreProperties, "123456789", clock);
 		samlToken = samlSupport.createNewToken();
 		Mockito.doThrow(new IllegalStateException("Jeg feiler")).when(sakRepository).hentSak(Mockito.anyLong());
 	}

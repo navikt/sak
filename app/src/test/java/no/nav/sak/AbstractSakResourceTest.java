@@ -19,7 +19,9 @@ import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.client.WebTarget;
 import jakarta.ws.rs.core.Response;
 
-import static no.nav.sikkerhet.authentication.AuthenticationHeaderIdentifier.SAML;
+import java.time.Clock;
+
+import static no.nav.sak.infrastruktur.authentication.AuthenticationHeaderIdentifier.SAML;
 
 @ActiveProfiles("itest")
 @SpringBootTest(
@@ -41,10 +43,12 @@ public abstract class AbstractSakResourceTest {
 	protected TestUtilityRepository testUtilityRepository;
 	@Resource
 	SakTestTruststoreProperties sakTestTruststoreProperties;
+	@Resource
+	Clock clock;
 
 	@BeforeEach
 	void before() {
-		SAMLSupport samlSupport = new SAMLSupport(sakTestTruststoreProperties, "123456789");
+		SAMLSupport samlSupport = new SAMLSupport(sakTestTruststoreProperties, "123456789", clock);
 		String samlToken = samlSupport.createNewToken();
 		authHeaderSaml = SAML.getValue() + " " + samlToken;
 		client = ClientBuilder.newClient();

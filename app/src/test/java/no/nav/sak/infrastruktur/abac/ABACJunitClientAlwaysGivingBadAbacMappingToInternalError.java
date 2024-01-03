@@ -1,11 +1,13 @@
 package no.nav.sak.infrastruktur.abac;
 
-import no.nav.sikkerhet.abac.ABACClient;
-import no.nav.sikkerhet.abac.ABACRequest;
-import no.nav.sikkerhet.abac.ABACResult;
 import org.mockito.Mockito;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;

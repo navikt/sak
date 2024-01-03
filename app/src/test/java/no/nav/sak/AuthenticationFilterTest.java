@@ -5,7 +5,6 @@ import no.nav.sak.infrastruktur.oicd.JwtClaimsTestData;
 import no.nav.sak.infrastruktur.oicd.JwtTestData;
 import no.nav.sak.repository.Sak;
 import no.nav.sak.repository.SakTestData;
-import org.joda.time.DateTime;
 import org.jose4j.jwt.JwtClaims;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,7 +19,10 @@ import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.client.WebTarget;
 import jakarta.ws.rs.core.Response;
 
-import static no.nav.sikkerhet.authentication.AuthenticationHeaderIdentifier.SAML;
+import java.time.Clock;
+
+import static java.time.temporal.ChronoUnit.HOURS;
+import static no.nav.sak.infrastruktur.authentication.AuthenticationHeaderIdentifier.SAML;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ActiveProfiles("itest")
@@ -37,10 +39,12 @@ public class AuthenticationFilterTest {
 
 	@Resource
 	SakTestTruststoreProperties sakTestTruststoreProperties;
+	@Resource
+	Clock clock;
 
 	@BeforeEach
 	void before() throws Exception {
-		samlSupport = new SAMLSupport(sakTestTruststoreProperties, "123456789");
+		samlSupport = new SAMLSupport(sakTestTruststoreProperties, "123456789", clock);
 		samlToken = samlSupport.createNewToken();
 		client = ClientBuilder.newClient();
 	}
@@ -90,7 +94,7 @@ public class AuthenticationFilterTest {
 
 	@Test
 	void skal_nektes_adgang_naar_token_enda_ikke_gyldig() {
-		String token = samlSupport.createNewToken(DateTime.now().plusDays(1), DateTime.now().plusDays(1));
+		String token = samlSupport.createNewToken(clock.instant().plus(24, HOURS), clock.instant().plus(25, HOURS));
 
 		String header = SAML.getValue() + " " + token;
 		Response response = sakRootTarget().request()
@@ -101,7 +105,7 @@ public class AuthenticationFilterTest {
 
 	@Test
 	void skal_nektes_adgang_naar_token_er_expired() {
-		String token = samlSupport.createNewToken(DateTime.now().minusDays(2), DateTime.now().minusDays(1));
+		String token = samlSupport.createNewToken(clock.instant().minus(2*24, HOURS), clock.instant().minus(24, HOURS));
 
 		String header = SAML.getValue() + " " + token;
 		Response response = sakRootTarget().request()
