@@ -24,6 +24,11 @@
       "application": "eux-neessi",
       "namespace": "eessibasis",
       "cluster": "prod-gcp"
+    },
+    {
+      "application": "oebs-joark-api",
+      "namespace": "team-oebs",
+      "cluster": "prod-fss"
     }
 
   ]
