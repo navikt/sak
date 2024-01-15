@@ -31,11 +31,6 @@
       "application": "eux-neessi-q2",
       "namespace": "eessibasis",
       "cluster": "dev-gcp"
-    },
-    {
-      "application": "oebs-joark-api",
-      "namespace": "team-oebs",
-      "cluster": "dev-fss"
     }
   ]
 }
