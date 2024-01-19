@@ -78,7 +78,7 @@
 		</dependency>
 		<dependency>
 			<groupId>io.swagger.core.v3</groupId>
-			<artifactId>swagger-annotations</artifactId>
+			<artifactId>swagger-annotations-jakarta</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>io.swagger.core.v3</groupId>
@@ -86,8 +86,7 @@
 		</dependency>
 		<dependency>
 			<groupId>io.swagger.core.v3</groupId>
-			<artifactId>swagger-core</artifactId>
-			<version>${swagger.version}</version>
+			<artifactId>swagger-core-jakarta</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>io.prometheus</groupId>
@@ -157,7 +156,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springdoc</groupId>
-			<artifactId>springdoc-openapi-ui</artifactId>
+			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
 		</dependency>
 
 		<!-- Test -->

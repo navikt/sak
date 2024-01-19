@@ -42,7 +42,7 @@ public class SakApplication extends ResourceConfig {
 		register(new JacksonFeature());
 		registerLoggingFeature();
 		initSAML();
-		register(OpenApiResource.class);
+		register(OpenApiShimResource.class);
 		property(ServerProperties.WADL_FEATURE_DISABLE, "true");
 
 		log.info("Jersey-Application ferdig initialisert");
