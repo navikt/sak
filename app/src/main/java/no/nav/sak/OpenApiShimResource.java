@@ -1,14 +1,18 @@
 package no.nav.sak;
 
-import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.UriInfo;
 
-public class OpenApiShimResource extends OpenApiResource {
+@Path("/openapi.{type:json|yaml}")
+public class OpenApiShimResource {
 
 	@Path("/swagger-config")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -17,7 +21,7 @@ public class OpenApiShimResource extends OpenApiResource {
 	public Response fakeConfig() {
 		return Response.ok("""
 						{
-						    "configUrl": "/api/openapi.json/config",
+						    "configUrl": "/api/openapi.json/swagger-config",
 						    "oauth2RedirectUrl": "/swagger-ui/oauth2-redirect.html",
 						    "operationsSorter": "alpha",
 						    "tagsSorter": "alpha",
@@ -25,6 +29,15 @@ public class OpenApiShimResource extends OpenApiResource {
 						    "validatorUrl": ""
 						}""")
 				.build();
+	}
+
+	@GET
+	@Produces({"application/json"})
+	@Operation(hidden = true)
+	public Response getOpenApi(@Context HttpHeaders headers, @Context UriInfo uriInfo, @PathParam("type") String type) throws Exception {
+		try (var openApiStream =  this.getClass().getResourceAsStream("/openapi.json")) {
+			return Response.ok(openApiStream.readAllBytes()).build();
+		}
 	}
 
 }
