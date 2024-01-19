@@ -11,6 +11,7 @@ public class SwaggerConfigurationTest extends AbstractSakResourceTest {
 
 	@ParameterizedTest
 	@CsvSource(value = {
+			"/api/openapi.json/swagger-config,application/json,/api/openapi.json",
 			"/api/openapi.json,application/json,Sak API",
 			"/swagger-ui/index.html,text/html,Swagger UI"
 	})
