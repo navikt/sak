@@ -14,23 +14,25 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.MDC;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
 
 @Component
 // @Provider
 @Priority(Priorities.HEADER_DECORATOR)
 @Slf4j
-public class CorrelationFilter implements Filter {
+public class CorrelationFilter extends SakOncePerRequestFilter {
     private static final String CORRELATION_HEADER = "X-Correlation-ID";
 
-    @Override
-    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
+	@Override
+    public void doFilterInternal(HttpServletRequest httpRequest, HttpServletResponse httpResponse, FilterChain filterChain) throws IOException, ServletException {
 		try {
-			if (servletRequest instanceof HttpServletRequest httpRequest) {
 				String correlationId = httpRequest.getHeader(CORRELATION_HEADER);
 				MDC.put("uuid", UUID.randomUUID().toString());
 
@@ -41,14 +43,11 @@ public class CorrelationFilter implements Filter {
 				}
 
 				MDC.put("correlation-id", correlationId);
-			}
 
-			filterChain.doFilter(servletRequest, servletResponse);
+			filterChain.doFilter(httpRequest, httpResponse);
 
-			if (servletResponse instanceof HttpServletResponse httpResponse) {
 				httpResponse.addHeader(CORRELATION_HEADER, MDC.get("correlation-id"));
 				httpResponse.addHeader("X-UUID", MDC.get("uuid"));
-			}
 		} finally {
 			MDC.clear();
 		}

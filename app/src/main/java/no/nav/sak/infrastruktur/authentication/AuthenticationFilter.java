@@ -3,27 +3,28 @@ package no.nav.sak.infrastruktur.authentication;
 
 import io.prometheus.client.Counter;
 import io.prometheus.client.Histogram;
-import jakarta.servlet.Filter;
+import jakarta.annotation.Priority;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.ServletRequest;
-import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.ws.rs.Priorities;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.resilience.ResilienceConfig;
 import no.nav.resilience.ResilienceExecutor;
+import no.nav.sak.infrastruktur.ErrorResponse;
+import no.nav.sak.infrastruktur.SakOncePerRequestFilter;
 import no.nav.sak.infrastruktur.rest.UnauthorizedException;
 import no.nav.sak.tokensupport.TokenUtils;
-import no.nav.sak.infrastruktur.ErrorResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
 
-import jakarta.annotation.Priority;
-import jakarta.ws.rs.Priorities;
-import jakarta.ws.rs.ext.Provider;
 import java.io.IOException;
+import java.util.List;
 import java.util.Objects;
 
 import static jakarta.ws.rs.core.HttpHeaders.AUTHORIZATION;
@@ -37,7 +38,7 @@ import static org.apache.commons.lang3.StringUtils.trim;
 @Component
 @Priority(Priorities.AUTHENTICATION)
 @Slf4j
-public class AuthenticationFilter implements Filter {
+public class AuthenticationFilter extends SakOncePerRequestFilter {
 	public static final String REQUEST_USERNAME = "username";
 	public static final String REQUEST_CONSUMERID = "consumerid";
 
@@ -56,9 +57,9 @@ public class AuthenticationFilter implements Filter {
 	}
 
 	@Override
-	public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws ServletException, IOException {
+	public void doFilterInternal(HttpServletRequest httpRequest, HttpServletResponse servletResponse, FilterChain filterChain) throws ServletException, IOException {
 		try {
-			if (servletRequest instanceof HttpServletRequest httpRequest) {
+			// if (servletRequest instanceof HttpServletRequest httpRequest) {
 				String authHeader = httpRequest.getHeader(AUTHORIZATION);
 				String authIdentifier = StringUtils.substringBefore(trim(authHeader), " ");
 				Histogram.Timer timer;
@@ -108,9 +109,9 @@ public class AuthenticationFilter implements Filter {
 				} finally {
 					timer.observeDuration();
 				}
-			}
+			/// }
 
-			filterChain.doFilter(servletRequest, servletResponse);
+			filterChain.doFilter(httpRequest, servletResponse);
 		} finally {
 			MDC.remove(REQUEST_CONSUMERID);
 		}

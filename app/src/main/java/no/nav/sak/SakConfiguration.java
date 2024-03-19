@@ -38,11 +38,14 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 
 import javax.sql.DataSource;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.ZoneId;
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -166,4 +169,5 @@ public class SakConfiguration {
 	public ResilienceConfig resilienceConfig() {
 		return ResilienceConfig.ofDefaults();
 	}
+
 }
