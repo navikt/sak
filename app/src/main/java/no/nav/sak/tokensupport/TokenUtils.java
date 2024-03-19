@@ -25,9 +25,7 @@ public class TokenUtils {
 		JwtToken token = contextHolder.getTokenValidationContext().getJwtToken(ISSUER_AZUREAD);
 		JwtTokenClaims claims = token.getJwtTokenClaims();
 
-		Optional<String> navIdent = Optional.of(claims.getStringClaim("NAVident"));
-
-		return navIdent;
+		return Optional.ofNullable(claims.getStringClaim("NAVident"));
 	}
 
 	public static Optional<String> getClientConsumerId(String issuer) {
@@ -37,9 +35,7 @@ public class TokenUtils {
 		JwtToken token = contextHolder.getTokenValidationContext().getJwtToken(ISSUER_AZUREAD);
 		JwtTokenClaims claims = token.getJwtTokenClaims();
 
-		Optional<String> clientConsumer = Optional.of(claims.getStringClaim("azp_name"));
-
-		return clientConsumer;
+		return Optional.ofNullable(claims.getStringClaim("azp_name"));
 	}
 
 

@@ -12,10 +12,10 @@ import no.nav.sak.infrastruktur.abac.ABACClient;
 import no.nav.sak.infrastruktur.abac.SakPEP;
 import no.nav.sak.infrastruktur.authentication.AuthenticationResult;
 import no.nav.sak.infrastruktur.authentication.Authenticator;
+import no.nav.sak.infrastruktur.authentication.BasicAuthenticator;
 import no.nav.sak.infrastruktur.authentication.LdapConfiguration;
 import no.nav.sak.infrastruktur.authentication.OidcTokenValidator;
 import no.nav.sak.infrastruktur.authentication.SAMLValidator;
-import no.nav.sak.infrastruktur.authentication.BasicAuthenticator;
 import no.nav.sak.repository.Database;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -37,20 +37,15 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.EnableAspectJAutoProxy;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.security.web.util.matcher.RequestMatcher;
 
 import javax.sql.DataSource;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.ZoneId;
-import java.util.List;
 import java.util.Map;
 
 @Slf4j
 @EnableAutoConfiguration
-// @EnableJwtTokenValidation(ignore = {"org.springframework", "org.springdoc"})
 @Configuration
 @EnableConfigurationProperties({
 		AbacProperties.class,

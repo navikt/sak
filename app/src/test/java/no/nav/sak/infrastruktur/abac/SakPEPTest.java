@@ -79,8 +79,6 @@ class SakPEPTest {
         HttpServletRequest ctx = mock(HttpServletRequest.class);
         when(ctx.getAttribute(REQUEST_USERNAME)).thenReturn(username);
         when(ctx.getHeader("Authorization")).thenReturn(authHeaderContent);
-        //when(ctx.getUriInfo()).thenReturn(mock(UriInfo.class));
-        //when(ctx.getRequest()).thenReturn(mock(Request.class));
         return ctx;
     }
 

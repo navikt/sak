@@ -19,12 +19,9 @@ import no.nav.sak.tokensupport.TokenUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.stereotype.Component;
-import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Objects;
 
 import static jakarta.ws.rs.core.HttpHeaders.AUTHORIZATION;
@@ -36,7 +33,7 @@ import static org.apache.commons.lang3.StringUtils.defaultString;
 import static org.apache.commons.lang3.StringUtils.trim;
 
 @Component
-@Priority(Priorities.AUTHENTICATION)
+@Priority(Priorities.AUTHENTICATION + 1)
 @Slf4j
 public class AuthenticationFilter extends SakOncePerRequestFilter {
 	public static final String REQUEST_USERNAME = "username";
@@ -59,26 +56,23 @@ public class AuthenticationFilter extends SakOncePerRequestFilter {
 	@Override
 	public void doFilterInternal(HttpServletRequest httpRequest, HttpServletResponse servletResponse, FilterChain filterChain) throws ServletException, IOException {
 		try {
-			// if (servletRequest instanceof HttpServletRequest httpRequest) {
-				String authHeader = httpRequest.getHeader(AUTHORIZATION);
-				String authIdentifier = StringUtils.substringBefore(trim(authHeader), " ");
-				Histogram.Timer timer;
-				if (TokenUtils.hasTokenForIssuer(TokenUtils.ISSUER_AZUREAD)) {
-					timer = authenticationHistogram
-							.labels(
-									defaultString(TokenUtils.ISSUER_AZUREAD, "N/A"))
-							.startTimer();
-					timer.observeDuration();
-					authCounter.labels(defaultString("azureConsumer", "N/A"),
-							getSubjectType(httpRequest).getValue(),
-							"YES",
-							defaultString(authIdentifier, "N/A")).inc();
-					MDC.put(REQUEST_CONSUMERID, TokenUtils.getClientConsumerId(TokenUtils.ISSUER_AZUREAD).orElseThrow(this::createUnauthorizedException));
-					httpRequest.setAttribute(REQUEST_CONSUMERID, TokenUtils.getClientConsumerId(TokenUtils.ISSUER_AZUREAD).orElseThrow(this::createUnauthorizedException));
-					httpRequest.setAttribute(REQUEST_USERNAME, TokenUtils.getNavIdent(TokenUtils.ISSUER_AZUREAD).orElseThrow(this::createUnauthorizedException));
-
-					return;
-				}
+			String authHeader = httpRequest.getHeader(AUTHORIZATION);
+			String authIdentifier = StringUtils.substringBefore(trim(authHeader), " ");
+			Histogram.Timer timer;
+			if (TokenUtils.hasTokenForIssuer(TokenUtils.ISSUER_AZUREAD)) {
+				timer = authenticationHistogram
+						.labels(
+								defaultString(TokenUtils.ISSUER_AZUREAD, "N/A"))
+						.startTimer();
+				timer.observeDuration();
+				authCounter.labels(defaultString("azureConsumer", "N/A"),
+						getSubjectType(httpRequest).getValue(),
+						"YES",
+						defaultString(authIdentifier, "N/A")).inc();
+				MDC.put(REQUEST_CONSUMERID, TokenUtils.getClientConsumerId(TokenUtils.ISSUER_AZUREAD).orElseThrow(this::createUnauthorizedException));
+				httpRequest.setAttribute(REQUEST_CONSUMERID, TokenUtils.getClientConsumerId(TokenUtils.ISSUER_AZUREAD).orElseThrow(this::createUnauthorizedException));
+				httpRequest.setAttribute(REQUEST_USERNAME, TokenUtils.getNavIdent(TokenUtils.ISSUER_AZUREAD).orElseThrow(this::createUnauthorizedException));
+			} else {
 
 				if (!(Objects.equals(authIdentifier, SAML.getValue()) || Objects.equals(authIdentifier, OIDC.getValue()) || Objects.equals(authIdentifier, BASIC.getValue()))) {
 					authIdentifier = "N/A";
@@ -91,7 +85,6 @@ public class AuthenticationFilter extends SakOncePerRequestFilter {
 				try {
 					AuthenticationResult result = resilienceExecutor.execute(authHeader);
 					if (!result.isValid()) {
-						log.warn("Autentisering feilet: {}", result.getErrorMessage());
 						authCounter.labels(
 								defaultString(result.getConsumerId(), "N/A"),
 								getSubjectType(httpRequest).getValue(),
@@ -109,8 +102,8 @@ public class AuthenticationFilter extends SakOncePerRequestFilter {
 				} finally {
 					timer.observeDuration();
 				}
-			/// }
 
+			}
 			filterChain.doFilter(httpRequest, servletResponse);
 		} finally {
 			MDC.remove(REQUEST_CONSUMERID);

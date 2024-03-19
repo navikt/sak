@@ -19,50 +19,47 @@ public class PrometheusFilter extends SakOncePerRequestFilter {
         .labelNames("path", "queryparams", "method", "consumer")
         .register();
 
-    private static final String PROMETHEUS_TIMER = "prometheus_timer";
-
     @Override
     public void doFilterInternal(HttpServletRequest httpRequest, HttpServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
-		Histogram.Timer timer = null;
-			String path = httpRequest.getRequestURI();// .getPath();
-			Map<String, String> pathParameters = (Map<String, String>) httpRequest.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
+		String path = httpRequest.getRequestURI();
+		Map<String, String> pathParameters = (Map<String, String>) httpRequest.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
 
-			String sanitizedPath;
-			String jerseyApiPrefix = "/api/v1";
-			if (path.startsWith(jerseyApiPrefix)) {
-				sanitizedPath = jerseyApiPrefix + replacePathparams(StringUtils.remove(path, jerseyApiPrefix), pathParameters);
-			} else {
-				sanitizedPath = path;
-			}
-			String queryparams = "N/A";
-			if (httpRequest.getQueryString() != null && !httpRequest.getQueryString().isEmpty()) {
-				queryparams = httpRequest.getQueryString();
-			}
+		String sanitizedPath;
+		String jerseyApiPrefix = "/api/v1";
+		if (path.startsWith(jerseyApiPrefix)) {
+			sanitizedPath = jerseyApiPrefix + replacePathparams(StringUtils.remove(path, jerseyApiPrefix), pathParameters);
+		} else {
+			sanitizedPath = path;
+		}
+		String queryparams = "N/A";
+		if (httpRequest.getQueryString() != null && !httpRequest.getQueryString().isEmpty()) {
+			queryparams = httpRequest.getQueryString();
+		}
 
-			timer = requestsHistogram
-					.labels(
-							sanitizedPath,
-							queryparams,
-							httpRequest.getMethod(),
-							(String) httpRequest.getAttribute(AuthenticationFilter.REQUEST_CONSUMERID))
-					.startTimer();
+		Histogram.Timer timer = requestsHistogram
+				.labels(
+						sanitizedPath,
+						queryparams,
+						httpRequest.getMethod(),
+						(String) httpRequest.getAttribute(AuthenticationFilter.REQUEST_CONSUMERID))
+				.startTimer();
 
 		filterChain.doFilter(httpRequest, servletResponse);
 
 		if (timer != null) {
 			timer.observeDuration();
 		}
-    }
+	}
 
-    private static String replacePathparams(String path, Map<String, String> pathParameters) {
-        String modifiedPath = path;
+	private static String replacePathparams(String path, Map<String, String> pathParameters) {
+		String modifiedPath = path;
 		if (pathParameters != null)
-        for (Map.Entry<String, String> entry : pathParameters.entrySet()) {
-            String originalPathFragment = String.format("{%s}", entry.getKey());
-            modifiedPath = StringUtils.replace(path, entry.getValue(), originalPathFragment);
-        }
+			for (Map.Entry<String, String> entry : pathParameters.entrySet()) {
+				String originalPathFragment = String.format("{%s}", entry.getKey());
+				modifiedPath = StringUtils.replace(path, entry.getValue(), originalPathFragment);
+			}
 
-        return modifiedPath;
-    }
+		return modifiedPath;
+	}
 
 }
