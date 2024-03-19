@@ -58,7 +58,7 @@ import static org.springframework.http.HttpStatus.OK;
 
 @Protected
 @RestController
-@RequestMapping(SakResource.API_V1_SAKER)
+@RequestMapping({SakResource.API_V1_SAKER, SakResource.API_V1_SAKER_TRAILING_SLASH})
 @Tag(name = "/api/v1/saker")
 @OpenAPIDefinition(
 		info = @Info(
@@ -123,7 +123,8 @@ import static org.springframework.http.HttpStatus.OK;
 public class SakResource {
 
 	public static final String API_V1_SAKER_PATH_SEGMENT = "api/v1/saker";
-	public static final String API_V1_SAKER = "/" + API_V1_SAKER_PATH_SEGMENT + "/";
+	public static final String API_V1_SAKER = "/" + API_V1_SAKER_PATH_SEGMENT;
+	public static final String API_V1_SAKER_TRAILING_SLASH = API_V1_SAKER + "/";
 	private final SakRepository sakRepository;
 	private final SakPEP sakPEP;
 
