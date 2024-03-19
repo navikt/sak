@@ -65,7 +65,7 @@ public class SakRestExceptionHandler extends ResponseEntityExceptionHandler {
 	}
 
 	public ResponseEntity<Object> notFoundExceptionMapper(Exception e) {
-		log.warn("Mottatt kall mot ressurs som ikke finnes", e);
+		log.warn("Mottatt kall mot ressurs som ikke finnes {}", e.getMessage(), e);
 		return ResponseEntity
 				.status(NOT_FOUND)
 				.body(new ErrorResponse(MDC.get("uuid"), "Fant ingen ressurs for denne adressen"));
