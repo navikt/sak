@@ -5,31 +5,24 @@
         <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
     </appender>
 
-    <appender name="METRICS" class="io.prometheus.client.logback.InstrumentedAppender"/>
-
     <logger name="no.nav" level="INFO" additivity="false">
         <appender-ref ref="STDOUT_JSON"/>
-        <appender-ref ref="METRICS"/>
     </logger>
 
     <logger name="org.opensaml" level="WARN" additivity="false">
         <appender-ref ref="STDOUT_JSON"/>
-        <appender-ref ref="METRICS"/>
     </logger>
 
     <logger name="org.flyway" level="DEBUG" additivity="false">
         <appender-ref ref="STDOUT_JSON"/>
-        <appender-ref ref="METRICS"/>
     </logger>
 
     <logger name="no.nav.security.token.support" level="ERROR" additivity="false">
         <appender-ref ref="STDOUT_JSON"/>
-        <appender-ref ref="METRICS"/>
     </logger>
 
     <root level="WARN">
         <appender-ref ref="STDOUT_JSON"/>
-        <appender-ref ref="METRICS"/>
     </root>
 
 </configuration>
