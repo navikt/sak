@@ -28,7 +28,7 @@
 
         <logstash.encoder.version>7.4</logstash.encoder.version>
 
-        <commons.configuration.version>2.9.0</commons.configuration.version>
+        <commons.configuration.version>2.10.1</commons.configuration.version>
         <commons.beanutils.version>1.9.4</commons.beanutils.version>
         <nimbusds.version>11.7</nimbusds.version>
 		<opensaml.version>4.0.1</opensaml.version>
