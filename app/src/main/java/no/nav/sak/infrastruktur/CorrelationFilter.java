@@ -11,9 +11,7 @@ import jakarta.ws.rs.Priorities;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.MDC;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -36,7 +34,7 @@ public class CorrelationFilter extends SakOncePerRequestFilter {
 	}
 
 	@Override
-    public void doFilterInternal(HttpServletRequest httpRequest, HttpServletResponse httpResponse, FilterChain filterChain) throws IOException, ServletException {
+	public void doFilterInternal(HttpServletRequest httpRequest, HttpServletResponse httpResponse, FilterChain filterChain) throws IOException, ServletException {
 		try {
 			String correlationId = httpRequest.getHeader(CORRELATION_HEADER);
 			MDC.put(MDC_UUID, UUID.randomUUID().toString());

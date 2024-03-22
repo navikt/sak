@@ -29,7 +29,6 @@ import static no.nav.sak.infrastruktur.ContextExtractor.getSubjectType;
 import static no.nav.sak.infrastruktur.authentication.AuthenticationHeaderIdentifier.BASIC;
 import static no.nav.sak.infrastruktur.authentication.AuthenticationHeaderIdentifier.OIDC;
 import static no.nav.sak.infrastruktur.authentication.AuthenticationHeaderIdentifier.SAML;
-import static org.apache.commons.lang3.StringUtils.defaultString;
 import static org.apache.commons.lang3.StringUtils.trim;
 
 @Component
@@ -62,13 +61,13 @@ public class AuthenticationFilter extends SakOncePerRequestFilter {
 			if (TokenUtils.hasTokenForIssuer(TokenUtils.ISSUER_AZUREAD)) {
 				timer = authenticationHistogram
 						.labels(
-								defaultString(TokenUtils.ISSUER_AZUREAD, "N/A"))
+								Objects.toString(TokenUtils.ISSUER_AZUREAD, "N/A"))
 						.startTimer();
 				timer.observeDuration();
-				authCounter.labels(defaultString("azureConsumer", "N/A"),
+				authCounter.labels(Objects.toString("azureConsumer", "N/A"),
 						getSubjectType(httpRequest).getValue(),
 						"YES",
-						defaultString(authIdentifier, "N/A")).inc();
+						Objects.toString(authIdentifier, "N/A")).inc();
 				MDC.put(REQUEST_CONSUMERID, TokenUtils.getClientConsumerId(TokenUtils.ISSUER_AZUREAD).orElseThrow(this::createUnauthorizedException));
 				httpRequest.setAttribute(REQUEST_CONSUMERID, TokenUtils.getClientConsumerId(TokenUtils.ISSUER_AZUREAD).orElseThrow(this::createUnauthorizedException));
 				httpRequest.setAttribute(REQUEST_USERNAME, TokenUtils.getNavIdent(TokenUtils.ISSUER_AZUREAD).orElseThrow(this::createUnauthorizedException));
@@ -79,26 +78,26 @@ public class AuthenticationFilter extends SakOncePerRequestFilter {
 				}
 				timer = authenticationHistogram
 						.labels(
-								defaultString(authIdentifier, "N/A"))
+								Objects.toString(authIdentifier, "N/A"))
 						.startTimer();
 
 				try {
 					AuthenticationResult result = resilienceExecutor.execute(authHeader);
 					if (!result.isValid()) {
 						authCounter.labels(
-								defaultString(result.getConsumerId(), "N/A"),
+								Objects.toString(result.getConsumerId(), "N/A"),
 								getSubjectType(httpRequest).getValue(),
 								"NO",
-								defaultString(authIdentifier, "N/A")).inc();
+								Objects.toString(authIdentifier, "N/A")).inc();
 						throw createUnauthorizedException();
 					}
 					MDC.put(REQUEST_CONSUMERID, result.getConsumerId());
 					httpRequest.setAttribute(REQUEST_CONSUMERID, result.getConsumerId());
 					httpRequest.setAttribute(REQUEST_USERNAME, result.getUser());
-					authCounter.labels(defaultString(result.getConsumerId(), "N/A"),
+					authCounter.labels(Objects.toString(result.getConsumerId(), "N/A"),
 							getSubjectType(httpRequest).getValue(),
 							"YES",
-							defaultString(authIdentifier, "N/A")).inc();
+							Objects.toString(authIdentifier, "N/A")).inc();
 				} finally {
 					timer.observeDuration();
 				}

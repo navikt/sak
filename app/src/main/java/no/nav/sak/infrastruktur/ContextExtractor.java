@@ -4,8 +4,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import no.nav.sak.infrastruktur.authentication.AuthenticationFilter;
 import org.apache.commons.lang3.StringUtils;
 
-import jakarta.ws.rs.container.ContainerRequestContext;
-
 import static no.nav.sak.infrastruktur.SubjectType.SUBJECT_TYPE_EKSTERNBRUKER;
 import static no.nav.sak.infrastruktur.SubjectType.SUBJECT_TYPE_INTERNBRUKER;
 import static no.nav.sak.infrastruktur.SubjectType.SUBJECT_TYPE_SYSTEMBRUKER;

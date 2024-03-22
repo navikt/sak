@@ -18,9 +18,8 @@ public class ABACJunitClientAlwaysGivingBadAbacMappingToInternalError {
     static {
         final List<ABACResult.Code> tempAbacResultCodeList = Arrays.asList(ABACResult.Code.values());
         Collections.shuffle(tempAbacResultCodeList, new Random(197));
-        final Set<ABACResult.Code> tempAbacResultCodeSet = new HashSet<ABACResult.Code>(tempAbacResultCodeList);
+        final Set<ABACResult.Code> tempAbacResultCodeSet = new HashSet<>(tempAbacResultCodeList);
         tempAbacResultCodeSet.remove(ABACResult.Code.OK);
-        //tempAbacResultCodeSet.remove(ABACResult.Code.INVALID);
 
         abacResultCodesMappingToInternalError = Collections.unmodifiableSet(tempAbacResultCodeSet);
     }

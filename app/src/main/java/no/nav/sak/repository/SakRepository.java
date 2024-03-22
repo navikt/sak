@@ -10,10 +10,9 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import static org.apache.commons.lang3.StringUtils.defaultString;
 
 @Repository
 public class SakRepository {
@@ -49,8 +48,8 @@ public class SakRepository {
         opprettedeSakerCounter.labels(
             sak.getTema(),
             sak.getFagsakNr() != null ? "Fagsak" : "Generell",
-            defaultString(sak.getApplikasjon(), "N/A"),
-            defaultString(MDC.get("consumerid"), "N/A")).inc();
+			Objects.toString(sak.getApplikasjon(), "N/A"),
+            Objects.toString(MDC.get("consumerid"), "N/A")).inc();
         return sak;
     }
 
@@ -107,7 +106,7 @@ public class SakRepository {
         return latencyHisto
             .labels(
                 operation,
-                defaultString(MDC.get("consumerid"), "N/A")).startTimer();
+                Objects.toString(MDC.get("consumerid"), "N/A")).startTimer();
     }
 
     private static class Query {
