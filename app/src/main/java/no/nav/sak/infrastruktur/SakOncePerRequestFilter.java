@@ -9,7 +9,12 @@ import java.util.List;
 
 public abstract class SakOncePerRequestFilter extends OncePerRequestFilter {
 
-	private static final List<RequestMatcher> excludePaths = List.of(new AntPathRequestMatcher("/actuator/**"), new AntPathRequestMatcher("/internal/**"));
+	private static final List<RequestMatcher> excludePaths = List.of(
+			new AntPathRequestMatcher("/actuator/**"),
+			new AntPathRequestMatcher("/api/openapi.json/**"),
+			new AntPathRequestMatcher("/swagger-ui/**")
+	);
+
 	@Override
 	public final boolean shouldNotFilter(HttpServletRequest request) {
 		return excludePaths.stream().anyMatch(path -> path.matches(request));
