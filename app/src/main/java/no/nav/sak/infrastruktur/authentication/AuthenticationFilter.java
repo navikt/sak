@@ -1,8 +1,8 @@
 package no.nav.sak.infrastruktur.authentication;
 
 
-import io.prometheus.client.Counter;
-import io.prometheus.client.Histogram;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import jakarta.annotation.Priority;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -35,21 +35,24 @@ import static org.apache.commons.lang3.StringUtils.trim;
 @Priority(Priorities.AUTHENTICATION + 1)
 @Slf4j
 public class AuthenticationFilter extends SakOncePerRequestFilter {
+	public static final String CONSUMERID = "consumerid";
+	public static final String SUBJECTTYPE = "subjecttype";
+	public static final String VALID = "valid";
+	public static final String AUTHIDENTIFIER = "authidentifier";
 	public static final String REQUEST_USERNAME = "username";
-	public static final String REQUEST_CONSUMERID = "consumerid";
+	public static final String REQUEST_CONSUMERID = CONSUMERID;
 
-	private static final Histogram authenticationHistogram = Histogram.build("authentication_duration_seconds", "Authentication duration in seconds")
-			.labelNames("authidentifier")
-			.register();
-
-	private static final Counter authCounter = Counter.build("authentication_counter", "Antall autentiseringer")
-			.labelNames("consumerid", "subjecttype", "valid", "authidentifier").register();
+	private final Counter.Builder authCounter;
 
 	private final ResilienceExecutor<String, AuthenticationResult> resilienceExecutor;
+	private final MeterRegistry meterRegistry;
 
 	@Autowired
-	public AuthenticationFilter(Authenticator authenticator, ResilienceConfig resilienceConfig) {
+	public AuthenticationFilter(Authenticator authenticator, ResilienceConfig resilienceConfig, MeterRegistry meterRegistry) {
+		this.meterRegistry = meterRegistry;
 		this.resilienceExecutor = new ResilienceExecutor<>(authenticator::authenticate, resilienceConfig);
+		this.authCounter = Counter.builder("authentication_counter")
+				.description("Antall autentiseringer");
 	}
 
 	@Override
@@ -57,17 +60,13 @@ public class AuthenticationFilter extends SakOncePerRequestFilter {
 		try {
 			String authHeader = httpRequest.getHeader(AUTHORIZATION);
 			String authIdentifier = StringUtils.substringBefore(trim(authHeader), " ");
-			Histogram.Timer timer;
 			if (TokenUtils.hasTokenForIssuer(TokenUtils.ISSUER_AZUREAD)) {
-				timer = authenticationHistogram
-						.labels(
-								Objects.toString(TokenUtils.ISSUER_AZUREAD, "N/A"))
-						.startTimer();
-				timer.observeDuration();
-				authCounter.labels(Objects.toString("azureConsumer", "N/A"),
-						getSubjectType(httpRequest).getValue(),
-						"YES",
-						Objects.toString(authIdentifier, "N/A")).inc();
+				authCounter.tags(CONSUMERID, Objects.toString("azureConsumer", "N/A"),
+								SUBJECTTYPE, getSubjectType(httpRequest).getValue(),
+								VALID, "YES",
+								AUTHIDENTIFIER, Objects.toString(authIdentifier, "N/A"))
+						.register(meterRegistry)
+						.increment();
 				MDC.put(REQUEST_CONSUMERID, TokenUtils.getClientConsumerId(TokenUtils.ISSUER_AZUREAD).orElseThrow(this::createUnauthorizedException));
 				httpRequest.setAttribute(REQUEST_CONSUMERID, TokenUtils.getClientConsumerId(TokenUtils.ISSUER_AZUREAD).orElseThrow(this::createUnauthorizedException));
 				httpRequest.setAttribute(REQUEST_USERNAME, TokenUtils.getNavIdent(TokenUtils.ISSUER_AZUREAD).orElseThrow(this::createUnauthorizedException));
@@ -76,31 +75,26 @@ public class AuthenticationFilter extends SakOncePerRequestFilter {
 				if (!(Objects.equals(authIdentifier, SAML.getValue()) || Objects.equals(authIdentifier, OIDC.getValue()) || Objects.equals(authIdentifier, BASIC.getValue()))) {
 					authIdentifier = "N/A";
 				}
-				timer = authenticationHistogram
-						.labels(
-								Objects.toString(authIdentifier, "N/A"))
-						.startTimer();
 
-				try {
-					AuthenticationResult result = resilienceExecutor.execute(authHeader);
-					if (!result.isValid()) {
-						authCounter.labels(
-								Objects.toString(result.getConsumerId(), "N/A"),
-								getSubjectType(httpRequest).getValue(),
-								"NO",
-								Objects.toString(authIdentifier, "N/A")).inc();
-						throw createUnauthorizedException();
-					}
-					MDC.put(REQUEST_CONSUMERID, result.getConsumerId());
-					httpRequest.setAttribute(REQUEST_CONSUMERID, result.getConsumerId());
-					httpRequest.setAttribute(REQUEST_USERNAME, result.getUser());
-					authCounter.labels(Objects.toString(result.getConsumerId(), "N/A"),
-							getSubjectType(httpRequest).getValue(),
-							"YES",
-							Objects.toString(authIdentifier, "N/A")).inc();
-				} finally {
-					timer.observeDuration();
+				AuthenticationResult result = resilienceExecutor.execute(authHeader);
+				if (!result.isValid()) {
+					authCounter.tags(CONSUMERID, Objects.toString(result.getConsumerId(), "N/A"),
+									SUBJECTTYPE, getSubjectType(httpRequest).getValue(),
+									VALID, "NO",
+									AUTHIDENTIFIER, Objects.toString(authIdentifier, "N/A"))
+							.register(meterRegistry)
+							.increment();
+					throw createUnauthorizedException();
 				}
+				MDC.put(REQUEST_CONSUMERID, result.getConsumerId());
+				httpRequest.setAttribute(REQUEST_CONSUMERID, result.getConsumerId());
+				httpRequest.setAttribute(REQUEST_USERNAME, result.getUser());
+				authCounter.tags(CONSUMERID, Objects.toString(result.getConsumerId(), "N/A"),
+								SUBJECTTYPE, getSubjectType(httpRequest).getValue(),
+								VALID, "YES",
+								AUTHIDENTIFIER, Objects.toString(authIdentifier, "N/A"))
+						.register(meterRegistry)
+						.increment();
 
 			}
 			filterChain.doFilter(httpRequest, servletResponse);
