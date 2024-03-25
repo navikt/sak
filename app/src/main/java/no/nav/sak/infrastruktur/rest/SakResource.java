@@ -140,11 +140,11 @@ public class SakResource {
 					@ApiResponse(responseCode = "200",
 							description = "OK",
 							content = @Content(schema = @Schema(implementation = SakJson.class))),
-					@ApiResponse(responseCode = "401", description = "Konsument mangler gyldig token"),
-					@ApiResponse(responseCode = "403", description = "Konsument har ikke tilgang til å gjennomføre handlingen"),
-					@ApiResponse(responseCode = "404", description = "Det finnes ingen sak for angitt id"),
-					@ApiResponse(responseCode = "500", description = "Ukjent feilsituasjon har oppstått i Sak"),
-					@ApiResponse(responseCode = "503", description = "En eller flere tjenester som sak er avhengig av er ikke tilgjengelige eller svarer ikke.")
+					@ApiResponse(responseCode = "401", content = @Content(schema = @Schema(implementation = ErrorResponse.class)), description = "Konsument mangler gyldig token"),
+					@ApiResponse(responseCode = "403", content = @Content(schema = @Schema(implementation = ErrorResponse.class)), description = "Konsument har ikke tilgang til å gjennomføre handlingen"),
+					@ApiResponse(responseCode = "404", content = @Content(schema = @Schema(implementation = ErrorResponse.class)), description = "Det finnes ingen sak for angitt id"),
+					@ApiResponse(responseCode = "500", content = @Content(schema = @Schema(implementation = ErrorResponse.class)), description = "Ukjent feilsituasjon har oppstått i Sak"),
+					@ApiResponse(responseCode = "503", content = @Content(schema = @Schema(implementation = ErrorResponse.class)), description = "En eller flere tjenester som sak er avhengig av er ikke tilgjengelige eller svarer ikke.")
 
 			})
 	public ResponseEntity<?> hentSak(
@@ -176,10 +176,10 @@ public class SakResource {
 					@ApiResponse(responseCode = "200",
 							description = "OK",
 							content = @Content(schema = @Schema(implementation = SakJson.class, type = "list"))),
-					@ApiResponse(responseCode = "400", description = "Ugyldig input"),
-					@ApiResponse(responseCode = "401", description = "Konsument mangler gyldig token"),
-					@ApiResponse(responseCode = "500", description = "Ukjent feilsituasjon har oppstått i Sak"),
-					@ApiResponse(responseCode = "503", description = "En eller flere tjenester som sak er avhengig av er ikke tilgjengelige eller svarer ikke.")
+					@ApiResponse(responseCode = "400", content = @Content(schema = @Schema(implementation = ErrorResponse.class)), description = "Ugyldig input"),
+					@ApiResponse(responseCode = "401", content = @Content(schema = @Schema(implementation = ErrorResponse.class)), description = "Konsument mangler gyldig token"),
+					@ApiResponse(responseCode = "500", content = @Content(schema = @Schema(implementation = ErrorResponse.class)), description = "Ukjent feilsituasjon har oppstått i Sak"),
+					@ApiResponse(responseCode = "503", content = @Content(schema = @Schema(implementation = ErrorResponse.class)), description = "En eller flere tjenester som sak er avhengig av er ikke tilgjengelige eller svarer ikke.")
 			})
 	public ResponseEntity<?> finnSaker(
 			@Valid
@@ -215,12 +215,12 @@ public class SakResource {
 					@ApiResponse(responseCode = "201",
 							description = "Saken er opprettet",
 							headers = @Header(name = "location", description = "Angir URI til den opprettede saken")),
-					@ApiResponse(responseCode = "400", description = "Ugyldig input"),
-					@ApiResponse(responseCode = "401", description = "Konsument mangler gyldig token"),
-					@ApiResponse(responseCode = "403", description = "Konsument har ikke tilgang til å gjennomføre handlingen"),
-					@ApiResponse(responseCode = "409", description = "Det finnes allerede en sak for angitt kombinasjon av fagsaknr og applikasjon for aktør eller orgnr"),
-					@ApiResponse(responseCode = "500", description = "Ukjent feilsituasjon har oppstått i Sak"),
-					@ApiResponse(responseCode = "503", description = "En eller flere tjenester som sak er avhengig av er ikke tilgjengelige eller svarer ikke.")
+					@ApiResponse(responseCode = "400", content = @Content(schema = @Schema(implementation = ErrorResponse.class)), description = "Ugyldig input"),
+					@ApiResponse(responseCode = "401", content = @Content(schema = @Schema(implementation = ErrorResponse.class)), description = "Konsument mangler gyldig token"),
+					@ApiResponse(responseCode = "403", content = @Content(schema = @Schema(implementation = ErrorResponse.class)), description = "Konsument har ikke tilgang til å gjennomføre handlingen"),
+					@ApiResponse(responseCode = "409", content = @Content(schema = @Schema(implementation = ErrorResponse.class)), description = "Det finnes allerede en sak for angitt kombinasjon av fagsaknr og applikasjon for aktør eller orgnr"),
+					@ApiResponse(responseCode = "500", content = @Content(schema = @Schema(implementation = ErrorResponse.class)), description = "Ukjent feilsituasjon har oppstått i Sak"),
+					@ApiResponse(responseCode = "503", content = @Content(schema = @Schema(implementation = ErrorResponse.class)), description = "En eller flere tjenester som sak er avhengig av er ikke tilgjengelige eller svarer ikke.")
 			})
 	public ResponseEntity<?> opprettSak(
 			@RequestBody @Valid @Parameter(name = "Saken som skal opprettes", required = true) SakJson sakJson
