@@ -44,7 +44,6 @@ import java.util.Objects;
 import java.util.Optional;
 
 import static io.swagger.v3.oas.annotations.enums.SecuritySchemeIn.HEADER;
-import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
@@ -55,6 +54,7 @@ import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Protected
 @RestController
@@ -133,7 +133,7 @@ public class SakResource {
 		this.sakPEP = sakPEP;
 	}
 
-	@GetMapping(path = "/{id}", produces = APPLICATION_JSON)
+	@GetMapping(path = "/{id}", produces = APPLICATION_JSON_VALUE)
 	@Operation(summary = "Henter sak for en gitt id",
 			parameters = {@Parameter(name = "X-Correlation-ID", required = true, in = ParameterIn.HEADER)},
 			responses = {
@@ -169,7 +169,7 @@ public class SakResource {
 		}
 	}
 
-	@GetMapping(produces = APPLICATION_JSON)
+	@GetMapping(produces = APPLICATION_JSON_VALUE)
 	@Operation(summary = "Finner saker for angitte søkekriterier",
 			parameters = {@Parameter(name = "X-Correlation-ID", required = true, in = ParameterIn.HEADER)},
 			responses = {
@@ -208,7 +208,7 @@ public class SakResource {
 						.collect(toList()));
 	}
 
-	@PostMapping(produces = APPLICATION_JSON, consumes = APPLICATION_JSON)
+	@PostMapping(produces = APPLICATION_JSON_VALUE, consumes = APPLICATION_JSON_VALUE)
 	@Operation(summary = "Oppretter en ny sak",
 			description = "Merk at en sak enten skal tilhøre en aktør <b>eller</b> et foretak. Begge er p.t. ikke tillatt. ",
 			responses = {
