@@ -13,13 +13,13 @@ import java.net.URI;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpStatus.OK;
 
-public class UnrestrictedResourcesConfigurationTest extends AbstractSakResourceTest {
+public class UnprotectedResourcesConfigurationTest extends AbstractSakResourceTest {
 
 	@ParameterizedTest
 	@CsvSource(value = {
 			"/actuator/prometheus,text/plain,jvm_memory_max_bytes",
-			"/api/openapi.json/swagger-config,application/json,/api/openapi.json",
-			"/api/openapi.json,application/json,Sak API",
+			"/v3/api-docs/swagger-config,application/json,/v3/api-docs",
+			"/v3/api-docs,application/json,Sak API",
 			"/swagger-ui/index.html,text/html,Swagger UI"
 	})
 	void sjekk_at_swagger_og_actuator_er_tilgjengelig_uten_begrensninger(String path, String contentType, String title) {

@@ -6,12 +6,14 @@ import no.nav.sak.validering.AtLeastOneOf;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import jakarta.ws.rs.QueryParam;
+import org.springdoc.core.annotations.ParameterObject;
 
 import java.util.Collections;
 import java.util.List;
 
 import static org.apache.commons.lang3.builder.ToStringStyle.SHORT_PREFIX_STYLE;
 
+@ParameterObject
 @AtLeastOneOf(fields = {"aktoerId", "orgnr", "fagsakNr"})
 public class SakSearchRequest {
     @QueryParam("aktoerId")

@@ -12,6 +12,7 @@ public abstract class SakOncePerRequestFilter extends OncePerRequestFilter {
 	private static final List<RequestMatcher> excludePaths = List.of(
 			new AntPathRequestMatcher("/actuator/**"),
 			new AntPathRequestMatcher("/api/openapi.json/**"),
+			new AntPathRequestMatcher("/v3/api-docs/**"),
 			new AntPathRequestMatcher("/swagger-ui/**")
 	);
 
