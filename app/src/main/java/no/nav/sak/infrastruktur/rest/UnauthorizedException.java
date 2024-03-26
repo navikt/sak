@@ -5,7 +5,7 @@ import no.nav.sak.infrastruktur.ErrorResponse;
 public class UnauthorizedException extends SakRestException {
 
 	public UnauthorizedException(ErrorResponse errorResponse) {
-		super(errorResponse);
+		super("Unauthorized", errorResponse, null);
 	}
 
 }

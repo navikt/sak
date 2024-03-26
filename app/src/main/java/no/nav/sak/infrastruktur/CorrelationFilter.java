@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.ws.rs.Priorities;
 import lombok.extern.slf4j.Slf4j;
+import no.nav.sak.infrastruktur.rest.CorrelatableSakRuntimeException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
@@ -16,6 +17,8 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.util.UUID;
 
+import static jakarta.ws.rs.core.HttpHeaders.AUTHORIZATION;
+import static org.apache.commons.lang3.StringUtils.trim;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
 @Component
@@ -40,7 +43,8 @@ public class CorrelationFilter extends SakOncePerRequestFilter {
 			MDC.put(MDC_UUID, UUID.randomUUID().toString());
 
 			if (StringUtils.isBlank(correlationId)) {
-				log.warn("Forventet følgende header: {}, avbryter forespørsel", CORRELATION_HEADER);
+				String authIdentifier = StringUtils.substringBefore(trim(httpRequest.getHeader(AUTHORIZATION)), " ");
+				log.warn("Forventet følgende header: {}, avbryter forespørsel @ {} authIdentifier={}", CORRELATION_HEADER, httpRequest.getRequestURI(), authIdentifier);
 				httpResponse.setStatus(BAD_REQUEST.value());
 				ErrorResponse body = new ErrorResponse(MDC.get(MDC_UUID), String.format("Påkrevd header mangler: %s", CORRELATION_HEADER));
 				httpResponse.getWriter().write(OBJECT_MAPPER.writeValueAsString(body));
@@ -54,6 +58,8 @@ public class CorrelationFilter extends SakOncePerRequestFilter {
 
 			httpResponse.addHeader(CORRELATION_HEADER, MDC.get(MDC_CORRELATION_ID));
 			httpResponse.addHeader(UUID_HEADER, MDC.get(MDC_UUID));
+		} catch (RuntimeException unexpectedException) {
+			throw new CorrelatableSakRuntimeException(MDC.get(MDC_CORRELATION_ID), MDC.get(MDC_UUID), "Unexpected exception encountered: "+ unexpectedException, unexpectedException);
 		} finally {
 			MDC.clear();
 		}

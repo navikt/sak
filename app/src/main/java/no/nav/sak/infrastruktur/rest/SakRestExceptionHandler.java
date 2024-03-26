@@ -17,6 +17,7 @@ import org.springframework.web.bind.MissingPathVariableException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
@@ -31,19 +32,11 @@ import static org.springframework.http.HttpStatus.METHOD_NOT_ALLOWED;
 import static org.springframework.http.HttpStatus.NOT_ACCEPTABLE;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.SERVICE_UNAVAILABLE;
-import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 import static org.springframework.http.HttpStatus.UNSUPPORTED_MEDIA_TYPE;
 
 @ControllerAdvice
 @Slf4j
 public class SakRestExceptionHandler extends ResponseEntityExceptionHandler {
-
-	@ExceptionHandler({UnauthorizedException.class})
-	public ResponseEntity<ErrorResponse> unauthorizedExceptionMapper(UnauthorizedException unauthorizedException) {
-		return ResponseEntity
-				.status(UNAUTHORIZED)
-				.body(unauthorizedException.getErrorResponse());
-	}
 
 	@ExceptionHandler({ConstraintViolationException.class})
 	public ResponseEntity<ErrorResponse> constraintValidationExceptionMapper(ConstraintViolationException constraintValidationException) {
@@ -51,9 +44,11 @@ public class SakRestExceptionHandler extends ResponseEntityExceptionHandler {
 				.map(ConstraintViolation::getMessage)
 				.collect(Collectors.toList());
 
+		String feilmelding = StringUtils.join(violationMessages, ", ");
+		log.warn("sak request constraintviolation: [{}] ", feilmelding, constraintValidationException);
 		return ResponseEntity
 				.status(BAD_REQUEST)
-				.body(new ErrorResponse(MDC.get("uuid"), StringUtils.join(violationMessages, ", ")));
+				.body(new ErrorResponse(MDC.get("uuid"), feilmelding));
 	}
 
 	@ExceptionHandler({IllegalStateException.class})
@@ -64,8 +59,8 @@ public class SakRestExceptionHandler extends ResponseEntityExceptionHandler {
 				.body(new ErrorResponse(MDC.get("uuid"), "Det oppstod en ukjent feilsituasjon - se Kibana for årsak"));
 	}
 
-	public ResponseEntity<Object> notFoundExceptionMapper(Exception e) {
-		log.warn("Mottatt kall mot ressurs som ikke finnes {}", e.getMessage(), e);
+	private ResponseEntity<Object> notFoundExceptionMapper(Exception e, WebRequest request) {
+		log.warn("Mottatt kall mot ressurs som ikke finnes @ {} : {}", getPathForRequest(request), e.getMessage(), e);
 		return ResponseEntity
 				.status(NOT_FOUND)
 				.body(new ErrorResponse(MDC.get("uuid"), "Fant ingen ressurs for denne adressen"));
@@ -81,20 +76,21 @@ public class SakRestExceptionHandler extends ResponseEntityExceptionHandler {
 
 	@ExceptionHandler({ServiceUnavailableException.class})
 	public ResponseEntity<Object> serviceUnavailableExceptionMapper(ServiceUnavailableException serviceUnavailableException) {
+		log.warn("sak serviceunavailable downstream", serviceUnavailableException);
 		return ResponseEntity
 				.status(SERVICE_UNAVAILABLE)
 				.body(new ErrorResponse(MDC.get("uuid"), serviceUnavailableException.getMessage()));
 	}
 	@Override
 	protected ResponseEntity<Object> handleHttpRequestMethodNotSupported(HttpRequestMethodNotSupportedException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
-		log.info("Mottatt kall mot ressurs som ikke støttes");
+		log.info("Mottatt kall mot ressurs som ikke støttes @ {}", getPathForRequest(request), ex);
 		return ResponseEntity
 				.status(METHOD_NOT_ALLOWED)
 				.body(new ErrorResponse(MDC.get("uuid"), "Angitt operasjon er ikke tillatt"));
 	}
 	@Override
 	protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
-		log.info("Mottatt kall mot ressurs som ikke støttes");
+		log.info("Mottatt kall mot ressurs som ikke støttes @ {}", getPathForRequest(request), ex);
 		return ResponseEntity
 				.status(BAD_REQUEST)
 				.body(new ErrorResponse(MDC.get("uuid"), ex.getMessage()));
@@ -102,7 +98,7 @@ public class SakRestExceptionHandler extends ResponseEntityExceptionHandler {
 
 	@Override
 	protected ResponseEntity<Object> handleHttpMediaTypeNotSupported(HttpMediaTypeNotSupportedException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
-		log.info("Konsument brukte Content-Type vi ikke støtter", ex);
+		log.info("Konsument brukte Content-Type vi ikke støtter @ {}", getPathForRequest(request), ex);
 		return ResponseEntity
 				.status(UNSUPPORTED_MEDIA_TYPE)
 				.body(new ErrorResponse(MDC.get("uuid"), ex.getMessage()));
@@ -110,7 +106,7 @@ public class SakRestExceptionHandler extends ResponseEntityExceptionHandler {
 
 	@Override
 	protected ResponseEntity<Object> handleHttpMediaTypeNotAcceptable(HttpMediaTypeNotAcceptableException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
-		log.info("Konsument forespurte Accept som ikke er støttet", ex);
+		log.info("Konsument forespurte Accept som ikke er støttet @ {}", getPathForRequest(request), ex);
 		return ResponseEntity
 				.status(NOT_ACCEPTABLE)
 				.body(new ErrorResponse(MDC.get("uuid"), "MediaType not acceptable"));
@@ -118,7 +114,7 @@ public class SakRestExceptionHandler extends ResponseEntityExceptionHandler {
 
 	@Override
 	protected ResponseEntity<Object> handleMissingPathVariable(MissingPathVariableException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
-		log.info("Manglende path variabel", ex);
+		log.info("Manglende path variabel @ {}", getPathForRequest(request), ex);
 		return ResponseEntity
 				.status(BAD_REQUEST)
 				.body(new ErrorResponse(MDC.get("uuid"), ex.getMessage()));
@@ -126,7 +122,7 @@ public class SakRestExceptionHandler extends ResponseEntityExceptionHandler {
 
 	@Override
 	protected ResponseEntity<Object> handleMissingServletRequestParameter(MissingServletRequestParameterException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
-		log.info("Manglende parameter i request", ex);
+		log.info("Manglende parameter i request @ {}", getPathForRequest(request), ex);
 		return ResponseEntity
 				.status(BAD_REQUEST)
 				.body(new ErrorResponse(MDC.get("uuid"), ex.getMessage()));
@@ -134,10 +130,17 @@ public class SakRestExceptionHandler extends ResponseEntityExceptionHandler {
 
 	@Override
 	protected ResponseEntity<Object> handleNoHandlerFoundException(NoHandlerFoundException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
-		return this.notFoundExceptionMapper(ex);
+		return this.notFoundExceptionMapper(ex, request);
 	}
 	@Override
 	protected ResponseEntity<Object> handleNoResourceFoundException(NoResourceFoundException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
-		return this.notFoundExceptionMapper(ex);
+		return this.notFoundExceptionMapper(ex, request);
+	}
+
+	private static String getPathForRequest(WebRequest request) {
+		if (request instanceof ServletWebRequest servletWebRequest) {
+			return servletWebRequest.getRequest().getRequestURI();
+		}
+		return "unknown path";
 	}
 }
