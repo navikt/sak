@@ -7,16 +7,12 @@
         </encoder>
     </appender>
 
-    <appender name="METRICS" class="io.prometheus.client.logback.InstrumentedAppender"/>
-
     <logger name="no.nav" level="DEBUG" additivity="false">
         <appender-ref ref="STDOUT"/>
-        <appender-ref ref="METRICS"/>
     </logger>
 
     <logger name="org.opensaml" level="OFF" additivity="false">
         <appender-ref ref="STDOUT"/>
-        <appender-ref ref="METRICS"/>
     </logger>
 
     <logger name="io.gatling" level="DEBUG" additivity="false">
@@ -45,7 +41,6 @@
 
     <root level="OFF">
         <appender-ref ref="STDOUT"/>
-        <appender-ref ref="METRICS"/>
     </root>
 
 </configuration>

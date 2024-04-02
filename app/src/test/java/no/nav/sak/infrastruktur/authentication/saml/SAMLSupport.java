@@ -62,7 +62,7 @@ public class SAMLSupport {
 		this.clock = clock;
 		keyStore = new KeyStore(truststoreProperties.path(),
             truststoreProperties.password(),
-            keystorePrivateKeyPassword); // sakConfiguration.getRequiredString("sak.junit-keystore.privatekey.password"));
+            keystorePrivateKeyPassword);
 
         try {
             InitializationService.initialize();

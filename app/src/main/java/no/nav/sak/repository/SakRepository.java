@@ -1,9 +1,6 @@
 package no.nav.sak.repository;
 
-import io.prometheus.client.Counter;
-import io.prometheus.client.Histogram;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.MDC;
 import org.springframework.stereotype.Repository;
 
 import java.sql.SQLException;
@@ -13,17 +10,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static org.apache.commons.lang3.StringUtils.defaultString;
-
 @Repository
 public class SakRepository {
-    private static final Counter opprettedeSakerCounter = Counter.build("saker_opprettet_total", "Antall saker opprettet totalt")
-        .labelNames("tema", "type", "applikasjon", "consumer").register();
-
-    private static final Histogram latencyHisto = Histogram.build("repository_duration_seconds", "Repository latency in seconds")
-        .labelNames("operation", "consumer")
-        .register();
-
     private final Database database;
 
     public SakRepository(Database database) {
@@ -31,38 +19,21 @@ public class SakRepository {
     }
 
     public Sak lagre(Sak sak) {
-        Histogram.Timer timer = startTimer("insert");
-        try {
-            Long id = database.insert("insert into sak (id, aktoerid, orgnr, tema, applikasjon, fagsaknr, opprettet_av, opprettet_tidspunkt)" +
-                    " values (seq_sak.nextval, ?, ?, ?, ?, ?, ?, ?)",
-                sak.getAktoerId(),
-                sak.getOrgnr(),
-                sak.getTema(),
-                sak.getApplikasjon(),
-                sak.getFagsakNr(),
-                sak.getOpprettetAv(),
-                Timestamp.valueOf(sak.getOpprettetTidspunkt()));
-            sak.setId(id);
-        } finally {
-            timer.observeDuration();
-        }
-        opprettedeSakerCounter.labels(
-            sak.getTema(),
-            sak.getFagsakNr() != null ? "Fagsak" : "Generell",
-            defaultString(sak.getApplikasjon(), "N/A"),
-            defaultString(MDC.get("consumerid"), "N/A")).inc();
+		Long id = database.insert("insert into sak (id, aktoerid, orgnr, tema, applikasjon, fagsaknr, opprettet_av, opprettet_tidspunkt)" +
+						" values (seq_sak.nextval, ?, ?, ?, ?, ?, ?, ?)",
+				sak.getAktoerId(),
+				sak.getOrgnr(),
+				sak.getTema(),
+				sak.getApplikasjon(),
+				sak.getFagsakNr(),
+				sak.getOpprettetAv(),
+				Timestamp.valueOf(sak.getOpprettetTidspunkt()));
+		sak.setId(id);
         return sak;
     }
 
     public Optional<Sak> hentSak(Long id) {
-        Histogram.Timer timer = startTimer("get");
-        Optional<Sak> result;
-        try {
-             result = database.queryForSingle("select * from sak where id = ?", this::toSak, id);
-        } finally {
-            timer.observeDuration();
-        }
-        return result;
+		return database.queryForSingle("select * from sak where id = ?", this::toSak, id);
     }
 
     public List<Sak> finnSaker(SakSearchCriteria sakSearchCriteria) {
@@ -79,15 +50,8 @@ public class SakRepository {
             query.in("tema in (" + parameters + ")", sakSearchCriteria.getTema());
         }
         sakSearchCriteria.getFagsakNr().ifPresent(fagsaknr -> query.and("fagsaknr = ?", fagsaknr));
-        Histogram.Timer timer = startTimer("search");
         query.sql.append(" order by opprettet_tidspunkt desc");
-        List<Sak> result;
-        try {
-            result = database.queryForList(query.sql.toString(), query.params, this::toSak);
-        } finally {
-            timer.observeDuration();
-        }
-        return result;
+		return database.queryForList(query.sql.toString(), query.params, this::toSak);
     }
 
     private Sak toSak(Database.Row row) throws SQLException {
@@ -101,13 +65,6 @@ public class SakRepository {
             .medOpprettetAv(row.getString("opprettet_av"))
             .medOpprettetTidspunkt(row.getLocalDateTime("opprettet_tidspunkt"))
             .build();
-    }
-
-    private Histogram.Timer startTimer(String operation) {
-        return latencyHisto
-            .labels(
-                operation,
-                defaultString(MDC.get("consumerid"), "N/A")).startTimer();
     }
 
     private static class Query {

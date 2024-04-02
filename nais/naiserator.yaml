@@ -26,10 +26,9 @@ spec:
     initialDelay: 30
     failureThreshold: 10
   port: 8080
-  preStopHookPath: internal/prestop
   prometheus:
     enabled: true
-    path: internal/metrics
+    path: /actuator/prometheus
   readiness:
     path: /actuator/health/readiness
     port: 8080

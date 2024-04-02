@@ -1,6 +1,7 @@
 package no.nav.sak.infrastruktur.abac;
 
 import io.vavr.CheckedFunction1;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.abac.xacml.NavAttributter;
 import no.nav.abac.xacml.StandardAttributter;
@@ -9,7 +10,6 @@ import no.nav.resilience.ResilienceExecutor;
 import no.nav.sak.infrastruktur.SubjectType;
 import no.nav.sak.infrastruktur.authentication.AuthenticationFilter;
 
-import jakarta.ws.rs.container.ContainerRequestContext;
 import java.util.Objects;
 
 import static jakarta.ws.rs.core.HttpHeaders.AUTHORIZATION;
@@ -40,7 +40,7 @@ public class SakPEP {
 	}
 
 	public ABACResult autoriser(
-			final ContainerRequestContext ctx
+			final HttpServletRequest ctx
 			, final AuthorizationRequest authorizationRequest) {
 
 		ABACCategory category = new ABACCategory()
@@ -53,11 +53,11 @@ public class SakPEP {
 
 		authorizationRequest.getAktoerId().ifPresent(aktoerId -> category.addAttribute(new ABACAttribute(RESOURCE_FELLES_PERSON_AKTOERID_RESOURCE, aktoerId)));
 
-		final String authIdentifier = substringBefore(trim(ctx.getHeaderString(AUTHORIZATION)), " ");
-		final String token = substringAfter(trim(ctx.getHeaderString(AUTHORIZATION)), " ");
+		final String authIdentifier = substringBefore(trim(ctx.getHeader(AUTHORIZATION)), " ");
+		final String token = substringAfter(trim(ctx.getHeader(AUTHORIZATION)), " ");
 
 		if (Objects.equals(BASIC.getValue(), authIdentifier)) {
-			abacRequest.addAccessSubject(new ABACAttribute(StandardAttributter.SUBJECT_ID, (String) ctx.getProperty(AuthenticationFilter.REQUEST_USERNAME)));
+			abacRequest.addAccessSubject(new ABACAttribute(StandardAttributter.SUBJECT_ID, (String) ctx.getAttribute(AuthenticationFilter.REQUEST_USERNAME)));
 			abacRequest.addAccessSubject(new ABACAttribute(NavAttributter.SUBJECT_FELLES_SUBJECTTYPE, SubjectType.SUBJECT_TYPE_SYSTEMBRUKER.getValue()));
 		} else if (Objects.equals(OIDC.getValue(), authIdentifier)) {
 			final String tokenBody = substringBetween(token, ".");
@@ -74,12 +74,12 @@ public class SakPEP {
 			if (ABACResult.Code.OK.equals(abacResult.getResultCode())) {
 				if (abacResult.hasAccess()) {
 					log.info("Bruker fikk permit. ConsumerID: {}; User: {};",
-							ctx.getProperty(AuthenticationFilter.REQUEST_CONSUMERID),
-							ctx.getProperty(AuthenticationFilter.REQUEST_USERNAME));
+							ctx.getAttribute(AuthenticationFilter.REQUEST_CONSUMERID),
+							ctx.getAttribute(AuthenticationFilter.REQUEST_USERNAME));
 				} else {
 					log.info("Bruker fikk deny. ConsumerID: {}; User: {};",
-							ctx.getProperty(AuthenticationFilter.REQUEST_CONSUMERID),
-							ctx.getProperty(AuthenticationFilter.REQUEST_USERNAME));
+							ctx.getAttribute(AuthenticationFilter.REQUEST_CONSUMERID),
+							ctx.getAttribute(AuthenticationFilter.REQUEST_USERNAME));
 				}
 			}
 		} catch (Throwable t) {

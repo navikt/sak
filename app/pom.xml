@@ -26,22 +26,6 @@
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-jersey</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.glassfish.jersey.ext</groupId>
-			<artifactId>jersey-bean-validation</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.glassfish.jersey.containers</groupId>
-			<artifactId>jersey-container-servlet</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.glassfish.jersey.media</groupId>
-			<artifactId>jersey-media-json-jackson</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>jakarta.xml.bind</groupId>
 			<artifactId>jakarta.xml.bind-api</artifactId>
 		</dependency>
@@ -52,6 +36,10 @@
 		<dependency>
 			<groupId>com.oracle.database.jdbc</groupId>
 			<artifactId>ojdbc11</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate.validator</groupId>
+			<artifactId>hibernate-validator</artifactId>
 		</dependency>
 
 		<dependency>
@@ -89,18 +77,6 @@
 			<artifactId>swagger-core-jakarta</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>io.prometheus</groupId>
-			<artifactId>simpleclient</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>io.prometheus</groupId>
-			<artifactId>simpleclient_hotspot</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>io.prometheus</groupId>
-			<artifactId>simpleclient_logback</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>commons-beanutils</groupId>
 			<artifactId>commons-beanutils</artifactId>
 		</dependency>
@@ -119,10 +95,6 @@
 		<dependency>
 			<groupId>org.ehcache</groupId>
 			<artifactId>ehcache</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.glassfish.jersey.inject</groupId>
-			<artifactId>jersey-hk2</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>no.nav.security</groupId>
@@ -172,8 +144,8 @@
 			</exclusions>
 		</dependency>
 		<dependency>
-			<groupId>org.glassfish.jersey.test-framework.providers</groupId>
-			<artifactId>jersey-test-framework-provider-inmemory</artifactId>
+			<groupId>org.apache.httpcomponents.client5</groupId>
+			<artifactId>httpclient5</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -197,6 +169,14 @@
 		<dependency>
 			<groupId>jakarta.servlet</groupId>
 			<artifactId>jakarta.servlet-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-web</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.micrometer</groupId>
+			<artifactId>micrometer-registry-prometheus</artifactId>
 		</dependency>
 	</dependencies>
 

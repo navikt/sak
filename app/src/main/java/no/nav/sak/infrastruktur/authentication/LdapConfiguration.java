@@ -16,13 +16,13 @@ import lombok.Value;
 public class LdapConfiguration {
 
 	@NonNull
-	private final String serviceUserBaseDN;
+	String serviceUserBaseDN;
 	@NonNull
-	private final String url;
+	String url;
 	@NonNull
-	private final String bindUser;
+	String bindUser;
 	@ToString.Exclude
-	private final String bindPassword;
+	String bindPassword;
 
 	public static class Builder {
 		public LdapConfiguration build() {

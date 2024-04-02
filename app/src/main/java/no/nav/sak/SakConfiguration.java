@@ -12,10 +12,10 @@ import no.nav.sak.infrastruktur.abac.ABACClient;
 import no.nav.sak.infrastruktur.abac.SakPEP;
 import no.nav.sak.infrastruktur.authentication.AuthenticationResult;
 import no.nav.sak.infrastruktur.authentication.Authenticator;
+import no.nav.sak.infrastruktur.authentication.BasicAuthenticator;
 import no.nav.sak.infrastruktur.authentication.LdapConfiguration;
 import no.nav.sak.infrastruktur.authentication.OidcTokenValidator;
 import no.nav.sak.infrastruktur.authentication.SAMLValidator;
-import no.nav.sak.infrastruktur.authentication.BasicAuthenticator;
 import no.nav.sak.repository.Database;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -164,4 +164,5 @@ public class SakConfiguration {
 	public ResilienceConfig resilienceConfig() {
 		return ResilienceConfig.ofDefaults();
 	}
+
 }

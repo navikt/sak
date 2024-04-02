@@ -9,12 +9,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
-import jakarta.ws.rs.client.Entity;
-import jakarta.ws.rs.core.Response;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 
 public class SakResourceBadAbacMappingToInternalErrorTest extends AbstractSakResourceTest {
 
@@ -34,23 +35,25 @@ public class SakResourceBadAbacMappingToInternalErrorTest extends AbstractSakRes
         final String tema = RandomStringUtils.randomAlphabetic(4);
         final Sak sak = testUtilityRepository.lagre(new SakTestData().tema(tema).build());
 
-        final Response response = executeGetRequest(sakRootTarget()
+        final ResponseEntity<?> response = executeGetRequestWithSaml(
+				UriComponentsBuilder.newInstance()
                 .queryParam("tema", sak.getTema())
-                .queryParam("aktoerId", sak.getAktoerId()));
+                .queryParam("aktoerId", sak.getAktoerId())
+				.build().toUri()
+		);
 
-        assertThat(response.getStatus()).isEqualTo(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode());
+        assertThat(response.getStatusCode()).isEqualTo(INTERNAL_SERVER_ERROR);
     }
 
     @Override
-    protected Response createSakAndTestReponse(final Sak sak) {
+    protected ResponseEntity<Object> createSakAndTestReponse(final Sak sak) {
 
-        final Response createdResponse =
-                executePost(
-                        Entity
-                                .json(new SakJsonTestData(sak).buildJsonString())
+        final ResponseEntity<Object> createdResponse =
+                executePostWithSaml(
+                                new SakJsonTestData(sak).buildJsonString()
                 );
 
-        assertThat(createdResponse.getStatus()).isEqualTo(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode());
+        assertThat(createdResponse.getStatusCode()).isEqualTo(INTERNAL_SERVER_ERROR);
 
         return createdResponse;
     }

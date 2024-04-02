@@ -18,7 +18,6 @@ import org.springframework.web.context.request.RequestContextListener;
 })
 public class TokenSupportConfig {
 
-	@Bean
 	public FilterRegistrationBean<JwtTokenValidationFilter> oidcTokenValidationFilterBean(
 			MultiIssuerConfiguration config) {
 		return new FilterRegistrationBean<>(new SakJwtTokenValidationFilter(config));

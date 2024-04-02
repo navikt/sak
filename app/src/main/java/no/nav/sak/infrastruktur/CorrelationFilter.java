@@ -1,45 +1,68 @@
 package no.nav.sak.infrastruktur;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import jakarta.annotation.Priority;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.ws.rs.Priorities;
 import lombok.extern.slf4j.Slf4j;
+import no.nav.sak.infrastruktur.rest.CorrelatableSakRuntimeException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.MDC;
+import org.springframework.stereotype.Component;
 
-import jakarta.annotation.Priority;
-import jakarta.ws.rs.container.ContainerRequestContext;
-import jakarta.ws.rs.container.ContainerRequestFilter;
-import jakarta.ws.rs.container.ContainerResponseContext;
-import jakarta.ws.rs.container.ContainerResponseFilter;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.ext.Provider;
 import java.io.IOException;
 import java.util.UUID;
 
-@EnableApiFilters
-@Provider
-@Priority(0)
+import static jakarta.ws.rs.core.HttpHeaders.AUTHORIZATION;
+import static org.apache.commons.lang3.StringUtils.trim;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+
+@Component
+@Priority(Priorities.AUTHENTICATION - 10)
 @Slf4j
-public class CorrelationFilter implements ContainerRequestFilter, ContainerResponseFilter {
-    private static final String CORRELATION_HEADER = "X-Correlation-ID";
+public class CorrelationFilter extends SakOncePerRequestFilter {
+	private static final String CORRELATION_HEADER = "X-Correlation-ID";
+	public static final String MDC_CORRELATION_ID = "correlation-id";
+	public static final String UUID_HEADER = "X-UUID";
+	public static final String MDC_UUID = "uuid";
 
-    @Override
-    public void filter(ContainerRequestContext containerRequestContext) throws IOException {
-        String correlationId = containerRequestContext.getHeaderString(CORRELATION_HEADER);
-        MDC.put("uuid", UUID.randomUUID().toString());
+	public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-        if (StringUtils.isBlank(correlationId)) {
-            log.warn("Forventet følgende header: {}, avbryter forespørsel", CORRELATION_HEADER);
-            containerRequestContext.abortWith(Response.status(Response.Status.BAD_REQUEST)
-                .entity(new ErrorResponse(MDC.get("uuid"), String.format("Påkrevd header mangler: %s", CORRELATION_HEADER)))
-                .build());
-        }
+	static {
+		OBJECT_MAPPER.enable(SerializationFeature.WRAP_ROOT_VALUE);
+	}
 
-        MDC.put("correlation-id", correlationId);
-    }
+	@Override
+	public void doFilterInternal(HttpServletRequest httpRequest, HttpServletResponse httpResponse, FilterChain filterChain) throws IOException, ServletException {
+		try {
+			String correlationId = httpRequest.getHeader(CORRELATION_HEADER);
+			MDC.put(MDC_UUID, UUID.randomUUID().toString());
 
-    @Override
-    public void filter(ContainerRequestContext containerRequestContext, ContainerResponseContext containerResponseContext) throws IOException {
-        containerResponseContext.getHeaders().add(CORRELATION_HEADER, MDC.get("correlation-id"));
-        containerResponseContext.getHeaders().add("X-UUID", MDC.get("uuid"));
-        MDC.clear();
-    }
+			if (StringUtils.isBlank(correlationId)) {
+				String authIdentifier = StringUtils.substringBefore(trim(httpRequest.getHeader(AUTHORIZATION)), " ");
+				log.warn("Forventet følgende header: {}, avbryter forespørsel @ {} authIdentifier={}", CORRELATION_HEADER, httpRequest.getRequestURI(), authIdentifier);
+				httpResponse.setStatus(BAD_REQUEST.value());
+				ErrorResponse body = new ErrorResponse(MDC.get(MDC_UUID), String.format("Påkrevd header mangler: %s", CORRELATION_HEADER));
+				httpResponse.getWriter().write(OBJECT_MAPPER.writeValueAsString(body));
+				MDC.clear();
+				return;
+			}
+
+			MDC.put(MDC_CORRELATION_ID, correlationId);
+
+			filterChain.doFilter(httpRequest, httpResponse);
+
+			httpResponse.addHeader(CORRELATION_HEADER, MDC.get(MDC_CORRELATION_ID));
+			httpResponse.addHeader(UUID_HEADER, MDC.get(MDC_UUID));
+		} catch (RuntimeException unexpectedException) {
+			throw new CorrelatableSakRuntimeException(MDC.get(MDC_CORRELATION_ID), MDC.get(MDC_UUID), "Unexpected exception encountered: "+ unexpectedException, unexpectedException);
+		} finally {
+			MDC.clear();
+		}
+	}
+
 }
