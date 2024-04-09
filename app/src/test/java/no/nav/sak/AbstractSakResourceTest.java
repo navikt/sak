@@ -1,5 +1,6 @@
 package no.nav.sak;
 
+import jakarta.annotation.Resource;
 import no.nav.sak.infrastruktur.authentication.saml.SAMLSupport;
 import no.nav.sak.repository.Sak;
 import no.nav.sak.repository.SakRepository;
@@ -16,8 +17,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
-
-import jakarta.annotation.Resource;
 
 import java.net.URI;
 import java.time.Clock;
@@ -47,7 +46,7 @@ public abstract class AbstractSakResourceTest {
 	Clock clock;
 
 	@BeforeEach
-	void before() {
+	void beforeAbstract() {
 		SAMLSupport samlSupport = new SAMLSupport(sakTestTruststoreProperties, "123456789", clock);
 		String samlToken = samlSupport.createNewToken();
 		authHeaderSaml = SAML.getValue() + " " + samlToken;
