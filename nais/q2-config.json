@@ -2,7 +2,7 @@
   "ABAC_PDP_ENDPOINT": "https://abac-sak-q2.dev.intern.nav.no/application/asm-pdp/authorize",
   "STS_ISSUER": "https://security-token-service.nais.preprod.local",
   "STS_JWKS": "https://security-token-service.nais.preprod.local/rest/v1/sts/jwks",
-  "SPRING_DATASOURCE_URL": "jdbc:oracle:thin:@a01dbfl033.adeo.no:1521/joark_q2",
+  "SPRING_DATASOURCE_URL": "jdbc:oracle:thin:@dmv09-scan.adeo.no:1521/joark_q2_ha",
   "LDAP": "/serviceuser/data/dev/srvssolinux",
   "SRVSAK": "/serviceuser/data/dev/srvsak",
   "SAKDS": "/oracle/data/dev/creds/sak_q2-user",
