@@ -15,10 +15,12 @@ public class SakTestData {
     private String applikasjon;
     private String opprettetAv = RandomStringUtils.randomAlphabetic(8);
     private LocalDateTime opprettetTidspunkt = LocalDateTime.now();
+	private Long id;
 
 
     public Sak build() {
         return new Sak.Builder()
+            .medId(id)
             .medAktoerId(aktoerId)
             .medOrgnr(orgnr)
             .medTema(tema)
@@ -29,6 +31,14 @@ public class SakTestData {
             .build();
     }
 
+	public SakTestData duplicateOf(SakTestData sakTestData) {
+		this.tema = sakTestData.tema;
+		this.aktoerId = sakTestData.aktoerId;
+		this.orgnr = sakTestData.orgnr;
+		this.fagsakNr = sakTestData.fagsakNr;
+		this.applikasjon = sakTestData.applikasjon;
+		return this;
+	}
 
     public SakTestData aktoerId(String aktoerId) {
         this.aktoerId = aktoerId;
@@ -56,6 +66,11 @@ public class SakTestData {
         this.applikasjon = applikasjon;
         return this;
     }
+
+	public SakTestData medId(long id) {
+		this.id = id;
+		return this;
+	}
 
     public static String generateValidOrgnr() {
         return gyldigeOrgnr[RandomUtils.nextInt(0, 3)];

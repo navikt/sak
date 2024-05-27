@@ -6,9 +6,11 @@ import org.springframework.stereotype.Repository;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.*;
 
 @Repository
 public class SakRepository {
@@ -39,22 +41,22 @@ public class SakRepository {
     public List<Sak> finnSaker(SakSearchCriteria sakSearchCriteria) {
         Query query = new Query("select * from sak");
         if (sakSearchCriteria.getAktoerId() != null && !sakSearchCriteria.getAktoerId().isEmpty()) {
-            String parameters = sakSearchCriteria.getAktoerId().stream().map(t -> "?").collect(Collectors.joining(","));
+            String parameters = sakSearchCriteria.getAktoerId().stream().map(t -> "?").collect(joining(","));
             query.in("aktoerId in (" + parameters + ")", sakSearchCriteria.getAktoerId());
         }
         sakSearchCriteria.getOrgnr().ifPresent(orgnr -> query.and("orgnr = ?", orgnr));
         sakSearchCriteria.getApplikasjon().ifPresent(applikasjon -> query.and("applikasjon = ?", applikasjon));
 
         if(!sakSearchCriteria.getTema().isEmpty()) {
-            String parameters = sakSearchCriteria.getTema().stream().map(t -> "?").collect(Collectors.joining(","));
+            String parameters = sakSearchCriteria.getTema().stream().map(t -> "?").collect(joining(","));
             query.in("tema in (" + parameters + ")", sakSearchCriteria.getTema());
         }
         sakSearchCriteria.getFagsakNr().ifPresent(fagsaknr -> query.and("fagsaknr = ?", fagsaknr));
         query.sql.append(" order by opprettet_tidspunkt desc");
-		return database.queryForList(query.sql.toString(), query.params, this::toSak);
-    }
+		return velgTidligstOpprettetOmDupliserte(database.queryForList(query.sql.toString(), query.params, this::toSak));
+	}
 
-    private Sak toSak(Database.Row row) throws SQLException {
+	private Sak toSak(Database.Row row) throws SQLException {
         return new Sak.Builder()
             .medId(row.getLong("id"))
             .medAktoerId(row.getString("aktoerId"))
@@ -67,7 +69,18 @@ public class SakRepository {
             .build();
     }
 
-    private static class Query {
+	private static List<Sak> velgTidligstOpprettetOmDupliserte(List<Sak> saks) {
+		return saks
+				.stream()
+				.collect(groupingBy(Sak::hashForDuplikat,
+								minBy(Comparator.nullsLast(Comparator.comparing(Sak::getOpprettetTidspunkt)))))
+				.values()
+				.stream()
+				.map(Optional::get)
+				.toList();
+	}
+
+	private static class Query {
         private final StringBuilder sql = new StringBuilder();
         private final List<Object> params = new ArrayList<>();
 

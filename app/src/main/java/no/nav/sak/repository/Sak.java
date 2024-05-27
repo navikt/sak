@@ -76,6 +76,18 @@ public class Sak {
         return Objects.equals(id, sak.id);
     }
 
+	public boolean erDuplikat(Sak otherSak) {
+		return Objects.equals(tema, otherSak.tema) &&
+				Objects.equals(applikasjon, otherSak.applikasjon) &&
+				Objects.equals(fagsakNr, otherSak.fagsakNr) &&
+				Objects.equals(aktoerId, otherSak.aktoerId) &&
+				Objects.equals(orgnr, otherSak.orgnr);
+	}
+
+	public int hashForDuplikat() {
+		return Objects.hash(tema, applikasjon, fagsakNr, aktoerId, orgnr);
+	}
+
     @Override
     public int hashCode() {
         return Objects.hash(id);
