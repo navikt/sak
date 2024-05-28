@@ -68,15 +68,20 @@ public class Sak {
         return opprettetTidspunkt;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Sak sak = (Sak) o;
-        return Objects.equals(id, sak.id);
-    }
-
+    /**
+     * Sjekk om en sak er duplikat av en annen sak - dvs. at den har samme tema, applikasjon, fagsaknummer, aktørId og
+     * organisasjonsnummer.
+     *
+     * Merk at en duplikat sak ikke er identisk med en annen sak, den kan (vil som regel) ha annen id
+     * og annet opprettetTidspunkt. Dette er derfor ikke det samme som sak.equals() NB!
+     *
+     * @param otherSak sak som skal sjekkes om er duplikat
+     * @return true om saken og otherSak har samme verdier for de relevante feltene, false ellers
+     */
     public boolean erDuplikat(Sak otherSak) {
+        if (otherSak == null) {
+            return false;
+        }
         return Objects.equals(tema, otherSak.tema) &&
             Objects.equals(applikasjon, otherSak.applikasjon) &&
             Objects.equals(fagsakNr, otherSak.fagsakNr) &&
@@ -84,8 +89,26 @@ public class Sak {
             Objects.equals(orgnr, otherSak.orgnr);
     }
 
+    /**
+     * Hash som kan brukes for å finne duplikate saker - dvs. saker som har samme tema, applikasjon, fagsaknummer, aktørId og
+     * organisasjonsnummer. Se forøvrig erDuplikat(Sak) over.
+     *
+     * Merk at en duplikat sak ikke er identisk med en annen sak,
+     * den vil som regel ha annen id og annet opprettetTidspunkt. Denne metoden går ikke over alle feltene i sak-objektet,
+     * og har ikke sammenheng med sak.equals(...) / sak.hashCode() NB!
+     *
+     * @return hash over feltene som er relevante å sammenligne for å se om en sak er duplikat av en annen sak
+     */
     public int hashForDuplikat() {
         return Objects.hash(tema, applikasjon, fagsakNr, aktoerId, orgnr);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Sak sak = (Sak) o;
+        return Objects.equals(id, sak.id);
     }
 
     @Override
