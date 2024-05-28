@@ -15,7 +15,7 @@ public class SakTestData {
     private String applikasjon;
     private String opprettetAv = RandomStringUtils.randomAlphabetic(8);
     private LocalDateTime opprettetTidspunkt = LocalDateTime.now();
-	private Long id;
+    private Long id;
 
 
     public Sak build() {
@@ -31,14 +31,23 @@ public class SakTestData {
             .build();
     }
 
-	public SakTestData duplicateOf(SakTestData sakTestData) {
-		this.tema = sakTestData.tema;
-		this.aktoerId = sakTestData.aktoerId;
-		this.orgnr = sakTestData.orgnr;
-		this.fagsakNr = sakTestData.fagsakNr;
-		this.applikasjon = sakTestData.applikasjon;
-		return this;
-	}
+    public SakTestData duplicateOf(SakTestData sakTestData) {
+        this.tema = sakTestData.tema;
+        this.aktoerId = sakTestData.aktoerId;
+        this.orgnr = sakTestData.orgnr;
+        this.fagsakNr = sakTestData.fagsakNr;
+        this.applikasjon = sakTestData.applikasjon;
+        return this;
+    }
+
+    public SakTestData aktoerOrOrganisasjon(String aktoerId, String orgnr) {
+        if (aktoerId != null && orgnr != null) {
+            throw new IllegalArgumentException("One of aktoerId and orgnr must be null");
+        }
+        this.orgnr = orgnr;
+        this.aktoerId = aktoerId;
+        return this;
+    }
 
     public SakTestData aktoerId(String aktoerId) {
         this.aktoerId = aktoerId;
@@ -67,10 +76,10 @@ public class SakTestData {
         return this;
     }
 
-	public SakTestData medId(long id) {
-		this.id = id;
-		return this;
-	}
+    public SakTestData medId(long id) {
+        this.id = id;
+        return this;
+    }
 
     public static String generateValidOrgnr() {
         return gyldigeOrgnr[RandomUtils.nextInt(0, 3)];

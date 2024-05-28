@@ -1,7 +1,6 @@
 package no.nav.sak.repository;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
@@ -24,12 +23,11 @@ public class Database {
     private final DataSource dataSource;
     private final ThreadLocal<Connection> threadConnection = new ThreadLocal<>();
 
-    @Autowired
     public Database(DataSource dataSource) {
         this.dataSource = dataSource;
     }
 
-    public Long insert(String sql, Object... parameters) {
+    Long insert(String sql, Object... parameters) {
         return doWithConnection(conn -> {
             log.debug("Utfører: {}, med parametre: {}", sql, parameters);
             try (PreparedStatement preparedStatement = conn.prepareStatement(sql, new String[]{"id"})) {
@@ -53,7 +51,7 @@ public class Database {
         });
     }
 
-    public <T> Optional<T> queryForSingle(String query, RowMapper<T> mapper, Object... parameters) {
+    <T> Optional<T> queryForSingle(String query, RowMapper<T> mapper, Object... parameters) {
         return executeDbOperation(query, asList(parameters), stmt -> {
             try (ResultSet rs = stmt.executeQuery()) {
                 return mapSingleRow(rs, mapper);
@@ -61,7 +59,7 @@ public class Database {
         });
     }
 
-    public <T> List<T> queryForList(String query, List<Object> parameters, RowMapper<T> mapper) {
+    <T> List<T> queryForList(String query, List<Object> parameters, RowMapper<T> mapper) {
         return executeDbOperation(query, parameters, stmt -> {
             try (ResultSet rs = stmt.executeQuery()) {
                 Row row = new Row(rs);
@@ -74,16 +72,6 @@ public class Database {
         });
     }
 
-    public void execute(String query, Object... parameters) {
-        executeDbOperation(query, asList(parameters), PreparedStatement::executeUpdate);
-    }
-
-
-    public ThreadLocal<Connection> getThreadConnection() {
-        return threadConnection;
-    }
-
-
     private <T> T doWithConnection(ConnectionCallback<T> object) {
         if (threadConnection.get() != null) {
             return object.run(threadConnection.get());
@@ -95,11 +83,7 @@ public class Database {
         }
     }
 
-    public DataSource getDataSource() {
-        return dataSource;
-    }
-
-    private <T> T executeDbOperation(String query, Collection<Object> parameters,
+    protected  <T> T executeDbOperation(String query, Collection<Object> parameters,
                                      StatementCallback<T> statementCallback) {
         return doWithConnection(conn -> {
             log.debug("Kjører: {} med parametre {}", query, parameters);
@@ -126,7 +110,7 @@ public class Database {
         return Optional.of(result);
     }
 
-    private interface StatementCallback<T> {
+    protected interface StatementCallback<T> {
         T run(PreparedStatement stmt) throws SQLException;
     }
 
@@ -137,7 +121,6 @@ public class Database {
     public interface RowMapper<T> {
         T run(Row row) throws SQLException;
     }
-
 
     public static class Row {
 

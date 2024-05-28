@@ -53,10 +53,10 @@ public class SakRepository {
         }
         sakSearchCriteria.getFagsakNr().ifPresent(fagsaknr -> query.and("fagsaknr = ?", fagsaknr));
         query.sql.append(" order by opprettet_tidspunkt desc");
-		return velgTidligstOpprettetOmDupliserte(database.queryForList(query.sql.toString(), query.params, this::toSak));
-	}
+        return velgTidligstOpprettetOmDupliserte(database.queryForList(query.sql.toString(), query.params, this::toSak));
+    }
 
-	private Sak toSak(Database.Row row) throws SQLException {
+    private Sak toSak(Database.Row row) throws SQLException {
         return new Sak.Builder()
             .medId(row.getLong("id"))
             .medAktoerId(row.getString("aktoerId"))
@@ -69,18 +69,18 @@ public class SakRepository {
             .build();
     }
 
-	private static List<Sak> velgTidligstOpprettetOmDupliserte(List<Sak> saks) {
-		return saks
-				.stream()
-				.collect(groupingBy(Sak::hashForDuplikat,
-								minBy(Comparator.nullsLast(Comparator.comparing(Sak::getOpprettetTidspunkt)))))
-				.values()
-				.stream()
-				.map(Optional::get)
-				.toList();
-	}
+    private static List<Sak> velgTidligstOpprettetOmDupliserte(List<Sak> saks) {
+        return saks
+            .stream()
+            .collect(groupingBy(Sak::hashForDuplikat,
+                        minBy(Comparator.comparing(Sak::getOpprettetTidspunkt))))
+            .values()
+            .stream()
+            .map(Optional::get)
+            .toList();
+    }
 
-	private static class Query {
+    private static class Query {
         private final StringBuilder sql = new StringBuilder();
         private final List<Object> params = new ArrayList<>();
 

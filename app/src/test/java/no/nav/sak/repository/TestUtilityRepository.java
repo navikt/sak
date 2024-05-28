@@ -4,16 +4,16 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class TestUtilityRepository {
-	private final Database database;
+	private final TestDatabase database;
 	private final SakRepository sakRepository;
 
-	public TestUtilityRepository(Database database) {
+	public TestUtilityRepository(TestDatabase database) {
 		this.database = database;
 		this.sakRepository = new SakRepository(database);
 	}
 
 	public void resetAfterTest() {
-		database.execute("truncate table sak;");
+		database.truncateSakTable();
 	}
 
 	public Sak lagre(Sak sak) {
