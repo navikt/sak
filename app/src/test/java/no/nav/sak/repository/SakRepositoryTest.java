@@ -82,17 +82,18 @@ class SakRepositoryTest {
 
     @ParameterizedTest
     @CsvSource({
-    "TEM,,fasgka,974652250,",
-        "TEM,,fagska,,aktoer10",
-        "TEM,FS22,,974652250,",
-        "TEM,FS22,,,aktoer10"
+        ",fasgka,974652250,",
+        ",fagska,,aktoer10",
+        "FS22,,974652250,",
+        "FS22,,,aktoer10"
     })
-    void finner_saker_for_flere_kriterier_og_duplikater(String tema, String applikasjon, String fagsakNr, String orgnr, String aktoerId) {
+    void finner_saker_for_flere_kriterier_og_duplikater(String applikasjon, String fagsakNr, String orgnr, String aktoerId) {
         Sak sakAnnetOrgnr = sakRepository.lagre(new SakTestData().fagsakNr(randomNumeric(6)).orgnr(SakTestData.generateValidOrgnr()).build());
         Sak sakAnnenAktoer = sakRepository.lagre(new SakTestData().fagsakNr(randomNumeric(6)).aktoerId(randomNumeric(5)).build());
         Sak generellSakAnnetOrgnr = sakRepository.lagre(new SakTestData().applikasjon("FS22").orgnr(SakTestData.generateValidOrgnr()).build());
         Sak generellSakAnnenAktoer = sakRepository.lagre(new SakTestData().applikasjon("FS22").aktoerId(randomNumeric(5)).build());
 
+        String tema = "TEM";
         SakTestData protoSak = new SakTestData().tema(tema).applikasjon(applikasjon).fagsakNr(fagsakNr).aktoerOrOrganisasjon(aktoerId, orgnr);
         Sak sak1 = sakRepository.lagre(protoSak.build());
         Sak sak2 = sakRepository.lagre(new SakTestData().tema(tema).applikasjon(applikasjon).fagsakNr(randomNumeric(6)).aktoerOrOrganisasjon(aktoerId, orgnr).build());
