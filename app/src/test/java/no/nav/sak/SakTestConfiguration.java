@@ -15,7 +15,6 @@ import no.nav.sak.infrastruktur.authentication.SAMLValidator;
 import no.nav.sak.infrastruktur.authentication.basic.JunitBasicAuthenticator;
 import no.nav.sak.infrastruktur.oicd.JunitJsonWebKey;
 import no.nav.sak.infrastruktur.oicd.JwtClaimsTestData;
-import no.nav.sak.repository.TestDatabase;
 import no.nav.security.token.support.core.configuration.MultiIssuerConfiguration;
 import org.jose4j.keys.resolvers.JwksVerificationKeyResolver;
 import org.jose4j.keys.resolvers.VerificationKeyResolver;
@@ -49,12 +48,6 @@ public class SakTestConfiguration {
 	@Bean
 	public PlatformTransactionManager platformTransactionManager(DataSource dataSource) {
 		return new DataSourceTransactionManager(dataSource);
-	}
-
-	@Bean
-	@Primary
-	public TestDatabase database(DataSource dataSource) {
-		return new TestDatabase(dataSource);
 	}
 
 	@Bean
