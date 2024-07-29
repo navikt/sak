@@ -57,6 +57,15 @@
                 </exclusions>
             </dependency>
 
+			<dependency>
+				<groupId>com.oracle.database.ha</groupId>
+				<artifactId>ons</artifactId>
+			</dependency>
+			<dependency>
+				<groupId>com.oracle.database.ha</groupId>
+				<artifactId>simplefan</artifactId>
+			</dependency>
+
             <dependency>
                 <groupId>no.nav.abac.policies</groupId>
                 <artifactId>abac-attribute-constants</artifactId>
