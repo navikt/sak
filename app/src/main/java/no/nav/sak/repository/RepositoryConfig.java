@@ -1,6 +1,7 @@
 package no.nav.sak.repository;
 
 import lombok.extern.slf4j.Slf4j;
+import oracle.jdbc.pool.OracleDataSource;
 import oracle.ucp.jdbc.PoolDataSource;
 import oracle.ucp.jdbc.PoolDataSourceFactory;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
@@ -21,6 +22,7 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 @EnableConfigurationProperties({DataSourceProperties.class, DataSourceAdditionalProperties.class})
 public class RepositoryConfig {
 
+	private static final String JOARK = "JOARK";
 	public static final int STATISK_POOL_SIZE = 20;
 
 	@Bean
@@ -32,6 +34,7 @@ public class RepositoryConfig {
 		poolDataSource.setUser(dataSourceProperties.getUsername());
 		poolDataSource.setPassword(dataSourceProperties.getPassword());
 		poolDataSource.setConnectionFactoryClassName(dataSourceProperties.getDriverClassName());
+		poolDataSource.registerConnectionInitializationCallback(connection -> connection.setSchema(JOARK));
 
 		if (isOracleFastConnectionFailoverSupported(dataSourceProperties.getUrl(), dataSourceAdditionalProperties.getOnshosts())) {
 			poolDataSource.setFastConnectionFailoverEnabled(true);
