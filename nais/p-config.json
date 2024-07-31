@@ -4,7 +4,7 @@
   "STS_JWKS": "https://security-token-service.nais.adeo.no/rest/v1/sts/jwks",
   "LDAP": "/serviceuser/data/prod/srvssolinux",
   "SRVSAK": "/serviceuser/data/prod/srvsak",
-  "SAKDB_CREDS": "/oracle/data/prod/creds/sak-user",
+  "SAKDB_CREDS": "/oracle/data/prod/creds/sak-sak",
   "SAKDB_CONFIG": "/oracle/data/prod/config/sak",
   "APP_NAME": "sak",
   "MIN_REPLICAS": 2,
