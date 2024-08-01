@@ -38,6 +38,18 @@
 			<artifactId>ojdbc11</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>com.oracle.database.jdbc</groupId>
+			<artifactId>ucp</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.oracle.database.ha</groupId>
+			<artifactId>ons</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.oracle.database.ha</groupId>
+			<artifactId>simplefan</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>org.hibernate.validator</groupId>
 			<artifactId>hibernate-validator</artifactId>
 		</dependency>
@@ -87,10 +99,6 @@
 		<dependency>
 			<groupId>org.apache.santuario</groupId>
 			<artifactId>xmlsec</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.zaxxer</groupId>
-			<artifactId>HikariCP</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.ehcache</groupId>
