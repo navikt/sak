@@ -1,7 +1,7 @@
 {
   "ABAC_PDP_ENDPOINT": "https://abac-sak-q1.dev.intern.nav.no/application/asm-pdp/authorize",
-  "STS_ISSUER": "https://security-token-service.nais.preprod.local",
-  "STS_JWKS": "https://security-token-service.nais.preprod.local/rest/v1/sts/jwks",
+  "STS_ISSUER": "https://security-token-service.dev.adeo.no",
+  "STS_JWKS": "https://security-token-service.dev.adeo.no/rest/v1/sts/jwks",
   "LDAP": "/serviceuser/data/dev/srvssolinux",
   "SRVSAK": "/serviceuser/data/dev/srvsak",
   "SAKDB_CREDS": "/oracle/data/dev/creds/joark_q1-sak",
