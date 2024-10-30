@@ -13,6 +13,8 @@ spec:
       value: {{ STS_ISSUER }}
     - name: STS_JWKS
       value: {{ STS_JWKS }}
+    - name: OTEL_RESOURCE_ATTRIBUTES
+      value: "deployment.environment.name={{ ENVIRONMENT }}"
   image: {{ image }}
   ingresses:
         {{#each INGRESSES}}
@@ -68,3 +70,9 @@ spec:
         mountPath: /var/run/secrets/nais.io/ldap
       - kvPath: {{ SRVSAK }}
         mountPath: /var/run/secrets/nais.io/srvsak
+  observability:
+    autoInstrumentation:
+      enabled: true
+      runtime: java
+      destinations:
+        - id: "elastic-apm"
