@@ -1,57 +1,57 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xmlns="http://maven.apache.org/POM/4.0.0"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+		 xmlns="http://maven.apache.org/POM/4.0.0"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.2.11</version>
-    </parent>
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>3.2.11</version>
+	</parent>
 
-    <groupId>no.nav.sak</groupId>
-    <artifactId>sak</artifactId>
-    <version>1.0-SNAPSHOT</version>
-    <packaging>pom</packaging>
+	<groupId>no.nav.sak</groupId>
+	<artifactId>sak</artifactId>
+	<version>1.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
 
-    <modules>
-        <module>app</module>
-    </modules>
+	<modules>
+		<module>app</module>
+	</modules>
 
-    <properties>
-        <java.version>21</java.version>
+	<properties>
+		<java.version>21</java.version>
 
-        <oppgavehandtering-resilience.version>1.00.08</oppgavehandtering-resilience.version>
-        <abac.attribute.version>3.3.13</abac.attribute.version>
+		<oppgavehandtering-resilience.version>1.00.08</oppgavehandtering-resilience.version>
+		<abac.attribute.version>3.3.13</abac.attribute.version>
 		<token-support.version>3.2.0</token-support.version>
 
-        <logstash.encoder.version>8.0</logstash.encoder.version>
-        <commons-configuration2.version>2.11.0</commons-configuration2.version>
-        <commons-beanutils.version>1.9.4</commons-beanutils.version>
+		<logstash.encoder.version>8.0</logstash.encoder.version>
+		<commons-configuration2.version>2.11.0</commons-configuration2.version>
+		<commons-beanutils.version>1.9.4</commons-beanutils.version>
 		<opensaml.version>4.0.1</opensaml.version>
 		<xmlsec.version>4.0.2</xmlsec.version>
 		<guava.version>33.3.1-jre</guava.version>
 		<ldaptive.version>1.3.3</ldaptive.version>
 		<jose4j.version>0.9.6</jose4j.version>
-        <swagger.version>2.2.25</swagger.version>
-        <springdoc-openapi-starter-webmvc-ui.version>2.6.0</springdoc-openapi-starter-webmvc-ui.version>
+		<swagger.version>2.2.25</swagger.version>
+		<springdoc-openapi-starter-webmvc-ui.version>2.6.0</springdoc-openapi-starter-webmvc-ui.version>
 
-        <maven-toolchains-plugin.version>3.2.0</maven-toolchains-plugin.version>
-    </properties>
+		<maven-toolchains-plugin.version>3.2.0</maven-toolchains-plugin.version>
+	</properties>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>no.nav.abac.policies</groupId>
-                <artifactId>abac-attribute-constants</artifactId>
-                <version>${abac.attribute.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>no.nav.oppgavehandtering</groupId>
-                <artifactId>oppgavehandtering-resilience</artifactId>
-                <version>${oppgavehandtering-resilience.version}</version>
-            </dependency>
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>no.nav.abac.policies</groupId>
+				<artifactId>abac-attribute-constants</artifactId>
+				<version>${abac.attribute.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>no.nav.oppgavehandtering</groupId>
+				<artifactId>oppgavehandtering-resilience</artifactId>
+				<version>${oppgavehandtering-resilience.version}</version>
+			</dependency>
 
 			<dependency>
 				<groupId>org.springdoc</groupId>
@@ -64,48 +64,48 @@
 					</exclusion>
 				</exclusions>
 			</dependency>
-            <dependency>
-                <groupId>net.logstash.logback</groupId>
-                <artifactId>logstash-logback-encoder</artifactId>
-                <version>${logstash.encoder.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.swagger.core.v3</groupId>
-                <artifactId>swagger-annotations-jakarta</artifactId>
-                <version>${swagger.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.swagger.core.v3</groupId>
-                <artifactId>swagger-jaxrs2-jakarta</artifactId>
-                <version>${swagger.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.swagger.core.v3</groupId>
-                <artifactId>swagger-core-jakarta</artifactId>
-                <version>${swagger.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.commons</groupId>
-                <artifactId>commons-configuration2</artifactId>
-                <version>${commons-configuration2.version}</version>
+			<dependency>
+				<groupId>net.logstash.logback</groupId>
+				<artifactId>logstash-logback-encoder</artifactId>
+				<version>${logstash.encoder.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.swagger.core.v3</groupId>
+				<artifactId>swagger-annotations-jakarta</artifactId>
+				<version>${swagger.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.swagger.core.v3</groupId>
+				<artifactId>swagger-jaxrs2-jakarta</artifactId>
+				<version>${swagger.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.swagger.core.v3</groupId>
+				<artifactId>swagger-core-jakarta</artifactId>
+				<version>${swagger.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-configuration2</artifactId>
+				<version>${commons-configuration2.version}</version>
 				<exclusions>
 					<exclusion>
 						<groupId>commons-logging</groupId>
 						<artifactId>commons-logging</artifactId>
 					</exclusion>
 				</exclusions>
-            </dependency>
-            <dependency>
-                <groupId>commons-beanutils</groupId>
-                <artifactId>commons-beanutils</artifactId>
-                <version>${commons-beanutils.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>commons-beanutils</groupId>
+				<artifactId>commons-beanutils</artifactId>
+				<version>${commons-beanutils.version}</version>
 				<exclusions>
 					<exclusion>
 						<groupId>commons-logging</groupId>
 						<artifactId>commons-logging</artifactId>
 					</exclusion>
 				</exclusions>
-            </dependency>
+			</dependency>
 			<dependency>
 				<groupId>com.google.guava</groupId>
 				<artifactId>guava</artifactId>
@@ -118,11 +118,11 @@
 			</dependency>
 
 			<!-- Security -->
-            <dependency>
-                <groupId>no.nav.security</groupId>
-                <artifactId>token-validation-jaxrs</artifactId>
-                <version>${token-support.version}</version>
-            </dependency>
+			<dependency>
+				<groupId>no.nav.security</groupId>
+				<artifactId>token-validation-jaxrs</artifactId>
+				<version>${token-support.version}</version>
+			</dependency>
 			<dependency>
 				<groupId>org.opensaml</groupId>
 				<artifactId>opensaml-core</artifactId>
@@ -184,8 +184,8 @@
 				<artifactId>jose4j</artifactId>
 				<version>${jose4j.version}</version>
 			</dependency>
-        </dependencies>
-    </dependencyManagement>
+		</dependencies>
+	</dependencyManagement>
 
 	<dependencies>
 		<dependency>
@@ -195,32 +195,32 @@
 		</dependency>
 	</dependencies>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-failsafe-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-toolchains-plugin</artifactId>
-                <version>${maven-toolchains-plugin.version}</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>toolchain</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <toolchains>
-                        <jdk>
-                            <version>${java.version}</version>
-                            <vendor>openjdk</vendor>
-                        </jdk>
-                    </toolchains>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-failsafe-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-toolchains-plugin</artifactId>
+				<version>${maven-toolchains-plugin.version}</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>toolchain</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<toolchains>
+						<jdk>
+							<version>${java.version}</version>
+							<vendor>openjdk</vendor>
+						</jdk>
+					</toolchains>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 </project>
