@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import io.swagger.v3.oas.annotations.security.SecuritySchemes;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -85,7 +86,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @SecuritySchemes(
 		value = {
 				@SecurityScheme(
-						name = "Bearer",
+						name = "OIDC",
 						in = HEADER,
 						description = """
 								OIDC-token (JWT via OAuth2.0). Dette preferert autentiseringsmekanisme, og <strong>skal</strong>
@@ -136,6 +137,7 @@ public class SakResource {
 	@GetMapping(path = "/{id}", produces = APPLICATION_JSON_VALUE)
 	@Operation(summary = "Henter sak for en gitt id",
 			parameters = {@Parameter(name = "X-Correlation-ID", required = true, in = ParameterIn.HEADER)},
+			security = {@SecurityRequirement(name = "OIDC"), @SecurityRequirement(name = "Saml"), @SecurityRequirement(name = "Basic Auth")},
 			responses = {
 					@ApiResponse(responseCode = "200",
 							description = "OK",
@@ -171,6 +173,7 @@ public class SakResource {
 
 	@GetMapping(produces = APPLICATION_JSON_VALUE)
 	@Operation(summary = "Finner saker for angitte søkekriterier",
+			security = {@SecurityRequirement(name = "OIDC"), @SecurityRequirement(name = "Saml"), @SecurityRequirement(name = "Basic Auth")},
 			parameters = {@Parameter(name = "X-Correlation-ID", required = true, in = ParameterIn.HEADER)},
 			responses = {
 					@ApiResponse(responseCode = "200",
@@ -211,6 +214,7 @@ public class SakResource {
 	@PostMapping(produces = APPLICATION_JSON_VALUE, consumes = APPLICATION_JSON_VALUE)
 	@Operation(summary = "Oppretter en ny sak",
 			description = "Merk at en sak enten skal tilhøre en aktør <b>eller</b> et foretak. Begge er p.t. ikke tillatt. ",
+			security = {@SecurityRequirement(name = "OIDC"), @SecurityRequirement(name = "Saml"), @SecurityRequirement(name = "Basic Auth")},
 			responses = {
 					@ApiResponse(responseCode = "201",
 							description = "Saken er opprettet",
