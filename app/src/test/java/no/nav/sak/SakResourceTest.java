@@ -49,7 +49,7 @@ class SakResourceTest extends AbstractSakResourceTest {
             testUtilityRepository
                 .lagre(
                     new SakTestData()
-                        .aktoerId("123")
+                        .aktoerId("1234567890123")
                         .build()
                 );
 
@@ -90,7 +90,7 @@ class SakResourceTest extends AbstractSakResourceTest {
     @Test
     void oppretter_sak_for_aktoer() {
         Sak sak = new SakTestData()
-            .aktoerId("1")
+            .aktoerId("1234567890123")
             .build();
         JsonObject jsonObject = createAndRetrieveAtLocation(sak);
         assertThat(jsonObject.get("id").getAsLong()).isNotNull();
@@ -134,7 +134,7 @@ class SakResourceTest extends AbstractSakResourceTest {
     @Test
     void gir_konflikt_og_oppretter_ikke_ny_sak_dersom_fagsak_finnes_fra_foer() {
         Sak sak = new SakTestData()
-            .aktoerId("123")
+            .aktoerId("1234567890123")
             .fagsakNr("321")
             .applikasjon("Gosys")
             .build();
@@ -156,7 +156,7 @@ class SakResourceTest extends AbstractSakResourceTest {
 
     @Test
     void oppretter_ny_sak_dersom_fagsak_finnes_fra_foer_men_med_annet_tema() {
-        final String AKTOER_ID = "123";
+        final String AKTOER_ID = "1234567890123";
         final String FAGSAK_NR = "321";
         final String APPLIKASJON = "Gosys";
         final String TEMA_1 = "TEMA1";
@@ -201,7 +201,7 @@ class SakResourceTest extends AbstractSakResourceTest {
     @Test
     void oppretter_generell_sak_uten_applikasjon_angitt() {
         Sak sak = new SakTestData()
-            .aktoerId("1")
+            .aktoerId("1234567890123")
             .applikasjon(null)
             .build();
         JsonObject jsonObject = createAndRetrieveAtLocation(sak);
@@ -213,7 +213,7 @@ class SakResourceTest extends AbstractSakResourceTest {
     @Test
     void kan_opprette_sak_med_applikasjon_uten_aa_angi_fagsaknr() {
         Sak sak = new SakTestData()
-            .aktoerId("1")
+            .aktoerId("1234567890123")
             .applikasjon("FS22")
             .build();
         JsonObject jsonObject = createAndRetrieveAtLocation(sak);
@@ -225,7 +225,7 @@ class SakResourceTest extends AbstractSakResourceTest {
     @Test
     void applikasjon_er_paakrevd_for_fagsak() {
         Sak sak = new SakTestData()
-            .aktoerId("1")
+            .aktoerId("12345678901231")
             .applikasjon(null)
             .fagsakNr("123")
             .build();
