@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 public class SakTestData {
     private static final String[] gyldigeOrgnr = {"999263550", "991012133", "895106402"};
     private String tema = RandomStringUtils.randomAlphabetic(3);
-    private String aktoerId = RandomStringUtils.randomAlphabetic(9);
+    private String aktoerId = RandomStringUtils.randomNumeric(13);
     private String orgnr;
     private String fagsakNr;
     private String applikasjon;

@@ -28,11 +28,11 @@ public class SakJson {
     @Size(max = 40)
     private String applikasjon;
 
-    @Size(message = "{no.nav.sak.aktoerId.Size}", max = 40)
+    @Size(message = "{no.nav.sak.aktoerId.Size}", max = 13, min = 13)
     private String aktoerId;
 
     @Organisasjonsnummer
-    @Size(message = "{no.nav.sak.orgnr.Size}", max = 9)
+    @Size(message = "{no.nav.sak.orgnr.Size}", max = 9, min = 9)
     private String orgnr;
 
     private String fagsakNr;
