@@ -37,6 +37,12 @@
       "application": "pensjon-psak-q2",
       "namespace": "pensjon-q2",
       "cluster": "dev-gcp"
+    },
+    {
+      "application": "historisk-parykk-backend",
+      "namespace": "historisk",
+      "cluster": "dev-gcp"
     }
+
   ]
 }
