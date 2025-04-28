@@ -39,7 +39,7 @@
       "cluster": "dev-gcp"
     },
     {
-      "application": "historisk-parykk-backend",
+      "application": "historisk-helt-backend",
       "namespace": "historisk",
       "cluster": "dev-gcp"
     }
