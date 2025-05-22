@@ -1,7 +1,6 @@
 package no.nav.sak.repository;
 
 import lombok.extern.slf4j.Slf4j;
-import oracle.jdbc.pool.OracleDataSource;
 import oracle.ucp.jdbc.PoolDataSource;
 import oracle.ucp.jdbc.PoolDataSourceFactory;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;

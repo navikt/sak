@@ -5,7 +5,6 @@ import org.apache.commons.lang3.RandomUtils;
 
 import java.time.LocalDateTime;
 
-
 public class SakTestData {
     private static final String[] gyldigeOrgnr = {"999263550", "991012133", "895106402"};
     private String tema = RandomStringUtils.randomAlphabetic(3);
@@ -13,9 +12,8 @@ public class SakTestData {
     private String orgnr;
     private String fagsakNr;
     private String applikasjon;
-    private String opprettetAv = RandomStringUtils.randomAlphabetic(8);
-    private LocalDateTime opprettetTidspunkt = LocalDateTime.now();
-
+    private final String opprettetAv = RandomStringUtils.randomAlphabetic(8);
+    private final LocalDateTime opprettetTidspunkt = LocalDateTime.now();
 
     public Sak build() {
         return new Sak.Builder()
@@ -28,7 +26,6 @@ public class SakTestData {
             .medOpprettetTidspunkt(opprettetTidspunkt)
             .build();
     }
-
 
     public SakTestData aktoerId(String aktoerId) {
         this.aktoerId = aktoerId;

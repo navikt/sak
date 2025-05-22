@@ -1,9 +1,10 @@
 package no.nav.sak.infrastruktur.abac;
 
 public enum Decision {
-    PERMIT("Permit"), DENY("Deny");
+    PERMIT("Permit"),
+    DENY("Deny");
 
-    private String value;
+    private final String value;
 
     Decision(String value) {
         this.value = value;

@@ -61,12 +61,6 @@
 		<dependency>
 			<groupId>no.nav.oppgavehandtering</groupId>
 			<artifactId>oppgavehandtering-resilience</artifactId>
-			<exclusions>
-				<exclusion>
-					<groupId>io.prometheus</groupId>
-					<artifactId>simpleclient_common</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>net.logstash.logback</groupId>

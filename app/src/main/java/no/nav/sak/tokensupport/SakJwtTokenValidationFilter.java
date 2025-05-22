@@ -27,7 +27,7 @@ import static org.apache.commons.lang3.StringUtils.trim;
 @Slf4j
 public class SakJwtTokenValidationFilter extends JwtTokenValidationFilter {
 
-	private static String AUTORIZATION_BEARER = "Bearer";
+	private static final String AUTORIZATION_BEARER = "Bearer";
 
 	public SakJwtTokenValidationFilter(MultiIssuerConfiguration oidcConfig) {
 		super(new JwtTokenValidationHandler(oidcConfig), JaxrsTokenValidationContextHolder.getHolder());

@@ -7,9 +7,9 @@ import no.nav.sak.repository.SakTestData;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -19,8 +19,7 @@ import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 
 public class SakResourceBadAbacMappingToInternalErrorTest extends AbstractSakResourceTest {
 
-
-    @MockBean
+    @MockitoBean
     MockableSakPEP sakPEP;
 
     @BeforeEach
