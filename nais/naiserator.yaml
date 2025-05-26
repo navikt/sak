@@ -71,6 +71,9 @@ spec:
       - kvPath: {{ SRVSAK }}
         mountPath: /var/run/secrets/nais.io/srvsak
   observability:
+    logging:
+      destinations:
+        - id: elastic
     autoInstrumentation:
       enabled: true
       runtime: java

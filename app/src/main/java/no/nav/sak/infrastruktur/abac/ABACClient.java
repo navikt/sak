@@ -21,6 +21,8 @@ import java.io.UnsupportedEncodingException;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static java.lang.String.format;
+
 public class ABACClient {
 	public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 	static {
@@ -111,7 +113,7 @@ public class ABACClient {
 		try {
 			if (Response.Status.OK.getStatusCode() != statusCode) {
 				final String responseBody = EntityUtils.toString(httpResponse.getEntity());
-				errorMsg = String.format("Downstreams call to ABAC resulted in an error response. statusLine: %s, responseBody: %s", statusLine.toString(), responseBody);
+				errorMsg = format("Downstreams call to ABAC resulted in an error response. statusLine: %s, responseBody: %s", statusLine, responseBody);
 				exception = new IllegalStateException(errorMsg);
 			}
 		} catch (IOException e) {

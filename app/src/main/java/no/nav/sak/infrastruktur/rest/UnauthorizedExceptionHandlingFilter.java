@@ -12,8 +12,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.ws.rs.Priorities;
 import lombok.extern.slf4j.Slf4j;
-import no.nav.sak.infrastruktur.ErrorResponse;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;

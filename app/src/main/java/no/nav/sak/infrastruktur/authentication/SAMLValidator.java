@@ -47,15 +47,15 @@ import java.util.Optional;
 import static java.time.temporal.ChronoUnit.MINUTES;
 
 public class SAMLValidator {
+
 	private static final Logger log = LoggerFactory.getLogger(SAMLValidator.class);
 	private static final String ATTR_CONSUMER_ID = "consumerId";
 	private static final String CERT_X509 = "X509";
-	private static final String UTF_8 = "UTF-8";
 
 	private Collection<X509Certificate> trustedCertificates;
-	private SAMLSignatureProfileValidator profileValidator;
-	private KeyStore keyStore;
-	private int timeSkew;
+	private final SAMLSignatureProfileValidator profileValidator;
+	private final KeyStore keyStore;
+	private final int timeSkew;
 	private final Clock clock;
 
 	public SAMLValidator(String trustStore, String trustStorePassword, Clock clock) {

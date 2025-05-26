@@ -1,9 +1,11 @@
 package no.nav.sak.infrastruktur;
 
 public enum SubjectType {
-    SUBJECT_TYPE_SYSTEMBRUKER("Systemressurs"), SUBJECT_TYPE_INTERNBRUKER("InternBruker"), SUBJECT_TYPE_EKSTERNBRUKER("EksternBruker");
+    SUBJECT_TYPE_SYSTEMBRUKER("Systemressurs"),
+    SUBJECT_TYPE_INTERNBRUKER("InternBruker"),
+    SUBJECT_TYPE_EKSTERNBRUKER("EksternBruker");
 
-    private String value;
+    private final String value;
 
     SubjectType(String value) {
         this.value = value;

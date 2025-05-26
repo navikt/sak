@@ -9,9 +9,8 @@ import no.nav.security.token.support.jaxrs.JaxrsTokenValidationContextHolder;
 
 public class TokenUtils {
 
-	private static TokenValidationContextHolder contextHolder = JaxrsTokenValidationContextHolder.getHolder();
-
 	public static final String ISSUER_AZUREAD = "azuread";
+	private static final TokenValidationContextHolder contextHolder = JaxrsTokenValidationContextHolder.getHolder();
 
 	public static boolean hasTokenForIssuer(String issuer) {
 
@@ -37,6 +36,5 @@ public class TokenUtils {
 
 		return Optional.ofNullable(claims.getStringClaim("azp_name"));
 	}
-
 
 }
