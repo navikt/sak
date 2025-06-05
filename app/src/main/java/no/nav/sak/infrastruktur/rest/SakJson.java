@@ -37,6 +37,7 @@ public class SakJson {
 
     private String fagsakNr;
 
+    private String sakStatus;
     private String opprettetAv;
     private LocalDateTime opprettetTidspunkt;
 
@@ -46,12 +47,17 @@ public class SakJson {
     }
 
     SakJson(Sak sak) {
-        this.id = sak.getId();
+        this(sak, sak.getId());
+    }
+
+    SakJson(Sak sak, long id) {
+        this.id = id;
         this.tema = sak.getTema();
         this.aktoerId = sak.getAktoerId();
         this.orgnr = sak.getOrgnr();
         this.fagsakNr = sak.getFagsakNr();
         this.applikasjon = sak.getApplikasjon();
+        this.sakStatus = sak.getStatus();
         this.opprettetAv = sak.getOpprettetAv();
         this.opprettetTidspunkt = sak.getOpprettetTidspunkt();
     }
@@ -119,6 +125,12 @@ public class SakJson {
         this.fagsakNr = fagsakNr;
     }
 
+    @JsonProperty("sakStatus")
+    @Schema(description = "Status for den aktuelle saken - kan være null")
+    public String getSakStatus() {
+        return sakStatus;
+    }
+
     @JsonProperty("opprettetTidspunkt")
     @Schema(description = "Opprettet tidspunkt iht. ISO-8601")
     public String getOpprettetTidspunkt() {
@@ -133,6 +145,7 @@ public class SakJson {
             .medTema(tema)
             .medFagsakNr(fagsakNr)
             .medApplikasjon(applikasjon)
+            .medSakStatus(sakStatus)
             .medOpprettetAv(opprettetAv)
             .medOpprettetTidspunkt(LocalDateTime.now())
             .build();

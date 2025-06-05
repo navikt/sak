@@ -1,5 +1,8 @@
 package no.nav.sak.repository;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Value;
 import no.nav.sak.validering.OrganisasjonsnummerValidator;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
@@ -10,62 +13,42 @@ import java.util.Objects;
 
 import static org.apache.commons.lang3.builder.ToStringStyle.SHORT_PREFIX_STYLE;
 
+@Value
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Sak {
 
-    private final String tema;
-    private final String applikasjon;
-    private final String fagsakNr;
-    private final String aktoerId;
-    private final String orgnr;
-    private final String opprettetAv;
-    private final LocalDateTime opprettetTidspunkt;
-    private Long id;
+    Long id;
+    String fagsakNr;
+    String tema;
+    String aktoerId;
+    String applikasjon;
+    String orgnr;
+    String opprettetAv;
+    LocalDateTime opprettetTidspunkt;
+    String status;
 
     private Sak(Builder builder) {
-        this.id = builder.id;
-        this.fagsakNr = builder.fagsakNr;
-        this.tema = builder.tema;
-        this.aktoerId = builder.aktoerId;
-        this.applikasjon = builder.applikasjon;
-        this.orgnr = builder.orgnr;
-        this.opprettetAv = builder.opprettetAv;
-        this.opprettetTidspunkt = builder.opprettetTidspunkt;
+         this(builder.id,
+         builder.fagsakNr,
+         builder.tema,
+         builder.aktoerId,
+         builder.applikasjon,
+         builder.orgnr,
+         builder.opprettetAv,
+         builder.opprettetTidspunkt,
+         builder.status);
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getTema() {
-        return tema;
-    }
-
-    public String getApplikasjon() {
-        return applikasjon;
-    }
-
-    public String getFagsakNr() {
-        return fagsakNr;
-    }
-
-    public String getAktoerId() {
-        return aktoerId;
-    }
-
-    public String getOrgnr() {
-        return orgnr;
-    }
-
-    public String getOpprettetAv() {
-        return opprettetAv;
-    }
-
-    public LocalDateTime getOpprettetTidspunkt() {
-        return opprettetTidspunkt;
+	Sak withId(Long id) {
+        return new Sak(id,
+                this.fagsakNr,
+                this.tema,
+                this.aktoerId,
+                this.applikasjon,
+                this.orgnr,
+                this.opprettetAv,
+                this.opprettetTidspunkt,
+                this.status);
     }
 
     @Override
@@ -98,6 +81,7 @@ public class Sak {
         private String orgnr;
         private String opprettetAv;
         private LocalDateTime opprettetTidspunkt;
+        private String status;
 
         public Builder() {
         }
@@ -143,6 +127,11 @@ public class Sak {
 
         public Builder medOpprettetTidspunkt(LocalDateTime opprettetTidspunkt) {
             this.opprettetTidspunkt = opprettetTidspunkt;
+            return this;
+        }
+
+        public Builder medSakStatus(String status) {
+            this.status = status;
             return this;
         }
 

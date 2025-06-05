@@ -28,7 +28,8 @@ class SakRepositoryTest {
 
     @Test
     void henter_sak_med_en_gitt_id() {
-        Sak opprettet = sakRepository.lagre(new SakTestData().aktoerId("1").build());
+        Sak test = new SakTestData().aktoerId("1").build();
+        Sak opprettet = test.withId(sakRepository.lagre(test));
 
         Optional<Sak> hentet = sakRepository.hentSak(opprettet.getId());
 
@@ -37,18 +38,21 @@ class SakRepositoryTest {
 
     @Test
     void oppretter_og_returnerer_opprettet_sak() {
-        Sak sak = sakRepository.lagre(new SakTestData().aktoerId("1").build());
+        Long sakId = sakRepository.lagre(new SakTestData().aktoerId("1").build());
 
-        assertThat(sak).isNotNull();
+        assertThat(sakId).isNotNull();
     }
 
     @Test
     void finner_saker_for_enkelt_kriterie() {
-        String aktoerId = randomNumeric(5);
+        String aktoerId = "5";
 
-        sakRepository.lagre(new SakTestData().aktoerId(randomNumeric(5)).build());
-        Sak sak1 = sakRepository.lagre(new SakTestData().aktoerId(aktoerId).build());
-        Sak sak2 = sakRepository.lagre(new SakTestData().aktoerId(aktoerId).build());
+        sakRepository.lagre(new SakTestData().aktoerId("4").build());
+        Sak aktoerIdTwin = new SakTestData().aktoerId(aktoerId).build();
+        Long sak1Id = sakRepository.lagre(aktoerIdTwin);
+        Long sak2Id = sakRepository.lagre(aktoerIdTwin);
+        Sak sak1 = aktoerIdTwin.withId(sak1Id);
+        Sak sak2 = aktoerIdTwin.withId(sak2Id);
 
         List<Sak> saker = sakRepository.finnSaker(SakSearchCriteria.create().medAktoerId(List.of(sak1.getAktoerId())));
         Assertions.assertThat(saker).containsOnly(sak1, sak2);
@@ -59,10 +63,13 @@ class SakRepositoryTest {
         String tema = RandomStringUtils.randomAlphabetic(3);
         String orgnr = "974652250";
 
-        Sak sak1 = sakRepository.lagre(new SakTestData().orgnr(orgnr).tema(tema).build());
+        Sak sakLiktOrgnrTema = new SakTestData().orgnr(orgnr).tema(tema).build();
+        long sak1Id = sakRepository.lagre(sakLiktOrgnrTema);
         sakRepository.lagre(new SakTestData().orgnr(SakTestData.generateValidOrgnr()).build());
         sakRepository.lagre(new SakTestData().aktoerId(randomNumeric(5)).build());
-        Sak sak2 = sakRepository.lagre(new SakTestData().orgnr(orgnr).tema(tema).build());
+        long sak2Id = sakRepository.lagre(sakLiktOrgnrTema);
+        Sak sak1 = sakLiktOrgnrTema.withId(sak1Id);
+        Sak sak2 = sakLiktOrgnrTema.withId(sak2Id);
 
         List<Sak> saker = sakRepository.finnSaker(SakSearchCriteria.create().medTema(Collections.singletonList(tema)).medOrgnr(orgnr));
         Assertions.assertThat(saker).containsOnly(sak1, sak2);
