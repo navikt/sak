@@ -19,15 +19,14 @@ public class SakRepository {
     }
 
     public Long lagre(Sak sak) {
-		return database.insert("insert into sak (id, aktoerid, orgnr, tema, applikasjon, fagsaknr, opprettet_av, k_sak_status, opprettet_tidspunkt)" +
-						" values (seq_sak.nextval, ?, ?, ?, ?, ?, ?, ?, ?)",
+		return database.insert("insert into sak (id, aktoerid, orgnr, tema, applikasjon, fagsaknr, opprettet_av, opprettet_tidspunkt)" +
+						" values (seq_sak.nextval, ?, ?, ?, ?, ?, ?, ?)",
 				sak.getAktoerId(),
 				sak.getOrgnr(),
 				sak.getTema(),
 				sak.getApplikasjon(),
 				sak.getFagsakNr(),
 				sak.getOpprettetAv(),
-                sak.getStatus(),
 				Timestamp.valueOf(sak.getOpprettetTidspunkt()));
     }
 
