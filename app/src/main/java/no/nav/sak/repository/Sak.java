@@ -28,18 +28,18 @@ public class Sak {
     String status;
 
     private Sak(Builder builder) {
-         this(builder.id,
-         builder.fagsakNr,
-         builder.tema,
-         builder.aktoerId,
-         builder.applikasjon,
-         builder.orgnr,
-         builder.opprettetAv,
-         builder.opprettetTidspunkt,
-         builder.status);
+        this(builder.id,
+                builder.fagsakNr,
+                builder.tema,
+                builder.aktoerId,
+                builder.applikasjon,
+                builder.orgnr,
+                builder.opprettetAv,
+                builder.opprettetTidspunkt,
+                builder.status);
     }
 
-	Sak withId(Long id) {
+    Sak withId(Long id) {
         return new Sak(id,
                 this.fagsakNr,
                 this.tema,
