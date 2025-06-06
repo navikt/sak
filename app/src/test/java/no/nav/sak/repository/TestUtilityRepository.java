@@ -17,6 +17,6 @@ public class TestUtilityRepository {
 	}
 
 	public Sak lagre(Sak sak) {
-		return sakRepository.lagre(sak);
+		return sak.withId(sakRepository.lagre(sak));
 	}
 }

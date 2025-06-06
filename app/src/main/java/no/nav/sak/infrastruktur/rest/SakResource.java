@@ -251,17 +251,17 @@ public class SakResource {
 									innsendtSak.getOrgnr())));
 		} else {
 
-			final Sak opprettetSak = sakRepository.lagre(innsendtSak);
-			log.info("Opprettet: {}", opprettetSak);
-			log.info("opprettSak har opprettet arkivsakId={}", opprettetSak.getId());
+			final long opprettetSakId = sakRepository.lagre(innsendtSak);
+			log.info("Opprettet: {}", opprettetSakId);
+			log.info("opprettSak har opprettet arkivsakId={}", opprettetSakId);
 			URI path = servletUriComponentsBuilder
 					.pathSegment(API_V1_SAKER_PATH_SEGMENT)
-					.pathSegment(String.valueOf(opprettetSak.getId()))
+					.pathSegment(String.valueOf(opprettetSakId))
 					.build()
 					.toUri();
 			return ResponseEntity
 					.created(path)
-					.body(new SakJson(opprettetSak));
+					.body(new SakJson(innsendtSak, opprettetSakId));
 		}
 	}
 

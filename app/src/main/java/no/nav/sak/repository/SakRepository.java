@@ -18,8 +18,8 @@ public class SakRepository {
         this.database = database;
     }
 
-    public Sak lagre(Sak sak) {
-		Long id = database.insert("insert into sak (id, aktoerid, orgnr, tema, applikasjon, fagsaknr, opprettet_av, opprettet_tidspunkt)" +
+    public Long lagre(Sak sak) {
+		return database.insert("insert into sak (id, aktoerid, orgnr, tema, applikasjon, fagsaknr, opprettet_av, opprettet_tidspunkt)" +
 						" values (seq_sak.nextval, ?, ?, ?, ?, ?, ?, ?)",
 				sak.getAktoerId(),
 				sak.getOrgnr(),
@@ -28,8 +28,6 @@ public class SakRepository {
 				sak.getFagsakNr(),
 				sak.getOpprettetAv(),
 				Timestamp.valueOf(sak.getOpprettetTidspunkt()));
-		sak.setId(id);
-        return sak;
     }
 
     public Optional<Sak> hentSak(Long id) {
@@ -62,6 +60,7 @@ public class SakRepository {
             .medTema(row.getString("tema"))
             .medApplikasjon(row.getString("applikasjon"))
             .medFagsakNr(row.getString("fagsaknr"))
+            .medSakStatus(row.getString("k_sak_status"))
             .medOpprettetAv(row.getString("opprettet_av"))
             .medOpprettetTidspunkt(row.getLocalDateTime("opprettet_tidspunkt"))
             .build();
