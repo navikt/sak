@@ -66,19 +66,14 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 				title = "Sak API",
 				version = "1",
 				description = """
-						Her dokumenteres tjenestegrensesnittet for Sak.
-						            
-						Tjenesten leveres kontinuerlig til produksjon. For å sikre oss mot å innføre regresjon som påvirker våre konsumenter, benytter vi
-						Pact. Det er konsumentens ansvar å gi oss pact-test, men ta gjerne kontakt ved behov for bistand ifm. dette.
-						           
-						Vi ber nye konsumenter om å ta kontakt med teamet, dette for å få gjennomført ev. avklaringer, sikre korrekte tilganger, pact-test, og for å sikre at tjenesten støtter
-						forventet volum og ev. SLA.
-						            
-						Merk at vi forventer at Headeren <strong>"X-Correlation-ID"</strong> er angitt for alle tjenestekall. Denne logges alltid i Sak, og benyttes for å kunne sammenstille hendelser
-						på tvers av kallkjeder. X-Correlation-ID skal oppgis ved forespørsel om bistand fra Team Oppgavehåntering vedr. feilsøk ifm. bruk av tjenesten
-						Vi anbefaler at korrelasjonsID genereres så tidlig som mulig hos konsument, bindes til tråden, og logges sammen med alle hendelser som danner grunnlaget for kallet mot Sak.
-						            
-						KorrelasjonsIDen skal være unik, og kan enten genereres med f.eks UUID.randomUUID() eller hvis aktuelt, hentes ut fra inngående tjenestekall (i.e. callId via modig-biblioteket)
+						Tjenestene her er deprekerte. Journalpostapi håndterer oppretting av arkivsaker under journalføringen.
+						
+						Konsumenter som behøver å hente arkivsaker skal bruke <a href="https://confluence.adeo.no/spaces/BOA/pages/402023600/Query+saker">saf saker GraphQL query</a> i stedet.
+						
+						Nye konsumenter som skal opprette arkivsaker må avklare bruk med <a href="https://nav-it.slack.com/archives/C6W9E5GPJ">Team Dokumentløsninger</a>.
+						
+						Sak API forventer at header <strong>"X-Correlation-ID"</strong> er angitt for alle tjenestekall. Denne logges alltid i Sak, og benyttes for å kunne sammenstille hendelser
+						på tvers av kallkjeder. Bruk en korrelasjonsId
 						""",
 				contact = @Contact(
 						name = "Team Dokumentløsninger"
@@ -86,29 +81,20 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @SecuritySchemes(
 		value = {
 				@SecurityScheme(
-						name = "OIDC",
+						name = "bearerAuth",
 						in = HEADER,
 						description = """
-								OIDC-token (JWT via OAuth2.0). Dette preferert autentiseringsmekanisme, og <strong>skal</strong>
-								benyttes ved tjenestekall initiert av en bruker for å propagere konteksten (unntatt i særtilfeller - se Saml)
-								Følgende format må brukes i input-feltet "Value" under: <strong>"Bearer {token}"</strong>.
-								Eksempel på verdi i input-felt: <strong>Bearer eYdmifml0ejugm</strong>
-								                                
-								Et gyldig token kommer til å ha mange flere karakterer enn i eksempelet.
+								Dette er preferert metode for autorisasjon.
+								Eksempel på verdi i input-felt: <strong>eYdmifml0ejugm</strong>
 								""",
-						type = SecuritySchemeType.APIKEY),
+						scheme = "bearer",
+						bearerFormat = "JWT",
+						type = SecuritySchemeType.HTTP),
 				@SecurityScheme(
 						name = "Saml",
 						in = HEADER,
 						description = """
-								P.t støttes ikke konvertering fra SAML til OIDC-token og det er derfor implementert støtte for Saml for å propagere brukercontext fra legacy-systemer
-								(i.e. fra et system som kun eksponerer soap-tjenester og som skal gjøre tjenestekall videre mot Oppgave.
-								I denne konteksten er et SAML token en SAML assertion som er Base 64 enkodet.
-								På grunn av begrensninger i header-lengde, må saml-assertion strippes for whitespaces før den encodes
-								Formatet skal være som følger: <strong>"Saml {token}"</strong>.
-								Eksempel på verdi i input-felt: <strong>Saml eYdmifml0ejugm</strong>
-								                                
-								Et gyldig token kommer til å ha mange flere karakterer enn i eksempelet.
+								Autorisasjon med SAML Assertions er deprekert.
 								""",
 						type = SecuritySchemeType.APIKEY
 				),
@@ -116,7 +102,9 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 						name = "Basic Auth",
 						type = SecuritySchemeType.HTTP,
 						scheme = "basic",
-						description = "Basic auth kan brukes når det er snakk om system-til-system kommunikasjon"
+						description = """
+								Autorisasjon med basic auth er deprekert. Brukes kun av teamet.
+								"""
 				)
 		}
 )
@@ -135,9 +123,9 @@ public class SakResource {
 	}
 
 	@GetMapping(path = "/{id}", produces = APPLICATION_JSON_VALUE)
-	@Operation(summary = "Henter sak for en gitt id",
+	@Operation(summary = "Henter informasjon om sak, gitt en id",
 			parameters = {@Parameter(name = "X-Correlation-ID", required = true, in = ParameterIn.HEADER)},
-			security = {@SecurityRequirement(name = "OIDC"), @SecurityRequirement(name = "Saml"), @SecurityRequirement(name = "Basic Auth")},
+			security = {@SecurityRequirement(name = "bearerAuth"), @SecurityRequirement(name = "Saml"), @SecurityRequirement(name = "Basic Auth")},
 			responses = {
 					@ApiResponse(responseCode = "200",
 							description = "OK",
@@ -173,7 +161,7 @@ public class SakResource {
 
 	@GetMapping(produces = APPLICATION_JSON_VALUE)
 	@Operation(summary = "Finner saker for angitte søkekriterier",
-			security = {@SecurityRequirement(name = "OIDC"), @SecurityRequirement(name = "Saml"), @SecurityRequirement(name = "Basic Auth")},
+			security = {@SecurityRequirement(name = "bearerAuth"), @SecurityRequirement(name = "Saml"), @SecurityRequirement(name = "Basic Auth")},
 			parameters = {@Parameter(name = "X-Correlation-ID", required = true, in = ParameterIn.HEADER)},
 			responses = {
 					@ApiResponse(responseCode = "200",
@@ -185,8 +173,7 @@ public class SakResource {
 					@ApiResponse(responseCode = "503", content = @Content(schema = @Schema(implementation = ErrorResponse.class)), description = "En eller flere tjenester som sak er avhengig av er ikke tilgjengelige eller svarer ikke.")
 			})
 	public ResponseEntity<?> finnSaker(
-			@Valid
-			final SakSearchRequest sakSearchRequest
+			@Valid final SakSearchRequest sakSearchRequest
 			, HttpServletRequest ctx) {
 
 		log.info("finnSak Søker etter saker for: {}", sakSearchRequest);
@@ -213,8 +200,10 @@ public class SakResource {
 
 	@PostMapping(produces = APPLICATION_JSON_VALUE, consumes = APPLICATION_JSON_VALUE)
 	@Operation(summary = "Oppretter en ny sak",
-			description = "Merk at en sak enten skal tilhøre en aktør <b>eller</b> et foretak. Begge er p.t. ikke tillatt. ",
-			security = {@SecurityRequirement(name = "OIDC"), @SecurityRequirement(name = "Saml"), @SecurityRequirement(name = "Basic Auth")},
+			description = """
+					Dette var tidligere noe fagsystemene måtte gjøre for å kunne journalføre, men er ikke lenger nødvendig lenger.
+					""",
+			security = {@SecurityRequirement(name = "bearerAuth"), @SecurityRequirement(name = "Saml"), @SecurityRequirement(name = "Basic Auth")},
 			responses = {
 					@ApiResponse(responseCode = "201",
 							description = "Saken er opprettet",
@@ -252,7 +241,6 @@ public class SakResource {
 		} else {
 
 			final long opprettetSakId = sakRepository.lagre(innsendtSak);
-			log.info("Opprettet: {}", opprettetSakId);
 			log.info("opprettSak har opprettet arkivsakId={}", opprettetSakId);
 			URI path = servletUriComponentsBuilder
 					.pathSegment(API_V1_SAKER_PATH_SEGMENT)
@@ -290,7 +278,7 @@ public class SakResource {
 						.medApplikasjon(sak.getApplikasjon());
 
 		return sak.getFagsakNr() != null &&
-				!sakRepository.finnSaker(sakSearchCriteria).isEmpty();
+			   !sakRepository.finnSaker(sakSearchCriteria).isEmpty();
 	}
 
 	private ResponseEntity<?> makeResponseUponAbacFailure(ABACResult.Code abacResultCode) {
