@@ -40,8 +40,9 @@ spec:
     cpuThresholdPercentage: 50
   resources:
     limits:
-      cpu: 4000m
       memory: 1024Mi
+    requests:
+      cpu: 60m
   accessPolicy:
     inbound:
       rules:
@@ -74,6 +75,7 @@ spec:
     logging:
       destinations:
         - id: elastic
+        - id: loki
     autoInstrumentation:
       enabled: true
       runtime: java
