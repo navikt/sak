@@ -104,6 +104,6 @@ public class AuthenticationFilter extends SakOncePerRequestFilter {
 	}
 
 	private UnauthorizedException createUnauthorizedException() {
-		return new UnauthorizedException(new ErrorResponse(MDC.get("uuid"), "Autentisering feilet - se Kibana for årsak"));
+		return new UnauthorizedException(new ErrorResponse(MDC.get("uuid"), "Autentisering feilet"));
 	}
 }

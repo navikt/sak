@@ -56,7 +56,7 @@ public class SakRestExceptionHandler extends ResponseEntityExceptionHandler {
 		log.error("Det oppstod en ukjent feilsituasjon", e);
 		return ResponseEntity
 				.status(INTERNAL_SERVER_ERROR)
-				.body(new ErrorResponse(MDC.get("uuid"), "Det oppstod en ukjent feilsituasjon - se Kibana for årsak"));
+				.body(new ErrorResponse(MDC.get("uuid"), "Det oppstod en ukjent feilsituasjon"));
 	}
 
 	private ResponseEntity<Object> notFoundExceptionMapper(Exception e, WebRequest request) {
