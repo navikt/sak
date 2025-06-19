@@ -66,7 +66,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 				title = "Sak API",
 				version = "1",
 				description = """
-						Tjenestene her er deprekerte. Journalpostapi håndterer oppretting av arkivsaker under journalføringen.
+						Tjenestene her er deprekerte. Journalpostapi på Dokarkiv håndterer oppretting av arkivsaker under journalføringen.
 						
 						Konsumenter som behøver å hente arkivsaker skal bruke <a href="https://confluence.adeo.no/spaces/BOA/pages/402023600/Query+saker">saf saker GraphQL query</a> i stedet.
 						
@@ -201,7 +201,7 @@ public class SakResource {
 	@PostMapping(produces = APPLICATION_JSON_VALUE, consumes = APPLICATION_JSON_VALUE)
 	@Operation(summary = "Oppretter en ny sak",
 			description = """
-					Dette var tidligere noe fagsystemene måtte gjøre for å kunne journalføre, men er ikke lenger nødvendig lenger.
+					Dette var tidligere noe fagsystemene måtte gjøre for å kunne journalføre, men er ikke lenger nødvendig.
 					""",
 			security = {@SecurityRequirement(name = "bearerAuth"), @SecurityRequirement(name = "Saml"), @SecurityRequirement(name = "Basic Auth")},
 			responses = {

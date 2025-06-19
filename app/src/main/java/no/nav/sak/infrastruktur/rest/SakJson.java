@@ -80,7 +80,7 @@ public class SakJson {
 	@JsonProperty("applikasjon")
 	@Schema(description = """
 			Kode for applikasjon.
-			For generelle saker skal denne 'FS22'.
+			For generelle saker skal denne være 'FS22'.
 			Finner du ikke ditt fagsystem i dokumentasjon på <a href="https://confluence.adeo.no/spaces/BOA/pages/313346837/opprettJournalpost">opprettJournalpost</a> under fagsaksystem? Ta kontakt med Team dokumentløsninger.
 			""", example = "IT01")
 	public String getApplikasjon() {
