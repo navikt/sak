@@ -13,7 +13,6 @@ import no.nav.sak.repository.SakTestData;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
-
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -44,7 +43,6 @@ class SakResourceTest extends AbstractSakResourceTest {
 
     @Test
     void henter_sak_for_gitt_id() {
-
         final Sak opprettetSak =
             testUtilityRepository
                 .lagre(
@@ -53,7 +51,7 @@ class SakResourceTest extends AbstractSakResourceTest {
                         .build()
                 );
 
-        ResponseEntity<String> response = executeGetRequestWithSaml(URI.create(String.valueOf(opprettetSak.getId())), String.class);
+        ResponseEntity<String> response = executeGetRequestWithBearer(URI.create(String.valueOf(opprettetSak.getId())), String.class);
 
         assertThat(response.getStatusCode()).isEqualTo(OK);
         assertThat(response.getHeaders().getContentType()).isEqualTo(APPLICATION_JSON);
@@ -66,7 +64,7 @@ class SakResourceTest extends AbstractSakResourceTest {
 
     @Test
     void gir_404_naar_sak_ikke_finnes_for_gitt_id() {
-        ResponseEntity<String> response = executeGetRequestWithSaml(URI.create("1"), String.class);
+        ResponseEntity<String> response = executeGetRequestWithBearer(URI.create("1"), String.class);
 
         JsonObject jsonObject = JsonParser.parseString(response.getBody()).getAsJsonObject();
         assertThat(jsonObject.get("feilmelding").getAsString()).isNotBlank();
@@ -75,13 +73,13 @@ class SakResourceTest extends AbstractSakResourceTest {
 
     @Test
     void gir_404_naar_ressurs_ikke_finnes() {
-        ResponseEntity<?> response = executeGetRequestWithSaml(URI.create("/v1/finnesikke/1"));
+        ResponseEntity<?> response = executeGetRequestWithBearer(URI.create("/v1/finnesikke/1"));
         assertThat(response.getStatusCode()).isEqualTo(NOT_FOUND);
     }
 
     @Test
     void gir_405_naar_operasjon_ikke_tillatt() {
-        ResponseEntity<?> response = doRequest(URI.create("1"), HttpMethod.POST, authHeaderSaml,
+        ResponseEntity<?> response = doRequest(URI.create("1"), HttpMethod.POST, authHeaderBearer,
                 new SakJsonTestData(new SakTestData().build()).buildJsonString(), Object.class);
 
         assertThat(response.getStatusCode()).isEqualTo(METHOD_NOT_ALLOWED);
@@ -100,7 +98,7 @@ class SakResourceTest extends AbstractSakResourceTest {
 
     @Test
     void gir_400_naar_hverken_aktoer_eller_organisasjon_er_utfylt_ved_opprettelse_av_sak() {
-		ResponseEntity<String> createdResponse = executePostWithSaml(new SakJsonTestData()
+		ResponseEntity<String> createdResponse = executePostWithBearer(new SakJsonTestData()
 				.medApplikasjon(random(3))
 				.medTema(random(3))
 				.buildJsonString(), String.class);
@@ -141,12 +139,12 @@ class SakResourceTest extends AbstractSakResourceTest {
         String json = (
             new SakJsonTestData(sak).buildJsonString());
 
-        ResponseEntity<?> firstResponse = executePostWithSaml(json);
+        ResponseEntity<?> firstResponse = executePostWithBearer(json);
 
         assertThat(firstResponse.getStatusCode()).isEqualTo(CREATED);
         assertThat(firstResponse.getHeaders().getContentType()).isEqualTo(APPLICATION_JSON);
 
-        ResponseEntity<?> secondResponse = executePostWithSaml(json);
+        ResponseEntity<?> secondResponse = executePostWithBearer(json);
 
         assertThat(secondResponse.getStatusCode()).isEqualTo(CONFLICT);
 		assertThat(secondResponse.getHeaders().getContentType()).isEqualTo(APPLICATION_JSON);
@@ -180,12 +178,12 @@ class SakResourceTest extends AbstractSakResourceTest {
         String jsonSak2 = (
                 new SakJsonTestData(sak2).buildJsonString());
 
-        ResponseEntity<?> firstResponse = executePostWithSaml(jsonSak1);
+        ResponseEntity<?> firstResponse = executePostWithBearer(jsonSak1);
 
         assertThat(firstResponse.getStatusCode()).isEqualTo(CREATED);
         assertThat(firstResponse.getHeaders().getContentType()).isEqualTo(APPLICATION_JSON);
 
-        ResponseEntity<?> secondResponse = executePostWithSaml(jsonSak2);
+        ResponseEntity<?> secondResponse = executePostWithBearer(jsonSak2);
 
         assertThat(secondResponse.getStatusCode()).isEqualTo(CREATED);
         assertThat(secondResponse.getHeaders().getContentType()).isEqualTo(APPLICATION_JSON);
@@ -229,7 +227,7 @@ class SakResourceTest extends AbstractSakResourceTest {
             .applikasjon(null)
             .fagsakNr("123")
             .build();
-        ResponseEntity<String> createdResponse = executePostWithSaml(new SakJsonTestData(sak)
+        ResponseEntity<String> createdResponse = executePostWithBearer(new SakJsonTestData(sak)
             .buildJsonString(), String.class);
         verify400(createdResponse);
     }
@@ -242,7 +240,7 @@ class SakResourceTest extends AbstractSakResourceTest {
         Sak sak1 = testUtilityRepository.lagre(new SakTestData().aktoerId(aktoerId).build());
         Sak sak2 = testUtilityRepository.lagre(new SakTestData().aktoerId(aktoerId).build());
 
-        ResponseEntity<String> response = executeGetRequestWithSaml(
+        ResponseEntity<String> response = executeGetRequestWithBearer(
 				UriComponentsBuilder.newInstance()
 				.queryParam("aktoerId", aktoerId)
 						.build().toUri(), String.class
@@ -257,7 +255,7 @@ class SakResourceTest extends AbstractSakResourceTest {
         String tema = RandomStringUtils.randomAlphabetic(4);
         Sak sak = testUtilityRepository.lagre(new SakTestData().tema(tema).build());
 
-        ResponseEntity<String> response = executeGetRequestWithSaml(
+        ResponseEntity<String> response = executeGetRequestWithBearer(
 				UriComponentsBuilder.newInstance()
             .queryParam("tema", sak.getTema())
             .queryParam("aktoerId", sak.getAktoerId())
@@ -277,7 +275,7 @@ class SakResourceTest extends AbstractSakResourceTest {
             .aktoerId(sak1.getAktoerId())
             .build());
 
-        ResponseEntity<String> response = executeGetRequestWithSaml(
+        ResponseEntity<String> response = executeGetRequestWithBearer(
 				UriComponentsBuilder.newInstance()
 				.queryParam("tema", sak1.getTema())
             .queryParam("tema", sak2.getTema())
@@ -296,7 +294,7 @@ class SakResourceTest extends AbstractSakResourceTest {
             applikasjon(RandomStringUtils.randomAlphabetic(3)).
             fagsakNr(fagsaknr).build());
 
-        ResponseEntity<String> response = executeGetRequestWithSaml(
+        ResponseEntity<String> response = executeGetRequestWithBearer(
 				UriComponentsBuilder.newInstance()
             .queryParam("fagsakNr", sak.getFagsakNr())
 						.build().toUri(), String.class
@@ -310,7 +308,7 @@ class SakResourceTest extends AbstractSakResourceTest {
         String orgnr = "974652250";
         Sak sak = testUtilityRepository.lagre(new SakTestData().orgnr(orgnr).build());
 
-        ResponseEntity<String> response = executeGetRequestWithSaml(
+        ResponseEntity<String> response = executeGetRequestWithBearer(
 				UriComponentsBuilder.newInstance()
 				.queryParam("orgnr", sak.getOrgnr())
 					.build().toUri(), String.class
@@ -325,7 +323,7 @@ class SakResourceTest extends AbstractSakResourceTest {
         String applikasjon = RandomStringUtils.randomAlphabetic(9);
         Sak sak = testUtilityRepository.lagre(new SakTestData().applikasjon(applikasjon).build());
 
-        ResponseEntity<String> response = executeGetRequestWithSaml(
+        ResponseEntity<String> response = executeGetRequestWithBearer(
 				UriComponentsBuilder.newInstance()
                 .queryParam("applikasjon", sak.getApplikasjon())
                 .queryParam("aktoerId", sak.getAktoerId())
@@ -374,7 +372,7 @@ class SakResourceTest extends AbstractSakResourceTest {
             .tema(tema)
             .build());
 
-        ResponseEntity<String> response = executeGetRequestWithSaml(
+        ResponseEntity<String> response = executeGetRequestWithBearer(
 				UriComponentsBuilder.newInstance()
                 .queryParam("fagsakNr", enesteGyldigeTreff.getFagsakNr())
                 .queryParam("applikasjon", enesteGyldigeTreff.getApplikasjon())
@@ -390,7 +388,7 @@ class SakResourceTest extends AbstractSakResourceTest {
     void gir_400_naar_hverken_aktoer_orgnr_eller_faksaknr_er_angitt_i_soek() {
         opprett100Tilfeldigesaker();
 
-        ResponseEntity<String> response = executeGetRequestWithSaml(null, String.class);
+        ResponseEntity<String> response = executeGetRequestWithBearer(null, String.class);
         verify400(response);
     }
 
@@ -402,7 +400,7 @@ class SakResourceTest extends AbstractSakResourceTest {
 
         String aktoerId2 = RandomStringUtils.randomNumeric(11);
         Sak sak2 = testUtilityRepository.lagre(new SakTestData().aktoerId(aktoerId2).build());
-        ResponseEntity<String> response = executeGetRequestWithSaml(
+        ResponseEntity<String> response = executeGetRequestWithBearer(
 			UriComponentsBuilder.newInstance()
                 .queryParam("aktoerId", sak1.getAktoerId())
                 .queryParam("aktoerId", sak2.getAktoerId())
@@ -416,7 +414,7 @@ class SakResourceTest extends AbstractSakResourceTest {
     protected ResponseEntity<Object> createSakAndTestReponse(final Sak sak) {
 
         final ResponseEntity<Object> createdResponse =
-            executePostWithSaml(
+            executePostWithBearer(
                     new SakJsonTestData(sak).buildJsonString()
             );
 
@@ -473,7 +471,7 @@ class SakResourceTest extends AbstractSakResourceTest {
         final ResponseEntity<Object> createdResponse = createSakAndTestReponse(sak);
 
         final ResponseEntity<String> getResponse =
-            executeGetRequestWithSaml(
+            executeGetRequestWithBearer(
                     createdResponse.getHeaders().getLocation(), String.class
             );
 

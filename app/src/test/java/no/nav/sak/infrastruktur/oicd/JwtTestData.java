@@ -6,28 +6,41 @@ import org.jose4j.jws.JsonWebSignature;
 import org.jose4j.jwt.JwtClaims;
 import org.jose4j.lang.JoseException;
 
+import java.util.Map;
+import java.util.UUID;
+
 public class JwtTestData {
-    private JwtClaims jwtClaims = new JwtClaimsTestData().build();
+	private JwtClaims jwtClaims = new JwtClaimsTestData().build();
 
-    public String build() {
-        RsaJsonWebKey rsaJsonWebKey = JunitJsonWebKey.get();
-        JsonWebSignature jws = new JsonWebSignature();
-        jws.setPayload(jwtClaims.toJson());
-        jws.setKey(rsaJsonWebKey.getPrivateKey());
-        jws.setKeyIdHeaderValue(rsaJsonWebKey.getKeyId());
-        jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.RSA_USING_SHA256);
+	public String build() {
+		RsaJsonWebKey rsaJsonWebKey = JunitJsonWebKey.get();
+		JsonWebSignature jws = new JsonWebSignature();
+		jws.setPayload(jwtClaims.toJson());
+		jws.setKey(rsaJsonWebKey.getPrivateKey());
+		jws.setKeyIdHeaderValue(rsaJsonWebKey.getKeyId());
+		jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.RSA_USING_SHA256);
 
-        String jwt;
-        try {
-            jwt = jws.getCompactSerialization();
-        } catch (JoseException e) {
-            throw new IllegalStateException(e);
-        }
-        return jwt;
-    }
+		String jwt;
+		try {
+			jwt = jws.getCompactSerialization();
+		} catch (JoseException e) {
+			throw new IllegalStateException(e);
+		}
+		return jwt;
+	}
 
-    public JwtTestData claims(JwtClaims jwtClaims) {
-        this.jwtClaims = jwtClaims;
-        return this;
-    }
+	public JwtTestData claims(JwtClaims jwtClaims) {
+		this.jwtClaims = jwtClaims;
+		return this;
+	}
+
+	public static Map<String, Object> entraClaims() {
+		return Map.of(
+				"azp_name", "itest:team:app",
+				"NAVident", "Z123456",
+				"oid", UUID.randomUUID().toString(),
+				"name", "Bjarne Betjent",
+				"scp", "api_admin defaultaccess"
+		);
+	}
 }

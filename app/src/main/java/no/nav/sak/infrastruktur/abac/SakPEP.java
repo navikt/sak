@@ -15,14 +15,12 @@ import java.util.Objects;
 import static jakarta.ws.rs.core.HttpHeaders.AUTHORIZATION;
 import static no.nav.abac.xacml.NavAttributter.ENVIRONMENT_FELLES_OIDC_TOKEN_BODY;
 import static no.nav.abac.xacml.NavAttributter.ENVIRONMENT_FELLES_PEP_ID;
-import static no.nav.abac.xacml.NavAttributter.ENVIRONMENT_FELLES_SAML_TOKEN;
 import static no.nav.abac.xacml.NavAttributter.RESOURCE_FELLES_DOMENE;
 import static no.nav.abac.xacml.NavAttributter.RESOURCE_FELLES_PERSON_AKTOERID_RESOURCE;
 import static no.nav.abac.xacml.NavAttributter.RESOURCE_FELLES_RESOURCE_TYPE;
 import static no.nav.sak.infrastruktur.abac.AbacExceptionTranslator.identifyException;
 import static no.nav.sak.infrastruktur.authentication.AuthenticationHeaderIdentifier.BASIC;
 import static no.nav.sak.infrastruktur.authentication.AuthenticationHeaderIdentifier.OIDC;
-import static no.nav.sak.infrastruktur.authentication.AuthenticationHeaderIdentifier.SAML;
 import static org.apache.commons.lang3.StringUtils.substringAfter;
 import static org.apache.commons.lang3.StringUtils.substringBefore;
 import static org.apache.commons.lang3.StringUtils.substringBetween;
@@ -62,8 +60,6 @@ public class SakPEP {
 		} else if (Objects.equals(OIDC.getValue(), authIdentifier)) {
 			final String tokenBody = substringBetween(token, ".");
 			abacRequest.addEnvironment(new ABACAttribute(ENVIRONMENT_FELLES_OIDC_TOKEN_BODY, tokenBody));
-		} else if (Objects.equals(SAML.getValue(), authIdentifier)) {
-			abacRequest.addEnvironment(new ABACAttribute(ENVIRONMENT_FELLES_SAML_TOKEN, token));
 		} else {
 			throw new IllegalStateException("Fant ingen gyldig authenticationHeader");
 		}

@@ -7,7 +7,6 @@ import no.nav.sak.repository.SakTestData;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -34,7 +33,7 @@ public class SakResourceBadAbacMappingToInternalErrorTest extends AbstractSakRes
         final String tema = RandomStringUtils.randomAlphabetic(4);
         final Sak sak = testUtilityRepository.lagre(new SakTestData().tema(tema).build());
 
-        final ResponseEntity<?> response = executeGetRequestWithSaml(
+        final ResponseEntity<?> response = executeGetRequestWithBearer(
 				UriComponentsBuilder.newInstance()
                 .queryParam("tema", sak.getTema())
                 .queryParam("aktoerId", sak.getAktoerId())
@@ -48,7 +47,7 @@ public class SakResourceBadAbacMappingToInternalErrorTest extends AbstractSakRes
     protected ResponseEntity<Object> createSakAndTestReponse(final Sak sak) {
 
         final ResponseEntity<Object> createdResponse =
-                executePostWithSaml(
+                executePostWithBearer(
                                 new SakJsonTestData(sak).buildJsonString()
                 );
 

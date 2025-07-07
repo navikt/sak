@@ -28,7 +28,6 @@ import static jakarta.ws.rs.core.HttpHeaders.AUTHORIZATION;
 import static no.nav.sak.infrastruktur.ContextExtractor.getSubjectType;
 import static no.nav.sak.infrastruktur.authentication.AuthenticationHeaderIdentifier.BASIC;
 import static no.nav.sak.infrastruktur.authentication.AuthenticationHeaderIdentifier.OIDC;
-import static no.nav.sak.infrastruktur.authentication.AuthenticationHeaderIdentifier.SAML;
 import static org.apache.commons.lang3.StringUtils.trim;
 
 @Component
@@ -72,7 +71,7 @@ public class AuthenticationFilter extends SakOncePerRequestFilter {
 				httpRequest.setAttribute(REQUEST_USERNAME, TokenUtils.getNavIdent(TokenUtils.ISSUER_AZUREAD).orElseThrow(this::createUnauthorizedException));
 			} else {
 
-				if (!(Objects.equals(authIdentifier, SAML.getValue()) || Objects.equals(authIdentifier, OIDC.getValue()) || Objects.equals(authIdentifier, BASIC.getValue()))) {
+				if (!(Objects.equals(authIdentifier, OIDC.getValue()) || Objects.equals(authIdentifier, BASIC.getValue()))) {
 					authIdentifier = "N/A";
 				}
 

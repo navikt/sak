@@ -11,11 +11,9 @@ import no.nav.sak.infrastruktur.abac.MockableSakPEP;
 import no.nav.sak.infrastruktur.authentication.Authenticator;
 import no.nav.sak.infrastruktur.authentication.LdapConfiguration;
 import no.nav.sak.infrastruktur.authentication.OidcTokenValidator;
-import no.nav.sak.infrastruktur.authentication.SAMLValidator;
 import no.nav.sak.infrastruktur.authentication.basic.JunitBasicAuthenticator;
 import no.nav.sak.infrastruktur.oicd.JunitJsonWebKey;
 import no.nav.sak.infrastruktur.oicd.JwtClaimsTestData;
-import no.nav.security.token.support.core.configuration.MultiIssuerConfiguration;
 import org.jose4j.keys.resolvers.JwksVerificationKeyResolver;
 import org.jose4j.keys.resolvers.VerificationKeyResolver;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -27,12 +25,10 @@ import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.sql.DataSource;
-import java.time.Clock;
 import java.util.HashMap;
 import java.util.Map;
 
 import static java.util.Collections.singletonList;
-import static org.mockito.Mockito.mock;
 
 @Configuration
 @EnableConfigurationProperties({
@@ -64,21 +60,11 @@ public class SakTestConfiguration {
 
 	@Bean
 	@Primary
-	public MultiIssuerConfiguration multiIssuerConfiguration() {
-		return mock(MultiIssuerConfiguration.class);
-	}
-
-	@Bean
-	@Primary
-	public Authenticator testAuthenticator(LdapProperties ldapProperties, SakTestTruststoreProperties truststoreProperties, Clock clock) {
+	public Authenticator testAuthenticator(LdapProperties ldapProperties) {
 		Map<String, VerificationKeyResolver> verificationKeyResolverMap = new HashMap<>();
 		verificationKeyResolverMap.put(JwtClaimsTestData.ISSUER, new JwksVerificationKeyResolver(
 				singletonList(JunitJsonWebKey.get())));
 		OidcTokenValidator oidcTokenValidator = new OidcTokenValidator(verificationKeyResolverMap);
-
-		SAMLValidator samlValidator = new SAMLValidator(
-				truststoreProperties.path(),
-				truststoreProperties.password(), clock);
 
 		LdapConfiguration ldapConfiguration = LdapConfiguration.builder()
 				.withUrl(ldapProperties.url())
@@ -89,6 +75,6 @@ public class SakTestConfiguration {
 
 		JunitBasicAuthenticator junitBasicAuthenticator = new JunitBasicAuthenticator(ldapConfiguration);
 
-		return new Authenticator(oidcTokenValidator, samlValidator, junitBasicAuthenticator);
+		return new Authenticator(oidcTokenValidator, junitBasicAuthenticator);
 	}
 }

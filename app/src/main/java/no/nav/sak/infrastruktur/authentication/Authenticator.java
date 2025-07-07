@@ -4,17 +4,14 @@ import org.apache.commons.lang3.StringUtils;
 
 import static no.nav.sak.infrastruktur.authentication.AuthenticationHeaderIdentifier.BASIC;
 import static no.nav.sak.infrastruktur.authentication.AuthenticationHeaderIdentifier.OIDC;
-import static no.nav.sak.infrastruktur.authentication.AuthenticationHeaderIdentifier.SAML;
 
 
 public class Authenticator {
-	private final SAMLValidator samlValidator;
 	private final BasicAuthenticator basicAuthenticator;
 	private final OidcTokenValidator oidcTokenValidator;
 
-	public Authenticator(OidcTokenValidator oidcTokenValidator, SAMLValidator samlValidator, BasicAuthenticator basicAuthenticator) {
+	public Authenticator(OidcTokenValidator oidcTokenValidator, BasicAuthenticator basicAuthenticator) {
 		this.oidcTokenValidator = oidcTokenValidator;
-		this.samlValidator = samlValidator;
 		this.basicAuthenticator = basicAuthenticator;
 	}
 
@@ -30,8 +27,6 @@ public class Authenticator {
 
 			if (OIDC.getValue().equals(identifier)) {
 				return oidcTokenValidator.validate(credentials);
-			} else if (SAML.getValue().equals(identifier)) {
-				return samlValidator.validate(credentials);
 			} else if (BASIC.getValue().equals(identifier)) {
 				return basicAuthenticator.authenticate(credentials);
 			} else {

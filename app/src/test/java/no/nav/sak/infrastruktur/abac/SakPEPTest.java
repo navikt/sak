@@ -11,7 +11,6 @@ import org.mockito.Mockito;
 
 import static no.nav.abac.xacml.NavAttributter.ENVIRONMENT_FELLES_OIDC_TOKEN_BODY;
 import static no.nav.abac.xacml.NavAttributter.ENVIRONMENT_FELLES_PEP_ID;
-import static no.nav.abac.xacml.NavAttributter.ENVIRONMENT_FELLES_SAML_TOKEN;
 import static no.nav.abac.xacml.NavAttributter.RESOURCE_FELLES_DOMENE;
 import static no.nav.abac.xacml.NavAttributter.RESOURCE_FELLES_PERSON_AKTOERID_RESOURCE;
 import static no.nav.abac.xacml.NavAttributter.RESOURCE_FELLES_RESOURCE_TYPE;
@@ -39,16 +38,6 @@ class SakPEPTest {
         assertThat(req.getAccessSubject().getAttributes()).containsOnly(
                 new ABACAttribute(StandardAttributter.SUBJECT_ID, username),
                 new ABACAttribute(NavAttributter.SUBJECT_FELLES_SUBJECTTYPE, SUBJECT_TYPE_SYSTEMBRUKER.getValue()));
-    }
-
-    @Test
-    void autoriserer_for_saml() {
-        HttpServletRequest ctx = mockContextFor(username, "Saml 123");
-
-        ABACRequest req = authorizeReturningCaptureOfRequest(ctx, new AuthorizationRequest(null));
-
-        assertDefaulValuesSpecifiedCorrectly(req);
-        assertThat(req.getEnvironment().getAttributes()).contains(new ABACAttribute(ENVIRONMENT_FELLES_SAML_TOKEN, "123"));
     }
 
     @Test

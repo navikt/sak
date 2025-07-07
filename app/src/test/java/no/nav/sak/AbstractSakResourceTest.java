@@ -1,14 +1,16 @@
 package no.nav.sak;
 
-import jakarta.annotation.Resource;
-import no.nav.sak.infrastruktur.authentication.saml.SAMLSupport;
 import no.nav.sak.repository.Sak;
 import no.nav.sak.repository.SakRepository;
 import no.nav.sak.repository.SakTestData;
 import no.nav.sak.repository.TestUtilityRepository;
+import no.nav.security.mock.oauth2.MockOAuth2Server;
+import no.nav.security.mock.oauth2.token.DefaultOAuth2TokenCallback;
+import no.nav.security.token.support.spring.test.EnableMockOAuth2Server;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpEntity;
@@ -19,37 +21,36 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.net.URI;
-import java.time.Clock;
+import java.util.List;
+import java.util.Map;
 
-import static no.nav.sak.infrastruktur.authentication.AuthenticationHeaderIdentifier.SAML;
+import static com.nimbusds.oauth2.sdk.token.AccessTokenType.BEARER;
+import static no.nav.sak.infrastruktur.oicd.JwtTestData.entraClaims;
 
 @ActiveProfiles("itest")
 @SpringBootTest(
 		classes = SakTestConfiguration.class,
 		webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
 )
+@EnableMockOAuth2Server
 public abstract class AbstractSakResourceTest {
 
 	public static final URI SAKER_BASE_PATH = URI.create("/api/v1/saker/");
-	static String authHeaderSaml;
+	static String authHeaderBearer;
 	static String correlationId = "junit";
 
-	@Resource
+	@Autowired
 	SakRepository sakRepository;
-	@Resource
+	@Autowired
 	protected TestUtilityRepository testUtilityRepository;
-	@Resource
-	SakTestTruststoreProperties sakTestTruststoreProperties;
-	@Resource
+	@Autowired
 	TestRestTemplate testRestTemplate;
-	@Resource
-	Clock clock;
+	@Autowired
+	private MockOAuth2Server server;
 
 	@BeforeEach
 	void beforeAbstract() {
-		SAMLSupport samlSupport = new SAMLSupport(sakTestTruststoreProperties, "123456789", clock);
-		String samlToken = samlSupport.createNewToken();
-		authHeaderSaml = SAML.getValue() + " " + samlToken;
+		authHeaderBearer = BEARER.getValue() + " " + bearerToken();
 	}
 
 	@AfterEach
@@ -59,7 +60,7 @@ public abstract class AbstractSakResourceTest {
 
 	protected abstract ResponseEntity<Object> createSakAndTestReponse(final Sak sak);
 
-	protected  <T,U> ResponseEntity<T> doRequest(URI path, HttpMethod method, String authHeader, U payload, Class<T> responseType) {
+	protected <T, U> ResponseEntity<T> doRequest(URI path, HttpMethod method, String authHeader, U payload, Class<T> responseType) {
 		HttpHeaders headers = new HttpHeaders();
 		headers.add("X-Correlation-ID", correlationId);
 		headers.add("Authorization", authHeader);
@@ -69,26 +70,45 @@ public abstract class AbstractSakResourceTest {
 		return testRestTemplate.exchange(uri, method, httpEntity, responseType);
 	}
 
-	protected ResponseEntity<Object> executeGetRequestWithSaml(URI path) {
-		return executeGetRequestWithSaml(path, Object.class);
+	protected ResponseEntity<Object> executeGetRequestWithBearer(URI path) {
+		return executeGetRequestWithBearer(path, Object.class);
 	}
 
-	protected <T> ResponseEntity<T> executeGetRequestWithSaml(URI path, Class<T> responseType) {
-		return doRequest(path, HttpMethod.GET, authHeaderSaml, null, responseType);
+	protected <T> ResponseEntity<T> executeGetRequestWithBearer(URI path, Class<T> responseType) {
+		return doRequest(path, HttpMethod.GET, authHeaderBearer, null, responseType);
 	}
 
-	protected ResponseEntity<Object> executePostWithSaml(String json) {
-		return executePostWithSaml(json, Object.class);
+	protected ResponseEntity<Object> executePostWithBearer(String json) {
+		return executePostWithBearer(json, Object.class);
 	}
 
-	protected <T> ResponseEntity<T> executePostWithSaml(String json, Class<T> responseType) {
-		return doRequest(null, HttpMethod.POST, authHeaderSaml, json, responseType);
+	protected <T> ResponseEntity<T> executePostWithBearer(String json, Class<T> responseType) {
+		return doRequest(null, HttpMethod.POST, authHeaderBearer, json, responseType);
 	}
 
 	protected void opprett100Tilfeldigesaker() {
 		for (int i = 0; i < 50; i++) {
-			testUtilityRepository.lagre(new SakTestData().aktoerId(RandomStringUtils.randomNumeric(5)).build());
+			testUtilityRepository.lagre(new SakTestData().aktoerId(RandomStringUtils.secure().next(13)).build());
 			testUtilityRepository.lagre(new SakTestData().orgnr(SakTestData.generateValidOrgnr()).build());
 		}
+	}
+
+	protected String bearerToken() {
+		return bearerToken(entraClaims());
+	}
+
+	private String bearerToken(Map<String, Object> claims) {
+		return server.issueToken(
+				"entra",
+				"sak-itest",
+				new DefaultOAuth2TokenCallback(
+						"entra",
+						"Z123456",
+						"JWT",
+						List.of("aud-localhost"),
+						claims,
+						3600
+				)
+		).serialize();
 	}
 }

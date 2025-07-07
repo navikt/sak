@@ -1,6 +1,8 @@
 package no.nav.sak.repository;
 
+import jakarta.annotation.Resource;
 import no.nav.sak.SakTestConfiguration;
+import no.nav.security.token.support.spring.test.EnableMockOAuth2Server;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -8,7 +10,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
-import jakarta.annotation.Resource;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -21,6 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
         classes = SakTestConfiguration.class,
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
 )
+@EnableMockOAuth2Server
 @Transactional
 class SakRepositoryTest {
     @Resource

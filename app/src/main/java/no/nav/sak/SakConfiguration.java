@@ -15,7 +15,6 @@ import no.nav.sak.infrastruktur.authentication.Authenticator;
 import no.nav.sak.infrastruktur.authentication.BasicAuthenticator;
 import no.nav.sak.infrastruktur.authentication.LdapConfiguration;
 import no.nav.sak.infrastruktur.authentication.OidcTokenValidator;
-import no.nav.sak.infrastruktur.authentication.SAMLValidator;
 import no.nav.sak.repository.Database;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -32,7 +31,6 @@ import org.ehcache.config.builders.ExpiryPolicyBuilder;
 import org.ehcache.config.builders.ResourcePoolsBuilder;
 import org.jose4j.jwk.HttpsJwks;
 import org.jose4j.keys.resolvers.HttpsJwksVerificationKeyResolver;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -105,15 +103,6 @@ public class SakConfiguration {
 	}
 
 	@Bean
-	public SAMLValidator samlValidator(
-			@Value("${javax.net.ssl.trustStore}") String truststorePath,
-			@Value("${javax.net.ssl.trustStorePassword}") String truststorePassword,
-			Clock clock
-	) {
-		return new SAMLValidator(truststorePath, truststorePassword, clock);
-	}
-
-	@Bean
 	public LdapConfiguration ldapConfiguration(LdapProperties ldapProperties) {
 		return LdapConfiguration.builder()
 				.withUrl(ldapProperties.url())
@@ -141,8 +130,8 @@ public class SakConfiguration {
 	}
 
 	@Bean
-	public Authenticator authenticator(OidcTokenValidator oidcTokenValidator, SAMLValidator samlValidator, BasicAuthenticator basicAuthenticator) {
-		return new Authenticator(oidcTokenValidator, samlValidator, basicAuthenticator);
+	public Authenticator authenticator(OidcTokenValidator oidcTokenValidator, BasicAuthenticator basicAuthenticator) {
+		return new Authenticator(oidcTokenValidator, basicAuthenticator);
 	}
 
 	@Bean
