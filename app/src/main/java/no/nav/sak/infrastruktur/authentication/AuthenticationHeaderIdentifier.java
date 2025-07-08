@@ -1,7 +1,6 @@
 package no.nav.sak.infrastruktur.authentication;
 
 public enum AuthenticationHeaderIdentifier {
-	SAML("Saml"),
 	BASIC("Basic"),
 	OIDC("Bearer");
 

@@ -11,10 +11,6 @@
         <appender-ref ref="STDOUT"/>
     </logger>
 
-    <logger name="org.opensaml" level="OFF" additivity="false">
-        <appender-ref ref="STDOUT"/>
-    </logger>
-
     <logger name="io.gatling" level="DEBUG" additivity="false">
         <appender-ref ref="STDOUT"/>
     </logger>

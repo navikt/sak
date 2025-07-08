@@ -40,7 +40,7 @@ public class SakResourceExceptionHandlingTest extends AbstractSakResourceTest {
 
 	@Test
 	void returnerer_500_med_uuid_og_aarsak_naar_intern_systemfeil() {
-		ResponseEntity<String> response = executeGetRequestWithSaml(URI.create("1"), String.class);
+		ResponseEntity<String> response = executeGetRequestWithBearer(URI.create("1"), String.class);
 
 		assertThat(response.getStatusCode()).isEqualTo(INTERNAL_SERVER_ERROR);
 		assertThat(response.getHeaders().getContentType()).isEqualTo(APPLICATION_JSON);

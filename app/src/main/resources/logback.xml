@@ -21,10 +21,6 @@
         <appender-ref ref="STDOUT_JSON"/>
     </logger>
 
-    <logger name="org.opensaml" level="WARN" additivity="false">
-        <appender-ref ref="STDOUT_JSON"/>
-    </logger>
-
     <logger name="org.flyway" level="DEBUG" additivity="false">
         <appender-ref ref="STDOUT_JSON"/>
     </logger>

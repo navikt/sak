@@ -91,14 +91,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 						bearerFormat = "JWT",
 						type = SecuritySchemeType.HTTP),
 				@SecurityScheme(
-						name = "Saml",
-						in = HEADER,
-						description = """
-								Autorisasjon med SAML Assertions er deprekert.
-								""",
-						type = SecuritySchemeType.APIKEY
-				),
-				@SecurityScheme(
 						name = "Basic Auth",
 						type = SecuritySchemeType.HTTP,
 						scheme = "basic",
@@ -125,7 +117,7 @@ public class SakResource {
 	@GetMapping(path = "/{id}", produces = APPLICATION_JSON_VALUE)
 	@Operation(summary = "Henter informasjon om sak, gitt en id",
 			parameters = {@Parameter(name = "X-Correlation-ID", required = true, in = ParameterIn.HEADER)},
-			security = {@SecurityRequirement(name = "bearerAuth"), @SecurityRequirement(name = "Saml"), @SecurityRequirement(name = "Basic Auth")},
+			security = {@SecurityRequirement(name = "bearerAuth"), @SecurityRequirement(name = "Basic Auth")},
 			responses = {
 					@ApiResponse(responseCode = "200",
 							description = "OK",
@@ -161,7 +153,7 @@ public class SakResource {
 
 	@GetMapping(produces = APPLICATION_JSON_VALUE)
 	@Operation(summary = "Finner saker for angitte søkekriterier",
-			security = {@SecurityRequirement(name = "bearerAuth"), @SecurityRequirement(name = "Saml"), @SecurityRequirement(name = "Basic Auth")},
+			security = {@SecurityRequirement(name = "bearerAuth"), @SecurityRequirement(name = "Basic Auth")},
 			parameters = {@Parameter(name = "X-Correlation-ID", required = true, in = ParameterIn.HEADER)},
 			responses = {
 					@ApiResponse(responseCode = "200",
@@ -203,7 +195,7 @@ public class SakResource {
 			description = """
 					Dette var tidligere noe fagsystemene måtte gjøre for å kunne journalføre, men er ikke lenger nødvendig.
 					""",
-			security = {@SecurityRequirement(name = "bearerAuth"), @SecurityRequirement(name = "Saml"), @SecurityRequirement(name = "Basic Auth")},
+			security = {@SecurityRequirement(name = "bearerAuth"), @SecurityRequirement(name = "Basic Auth")},
 			responses = {
 					@ApiResponse(responseCode = "201",
 							description = "Saken er opprettet",
