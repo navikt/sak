@@ -21,10 +21,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import org.springframework.transaction.PlatformTransactionManager;
 
-import javax.sql.DataSource;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -39,11 +36,6 @@ import static java.util.Collections.singletonList;
 })
 @ComponentScan(basePackages = "no.nav.sak")
 public class SakTestConfiguration {
-
-	@Bean
-	public PlatformTransactionManager platformTransactionManager(DataSource dataSource) {
-		return new DataSourceTransactionManager(dataSource);
-	}
 
 	@Bean
 	@Primary

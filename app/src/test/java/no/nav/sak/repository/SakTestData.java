@@ -7,16 +7,16 @@ import java.time.LocalDateTime;
 
 public class SakTestData {
     private static final String[] gyldigeOrgnr = {"999263550", "991012133", "895106402"};
-    private String tema = RandomStringUtils.randomAlphabetic(3);
-    private String aktoerId = RandomStringUtils.randomNumeric(13);
+    private String tema = RandomStringUtils.secure().nextAlphabetic(3);
+    private String aktoerId = RandomStringUtils.secure().nextNumeric(13);
     private String orgnr;
     private String fagsakNr;
     private String applikasjon;
-    private final String opprettetAv = RandomStringUtils.randomAlphabetic(8);
+    private final String opprettetAv = RandomStringUtils.secure().nextAlphabetic(8);
     private final LocalDateTime opprettetTidspunkt = LocalDateTime.now();
 
     public Sak build() {
-        return new Sak.Builder()
+        return Sak.builder()
             .medAktoerId(aktoerId)
             .medOrgnr(orgnr)
             .medTema(tema)
@@ -55,7 +55,7 @@ public class SakTestData {
     }
 
     public static String generateValidOrgnr() {
-        return gyldigeOrgnr[RandomUtils.nextInt(0, 3)];
+        return gyldigeOrgnr[RandomUtils.secure().randomInt(0, 3)];
     }
 }
 

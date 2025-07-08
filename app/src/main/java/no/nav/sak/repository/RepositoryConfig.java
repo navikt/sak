@@ -3,11 +3,14 @@ package no.nav.sak.repository;
 import lombok.extern.slf4j.Slf4j;
 import oracle.ucp.jdbc.PoolDataSource;
 import oracle.ucp.jdbc.PoolDataSourceFactory;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
@@ -19,6 +22,9 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 @Slf4j
 @Configuration
 @EnableConfigurationProperties({DataSourceProperties.class, DataSourceAdditionalProperties.class})
+@EnableTransactionManagement
+@EnableJpaRepositories("no.nav.sak.repository")
+@EntityScan("no.nav.sak.repository")
 public class RepositoryConfig {
 
 	private static final String JOARK = "JOARK";

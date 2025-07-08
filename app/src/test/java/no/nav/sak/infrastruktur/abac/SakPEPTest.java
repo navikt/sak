@@ -25,7 +25,7 @@ import static org.mockito.Mockito.when;
 class SakPEPTest {
     private ABACClient abacClient = mock(ABACClient.class);
     private SakPEP sakPEP = new SakPEP(abacClient, ResilienceConfig.ofDefaults());
-    private String username = RandomStringUtils.randomAlphabetic(5);
+    private String username = RandomStringUtils.secure().nextAlphabetic(5);
 
 
     @Test

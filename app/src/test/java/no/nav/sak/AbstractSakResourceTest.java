@@ -1,7 +1,7 @@
 package no.nav.sak;
 
 import no.nav.sak.repository.Sak;
-import no.nav.sak.repository.SakRepository;
+import no.nav.sak.repository.SakJpaRepository;
 import no.nav.sak.repository.SakTestData;
 import no.nav.sak.repository.TestUtilityRepository;
 import no.nav.security.mock.oauth2.MockOAuth2Server;
@@ -19,6 +19,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.net.URI;
 import java.util.List;
@@ -32,6 +33,7 @@ import static no.nav.sak.infrastruktur.oicd.JwtTestData.entraClaims;
 		classes = SakTestConfiguration.class,
 		webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
 )
+@Transactional
 @EnableMockOAuth2Server
 public abstract class AbstractSakResourceTest {
 
@@ -40,7 +42,7 @@ public abstract class AbstractSakResourceTest {
 	static String correlationId = "junit";
 
 	@Autowired
-	SakRepository sakRepository;
+	protected SakJpaRepository sakJpaRepository;
 	@Autowired
 	protected TestUtilityRepository testUtilityRepository;
 	@Autowired
@@ -88,7 +90,7 @@ public abstract class AbstractSakResourceTest {
 
 	protected void opprett100Tilfeldigesaker() {
 		for (int i = 0; i < 50; i++) {
-			testUtilityRepository.lagre(new SakTestData().aktoerId(RandomStringUtils.secure().next(13)).build());
+			testUtilityRepository.lagre(new SakTestData().aktoerId(RandomStringUtils.secure().nextNumeric(13)).build());
 			testUtilityRepository.lagre(new SakTestData().orgnr(SakTestData.generateValidOrgnr()).build());
 		}
 	}

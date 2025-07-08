@@ -43,3 +43,6 @@ OIDC ID_token valideres når det mottas en Authorization-header med 'Bearer' (Se
 ren tjeneste, er det ikke satt opp standard redirect->callback->hent token-mekanisme. Det er etablert integrasjonstest
 som kjører i Jenkins (der credentials er definert for clientId og clientSecret). 
 
+## Kode generert av GitHub Copilot
+
+Dette repoet inneholder GitHub Copilot generert kode.

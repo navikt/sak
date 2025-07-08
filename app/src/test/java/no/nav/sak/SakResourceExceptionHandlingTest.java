@@ -3,7 +3,7 @@ package no.nav.sak;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import no.nav.sak.repository.Sak;
-import no.nav.sak.repository.SakRepository;
+import no.nav.sak.repository.SakJpaRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -26,11 +26,11 @@ import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON;
 public class SakResourceExceptionHandlingTest extends AbstractSakResourceTest {
 
 	@MockitoBean
-	SakRepository sakRepository;
+	SakJpaRepository sakJpaRepository;
 
 	@BeforeEach
 	void before() {
-		Mockito.doThrow(new IllegalStateException("Jeg feiler")).when(sakRepository).hentSak(Mockito.anyLong());
+		Mockito.doThrow(new IllegalStateException("Jeg feiler")).when(sakJpaRepository).findById(Mockito.anyLong());
 	}
 
 	@Override
