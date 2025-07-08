@@ -11,6 +11,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -79,11 +80,8 @@ public class Sak {
 
     @Override
     public String toString() {
-        return "Sak{" +
-               "sakId=" + sakId +
-               ", tema='" + tema + '\'' +
-               ", applikasjon='" + applikasjon + '\'' +
-               ", fagsakNr='" + fagsakNr + '\'' +
-               '}';
+        return new ToStringBuilder(this)
+                .append("sakId", sakId)
+                .toString();
     }
 }

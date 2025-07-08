@@ -1,11 +1,12 @@
 package no.nav.sak.infrastruktur.rest;
 
 import io.swagger.v3.oas.annotations.Parameter;
+import jakarta.ws.rs.QueryParam;
+import lombok.Getter;
+import lombok.Setter;
 import no.nav.sak.repository.SakSearchCriteria;
 import no.nav.sak.validering.AtLeastOneOf;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-
-import jakarta.ws.rs.QueryParam;
 import org.springdoc.core.annotations.ParameterObject;
 
 import java.util.Collections;
@@ -13,88 +14,58 @@ import java.util.List;
 
 import static org.apache.commons.lang3.builder.ToStringStyle.SHORT_PREFIX_STYLE;
 
+@Setter
 @ParameterObject
 @AtLeastOneOf(fields = {"aktoerId", "orgnr", "fagsakNr"})
 public class SakSearchRequest {
-    @QueryParam("aktoerId")
-    @Parameter(description = "Filtrering på saker opprettet for en aktør (person)")
-    private List<String> aktoerId;
-    @QueryParam("orgnr")
-    @Parameter(description = "Filtrering på saker opprettet for en organisasjon")
-    private String orgnr;
-    @QueryParam("applikasjon")
-    @Parameter(description = "Filtrering på applikasjon (iht felles kodeverk)")
-    private String applikasjon;
-    @QueryParam("tema")
-    @Parameter(description = "Filtrering på tema (iht felles kodeverk)")
-    private List<String> tema;
-    @QueryParam("fagsakNr")
-    @Parameter(description = "Filtrering på fagsakNr")
-    private String fagsakNr;
+	@QueryParam("aktoerId")
+	@Parameter(description = "Filtrering på saker opprettet for en aktør (person)")
+	private List<String> aktoerId;
+	@Getter
+	@QueryParam("orgnr")
+	@Parameter(description = "Filtrering på saker opprettet for en organisasjon")
+	private String orgnr;
+	@Getter
+	@QueryParam("applikasjon")
+	@Parameter(description = "Filtrering på applikasjon (iht felles kodeverk)")
+	private String applikasjon;
+	@Getter
+	@QueryParam("tema")
+	@Parameter(description = "Filtrering på tema (iht felles kodeverk)")
+	private List<String> tema;
+	@Getter
+	@QueryParam("fagsakNr")
+	@Parameter(description = "Filtrering på fagsakNr")
+	private String fagsakNr;
 
-    public SakSearchRequest() {
-        //JaxRSActionDelAct
-    }
+	public SakSearchRequest() {
+		//JaxRSActionDelAct
+	}
 
-    public List<String> getAktoerId() {
+	public List<String> getAktoerId() {
 		if (aktoerId == null) {
 			return Collections.emptyList();
 		}
-        return aktoerId;
-    }
+		return aktoerId;
+	}
 
-    public void setAktoerId(List<String> aktoerId) {
-        this.aktoerId = aktoerId;
-    }
+	SakSearchCriteria toCriteria() {
+		return SakSearchCriteria.create()
+				.medAktoerId(aktoerId)
+				.medOrgnr(orgnr)
+				.medApplikasjon(applikasjon)
+				.medTema(tema)
+				.medFagsakNr(fagsakNr);
+	}
 
-    public String getOrgnr() {
-        return orgnr;
-    }
-
-    public void setOrgnr(String orgnr) {
-        this.orgnr = orgnr;
-    }
-
-    public String getApplikasjon() {
-        return applikasjon;
-    }
-
-    public void setApplikasjon(String applikasjon) {
-        this.applikasjon = applikasjon;
-    }
-
-    public List<String> getTema() {
-        return tema;
-    }
-
-    public void setTema(List<String> tema) {
-        this.tema = tema;
-    }
-
-    public String getFagsakNr() {
-        return fagsakNr;
-    }
-
-    public void setFagsakNr(String fagsakNr) {
-        this.fagsakNr = fagsakNr;
-    }
-
-    SakSearchCriteria toCriteria() {
-        return SakSearchCriteria.create()
-            .medAktoerId(aktoerId)
-            .medOrgnr(orgnr)
-            .medApplikasjon(applikasjon)
-            .medTema(tema)
-            .medFagsakNr(fagsakNr);
-    }
-
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this, SHORT_PREFIX_STYLE)
-            .append("orgnr", orgnr)
-            .append("applikasjon", applikasjon)
-            .append("tema", tema)
-            .append("fagsaknr", fagsakNr)
-            .toString();
-    }
+	@Override
+	public String toString() {
+		return new ToStringBuilder(this, SHORT_PREFIX_STYLE)
+				.append("aktoerId", aktoerId == null ? null : "*****")
+				.append("orgnr", orgnr)
+				.append("applikasjon", applikasjon)
+				.append("tema", tema)
+				.append("fagsaknr", fagsakNr)
+				.toString();
+	}
 }
