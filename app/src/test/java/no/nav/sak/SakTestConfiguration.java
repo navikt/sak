@@ -35,8 +35,7 @@ import static java.util.Collections.singletonList;
 		AbacProperties.class,
 		LdapProperties.class,
 		ServiceuserProperties.class,
-		StsProperties.class,
-		SakTestTruststoreProperties.class
+		StsProperties.class
 })
 @ComponentScan(basePackages = "no.nav.sak")
 public class SakTestConfiguration {
