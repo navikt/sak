@@ -27,7 +27,7 @@ public class SakResourceBadAbacMappingToServiceUnavailableTest extends AbstractS
 										.build()
 						);
 
-		final ResponseEntity<?> response = executeGetRequestWithBearer(URI.create(String.valueOf(opprettetSak.getId())));
+		final ResponseEntity<?> response = executeGetRequestWithBearer(URI.create(String.valueOf(opprettetSak.getSakId())));
 
 		assertThat(response.getStatusCode()).isEqualTo(SERVICE_UNAVAILABLE);
 	}
@@ -48,7 +48,7 @@ public class SakResourceBadAbacMappingToServiceUnavailableTest extends AbstractS
 	void finn_saker_giving_bad_abac_result_mapping_to_service_unavailable() {
 
 		opprett100Tilfeldigesaker();
-		final String tema = RandomStringUtils.randomAlphabetic(4);
+		final String tema = RandomStringUtils.secure().nextAlphabetic(4);
 		final Sak sak = testUtilityRepository.lagre(new SakTestData().tema(tema).build());
 
 		final ResponseEntity<?> response = executeGetRequestWithBearer(UriComponentsBuilder.newInstance()

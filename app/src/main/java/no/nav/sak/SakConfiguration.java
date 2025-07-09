@@ -15,7 +15,6 @@ import no.nav.sak.infrastruktur.authentication.Authenticator;
 import no.nav.sak.infrastruktur.authentication.BasicAuthenticator;
 import no.nav.sak.infrastruktur.authentication.LdapConfiguration;
 import no.nav.sak.infrastruktur.authentication.OidcTokenValidator;
-import no.nav.sak.repository.Database;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
@@ -36,7 +35,6 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import javax.sql.DataSource;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.ZoneId;
@@ -132,11 +130,6 @@ public class SakConfiguration {
 	@Bean
 	public Authenticator authenticator(OidcTokenValidator oidcTokenValidator, BasicAuthenticator basicAuthenticator) {
 		return new Authenticator(oidcTokenValidator, basicAuthenticator);
-	}
-
-	@Bean
-	public Database createDatabase(DataSource dataSource) {
-		return new Database(dataSource);
 	}
 
 	@Bean

@@ -46,7 +46,7 @@ public class SakJson {
 	}
 
 	SakJson(Sak sak) {
-		this(sak, sak.getId());
+		this(sak, sak.getSakId());
 	}
 
 	SakJson(Sak sak, long id) {
@@ -56,7 +56,7 @@ public class SakJson {
 		this.orgnr = sak.getOrgnr();
 		this.fagsakNr = sak.getFagsakNr();
 		this.applikasjon = sak.getApplikasjon();
-		this.sakStatus = sak.getStatus();
+		this.sakStatus = sak.getSakStatus();
 		this.opprettetAv = sak.getOpprettetAv();
 		this.opprettetTidspunkt = sak.getOpprettetTidspunkt();
 	}
@@ -141,7 +141,7 @@ public class SakJson {
 	}
 
 	Sak toSak(String opprettetAv) {
-		return new Sak.Builder()
+		return Sak.builder()
 				.medAktoerId(aktoerId)
 				.medOrgnr(orgnr)
 				.medTema(tema)

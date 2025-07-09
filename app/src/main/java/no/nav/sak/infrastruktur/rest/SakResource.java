@@ -24,12 +24,13 @@ import no.nav.sak.infrastruktur.abac.AuthorizationRequest;
 import no.nav.sak.infrastruktur.abac.SakPEP;
 import no.nav.sak.infrastruktur.authentication.AuthenticationFilter;
 import no.nav.sak.repository.Sak;
-import no.nav.sak.repository.SakRepository;
+import no.nav.sak.repository.SakJpaRepository;
 import no.nav.sak.repository.SakSearchCriteria;
 import no.nav.security.token.support.core.api.Protected;
 import org.slf4j.MDC;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -101,16 +102,18 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 		}
 )
 @Slf4j
+@Transactional(readOnly = true)
 public class SakResource {
 
 	public static final String API_V1_SAKER_PATH_SEGMENT = "api/v1/saker";
 	public static final String API_V1_SAKER = "/" + API_V1_SAKER_PATH_SEGMENT;
 	public static final String API_V1_SAKER_TRAILING_SLASH = API_V1_SAKER + "/";
-	private final SakRepository sakRepository;
+	private final SakJpaRepository sakJpaRepository;
 	private final SakPEP sakPEP;
 
-	SakResource(final SakRepository sakRepository, final SakPEP sakPEP) {
-		this.sakRepository = sakRepository;
+	SakResource(SakJpaRepository sakJpaRepository,
+				final SakPEP sakPEP) {
+		this.sakJpaRepository = sakJpaRepository;
 		this.sakPEP = sakPEP;
 	}
 
@@ -130,19 +133,19 @@ public class SakResource {
 
 			})
 	public ResponseEntity<?> hentSak(
-			@PathVariable("id") final Long id
-			, HttpServletRequest ctx) {
+			@PathVariable("id") final Long id,
+			HttpServletRequest ctx) {
 
-		log.info("hentSak henter arkivsakId={}", id);
-		final Optional<Sak> sak = sakRepository.hentSak(id);
+		log.info("hentSak henter sakId={}", id);
+		final Optional<Sak> sak = sakJpaRepository.findById(id);
 
 		if (sak.isPresent()) {
 			final Sak eksisterendeSak = sak.get();
-			log.info("hentSak har hentet arkivsakId={}", id);
+			log.info("hentSak har hentet sakId={}", id);
 			return ResponseEntity.ok().body(
 					new SakJson(eksisterendeSak));
 		} else {
-			log.warn("Mottatt oppslag på sak som ikke eksisterer, id: {}, consumer: {}", id, ctx.getAttribute(REQUEST_CONSUMERID));
+			log.warn("Mottatt oppslag på sak som ikke eksisterer, sakId={}, consumer={}", id, ctx.getAttribute(REQUEST_CONSUMERID));
 			return ResponseEntity
 					.status(NOT_FOUND)
 					.body(new ErrorResponse(
@@ -180,8 +183,7 @@ public class SakResource {
 			}
 		}
 
-		final List<Sak> saker =
-				sakRepository.finnSaker(sakSearchRequest.toCriteria());
+		final List<Sak> saker = sakJpaRepository.finnSaker(sakSearchRequest.toCriteria());
 		log.info("finnSak hentet antall_arkivsaker={}", saker.size());
 		return ResponseEntity.ok(
 				saker.stream()
@@ -190,6 +192,7 @@ public class SakResource {
 						.collect(toList()));
 	}
 
+	@Transactional
 	@PostMapping(produces = APPLICATION_JSON_VALUE, consumes = APPLICATION_JSON_VALUE)
 	@Operation(summary = "Oppretter en ny sak",
 			description = """
@@ -215,9 +218,8 @@ public class SakResource {
 
 		final String user = (String) ctx.getAttribute(AuthenticationFilter.REQUEST_USERNAME);
 		final Sak innsendtSak = sakJson.toSak(user);
-		final String aktoerId = innsendtSak.getAktoerId();
 
-		log.info("opprettSak for aktoerId={}", aktoerId);
+		log.info("opprettSak er kalt");
 
 		if (fagSakFinnesFraFoer(innsendtSak)) {
 			return ResponseEntity
@@ -232,7 +234,8 @@ public class SakResource {
 									innsendtSak.getOrgnr())));
 		} else {
 
-			final long opprettetSakId = sakRepository.lagre(innsendtSak);
+			Sak opprettetSak = sakJpaRepository.persist(innsendtSak);
+			Long opprettetSakId = opprettetSak.getSakId();
 			log.info("opprettSak har opprettet arkivsakId={}", opprettetSakId);
 			URI path = servletUriComponentsBuilder
 					.pathSegment(API_V1_SAKER_PATH_SEGMENT)
@@ -245,14 +248,13 @@ public class SakResource {
 		}
 	}
 
-	private boolean harTilgangTilSakInterneRegler(
-			final HttpServletRequest ctx
-			, final Sak sak) {
+	private boolean harTilgangTilSakInterneRegler(final HttpServletRequest ctx,
+												  final Sak sak) {
 
 		final boolean temaKontroll = Objects.equals("KTR", sak.getTema());
 		final boolean harTilgang = !(temaKontroll && Objects.equals(getSubjectType(ctx), SUBJECT_TYPE_EKSTERNBRUKER));
 		if (!harTilgang) {
-			log.info("Filtrerer ut sak med id: {} for ekstern bruker fordi den har tema: {} ", sak.getId(), sak.getTema());
+			log.info("Filtrerer ut sak med sakId={} for ekstern bruker fordi den har tema={} ", sak.getSakId(), sak.getTema());
 		}
 
 		return harTilgang;
@@ -270,7 +272,7 @@ public class SakResource {
 						.medApplikasjon(sak.getApplikasjon());
 
 		return sak.getFagsakNr() != null &&
-			   !sakRepository.finnSaker(sakSearchCriteria).isEmpty();
+			   !sakJpaRepository.finnSaker(sakSearchCriteria).isEmpty();
 	}
 
 	private ResponseEntity<?> makeResponseUponAbacFailure(ABACResult.Code abacResultCode) {

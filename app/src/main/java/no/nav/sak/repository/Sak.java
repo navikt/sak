@@ -1,148 +1,105 @@
 package no.nav.sak.repository;
 
-import lombok.AccessLevel;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
-import lombok.Value;
-import no.nav.sak.validering.OrganisasjonsnummerValidator;
-import org.apache.commons.lang3.StringUtils;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-import static org.apache.commons.lang3.builder.ToStringStyle.SHORT_PREFIX_STYLE;
+import static jakarta.persistence.GenerationType.SEQUENCE;
+import static no.nav.sak.validering.OrganisasjonsnummerValidator.isValid;
+import static org.apache.commons.lang3.StringUtils.isAllBlank;
+import static org.apache.commons.lang3.StringUtils.isNoneBlank;
 
-@Value
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
+/**
+ * Entitet basert på Sak fra dokarkiv. Kun relevante felt er beholdt
+ */
+@Entity
+@Table(name = "SAK")
+@Builder(toBuilder = true, setterPrefix = "med")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Sak {
 
-    Long id;
-    String fagsakNr;
-    String tema;
-    String aktoerId;
-    String applikasjon;
-    String orgnr;
-    String opprettetAv;
-    LocalDateTime opprettetTidspunkt;
-    String status;
+	private static final String SAK_SEQUENCE = "seq_sak";
+	private static final String DATABASE_SAK_SEQUENCE = "seq_sak";
 
-    private Sak(Builder builder) {
-        this(builder.id,
-                builder.fagsakNr,
-                builder.tema,
-                builder.aktoerId,
-                builder.applikasjon,
-                builder.orgnr,
-                builder.opprettetAv,
-                builder.opprettetTidspunkt,
-                builder.status);
-    }
+	@Id
+	@GeneratedValue(strategy = SEQUENCE, generator = SAK_SEQUENCE)
+	@SequenceGenerator(name = SAK_SEQUENCE, sequenceName = DATABASE_SAK_SEQUENCE, allocationSize = 1)
+	@Column(name = "id", nullable = false, length = 11)
+	private Long sakId;
 
-    Sak withId(Long id) {
-        return new Sak(id,
-                this.fagsakNr,
-                this.tema,
-                this.aktoerId,
-                this.applikasjon,
-                this.orgnr,
-                this.opprettetAv,
-                this.opprettetTidspunkt,
-                this.status);
-    }
+	@Column(name = "tema", nullable = false, length = 40)
+	private String tema;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Sak sak = (Sak) o;
-        return Objects.equals(id, sak.id);
-    }
+	@Column(name = "applikasjon", length = 40)
+	private String applikasjon;
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
+	@Column(name = "fagsaknr", length = 40)
+	private String fagsakNr;
 
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this, SHORT_PREFIX_STYLE)
-            .append("id", id)
-            .toString();
-    }
+	@ToString.Exclude
+	@Column(name = "aktoerid", length = 40)
+	private String aktoerId;
 
+	@Column(name = "orgnr", length = 9)
+	private String orgnr;
 
-    public static final class Builder {
-        private Long id;
-        private String tema;
-        private String applikasjon;
-        private String fagsakNr;
-        private String aktoerId;
-        private String orgnr;
-        private String opprettetAv;
-        private LocalDateTime opprettetTidspunkt;
-        private String status;
+	@Column(name = "opprettet_av", nullable = false, length = 40)
+	private String opprettetAv;
 
-        public Builder() {
-        }
+	@Column(name = "opprettet_tidspunkt", nullable = false)
+	private LocalDateTime opprettetTidspunkt;
 
-        public static Builder enSak() {
-            return new Builder();
-        }
+	/**
+	 * Modellert som enum i dokarkiv
+	 */
+	@Column(name = "k_sak_status", length = 40)
+	private String sakStatus;
 
-        Builder medId(Long id) {
-            this.id = id;
-            return this;
-        }
+	@Override
+	public boolean equals(Object o) {
+		if (o == null || getClass() != o.getClass()) return false;
+		Sak sak = (Sak) o;
+		return Objects.equals(sakId, sak.sakId);
+	}
 
-        public Builder medTema(String tema) {
-            this.tema = tema;
-            return this;
-        }
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(sakId);
+	}
 
-        public Builder medApplikasjon(String applikasjon) {
-            this.applikasjon = applikasjon;
-            return this;
-        }
+	@Override
+	public String toString() {
+		return new ToStringBuilder(this)
+				.append("sakId", sakId)
+				.toString();
+	}
 
-        public Builder medFagsakNr(String fagsakNr) {
-            this.fagsakNr = fagsakNr;
-            return this;
-        }
-
-        public Builder medAktoerId(String aktoerId) {
-            this.aktoerId = aktoerId;
-            return this;
-        }
-
-        public Builder medOrgnr(String orgnr) {
-            this.orgnr = orgnr;
-            return this;
-        }
-
-        public Builder medOpprettetAv(String opprettetAv) {
-            this.opprettetAv = opprettetAv;
-            return this;
-        }
-
-        public Builder medOpprettetTidspunkt(LocalDateTime opprettetTidspunkt) {
-            this.opprettetTidspunkt = opprettetTidspunkt;
-            return this;
-        }
-
-        public Builder medSakStatus(String status) {
-            this.status = status;
-            return this;
-        }
-
-        public Sak build() {
-            Validate.validState(!StringUtils.isNoneBlank(aktoerId, orgnr), "Kun en av aktørid eller orgnr kan være angitt");
-            Validate.validState(!StringUtils.isAllBlank(aktoerId, orgnr), "Aktørid eller orgnr må være angitt");
-            Validate.notBlank(tema, "Tema må være angitt");
-            Validate.notBlank(opprettetAv, "OpprettetAv må være angitt");
-            Validate.notNull(opprettetTidspunkt, "Opprettet tidspunkt må være angitt");
-            Validate.validState(OrganisasjonsnummerValidator.isValid(orgnr));
-            return new Sak(this);
-        }
-    }
+	// lombok
+	@SuppressWarnings("unused")
+	public static class SakBuilder {
+		public Sak build() {
+			Validate.validState(!isNoneBlank(aktoerId, orgnr), "Kun en av aktørid eller orgnr kan være angitt");
+			Validate.validState(!isAllBlank(aktoerId, orgnr), "Aktørid eller orgnr må være angitt");
+			Validate.notBlank(tema, "Tema må være angitt");
+			Validate.notBlank(opprettetAv, "OpprettetAv må være angitt");
+			Validate.notNull(opprettetTidspunkt, "Opprettet tidspunkt må være angitt");
+			Validate.validState(isValid(orgnr), "Orgnr er ikke gyldig");
+			return new Sak(sakId, tema, applikasjon, fagsakNr, aktoerId, orgnr, opprettetAv, opprettetTidspunkt, sakStatus);
+		}
+	}
 }
