@@ -26,6 +26,7 @@ import no.nav.sak.infrastruktur.authentication.AuthenticationFilter;
 import no.nav.sak.repository.Sak;
 import no.nav.sak.repository.SakJpaRepository;
 import no.nav.sak.repository.SakSearchCriteria;
+import no.nav.sak.validering.TemaService;
 import no.nav.security.token.support.core.api.Protected;
 import org.slf4j.MDC;
 import org.springframework.http.HttpStatus;
@@ -109,11 +110,14 @@ public class SakResource {
 	public static final String API_V1_SAKER = "/" + API_V1_SAKER_PATH_SEGMENT;
 	public static final String API_V1_SAKER_TRAILING_SLASH = API_V1_SAKER + "/";
 	private final SakJpaRepository sakJpaRepository;
+	private final TemaService temaService;
 	private final SakPEP sakPEP;
 
 	SakResource(SakJpaRepository sakJpaRepository,
+				TemaService temaService,
 				final SakPEP sakPEP) {
 		this.sakJpaRepository = sakJpaRepository;
+		this.temaService = temaService;
 		this.sakPEP = sakPEP;
 	}
 
@@ -227,11 +231,18 @@ public class SakResource {
 					.body(new ErrorResponse(
 							MDC.get("uuid"),
 							String.format(
-									"Det finnes allerede en sak for fagsaksnr: %s, applikasjon: %s, aktør: %s orgnr: %s",
+									"Det finnes allerede en sak for fagsaknr=%s, applikasjon=%s, aktør=%s, orgnr=%s",
 									innsendtSak.getFagsakNr(),
 									innsendtSak.getApplikasjon(),
-									innsendtSak.getAktoerId(),
+									innsendtSak.getAktoerId() == null ? null : "*****",
 									innsendtSak.getOrgnr())));
+		} else if (temaService.isTemaInaktivt(innsendtSak.getTema())) {
+			return ResponseEntity
+					.status(CONFLICT)
+					.body(new ErrorResponse(
+							MDC.get("uuid"),
+							String.format("Tema=%s er inaktivt. Kontakt #team_dokumentløsninger", innsendtSak.getTema())
+					));
 		} else {
 
 			Sak opprettetSak = sakJpaRepository.persist(innsendtSak);

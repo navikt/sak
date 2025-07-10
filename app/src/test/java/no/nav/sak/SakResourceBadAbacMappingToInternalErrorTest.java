@@ -4,13 +4,13 @@ import no.nav.sak.infrastruktur.abac.ABACJunitClientAlwaysGivingBadAbacMappingTo
 import no.nav.sak.infrastruktur.abac.MockableSakPEP;
 import no.nav.sak.repository.Sak;
 import no.nav.sak.repository.SakTestData;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import static no.nav.sak.repository.SakTestData.choosePopulatedTema;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -28,10 +28,8 @@ public class SakResourceBadAbacMappingToInternalErrorTest extends AbstractSakRes
 
     @Test
     void finn_saker_giving_bad_abac_result_mapping_to_internal_error() {
-
         opprett100Tilfeldigesaker();
-        final String tema = RandomStringUtils.secure().nextAlphabetic(4);
-        final Sak sak = testUtilityRepository.lagre(new SakTestData().tema(tema).build());
+        final Sak sak = testUtilityRepository.lagre(new SakTestData().tema(choosePopulatedTema()).build());
 
         final ResponseEntity<?> response = executeGetRequestWithBearer(
 				UriComponentsBuilder.newInstance()

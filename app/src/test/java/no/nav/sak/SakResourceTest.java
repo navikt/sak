@@ -29,6 +29,7 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static no.nav.sak.infrastruktur.authentication.basic.JunitBasicAuthenticator.PASSWORD;
 import static no.nav.sak.infrastruktur.authentication.basic.JunitBasicAuthenticator.USERNAME;
+import static no.nav.sak.repository.SakTestData.choosePopulatedTema;
 import static org.apache.commons.lang3.RandomStringUtils.random;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
@@ -135,6 +136,7 @@ class SakResourceTest extends AbstractSakResourceTest {
             .aktoerId("1234567890123")
             .fagsakNr("321")
             .applikasjon("Gosys")
+            .tema(choosePopulatedTema())
             .build();
         String json = (
             new SakJsonTestData(sak).buildJsonString());
@@ -153,12 +155,25 @@ class SakResourceTest extends AbstractSakResourceTest {
     }
 
     @Test
+    void gir_conflict_og_oppretter_ikke_ny_sak_dersom_tema_inaktivt() {
+        Sak sak = new SakTestData()
+                .aktoerId("1234567890123")
+                .tema("MOB")
+                .build();
+        String json = (new SakJsonTestData(sak).buildJsonString());
+
+        ResponseEntity<?> response = executePostWithBearer(json);
+        assertThat(response.getStatusCode()).isEqualTo(CONFLICT);
+        assertThat(response.getHeaders().getContentType()).isEqualTo(APPLICATION_JSON);
+    }
+
+    @Test
     void oppretter_ny_sak_dersom_fagsak_finnes_fra_foer_men_med_annet_tema() {
         final String AKTOER_ID = "1234567890123";
         final String FAGSAK_NR = "321";
         final String APPLIKASJON = "Gosys";
-        final String TEMA_1 = "TEMA1";
-        final String TEMA_2 = "TEMA2";
+        final String TEMA_1 = "FOR";
+        final String TEMA_2 = "AAP";
 
         Sak sak1 = new SakTestData()
                 .aktoerId(AKTOER_ID)
