@@ -2,7 +2,6 @@ package no.nav.sak;
 
 import no.nav.sak.repository.Sak;
 import no.nav.sak.repository.SakTestData;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.ResponseEntity;
@@ -10,6 +9,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 
+import static no.nav.sak.repository.SakTestData.choosePopulatedTema;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpStatus.SERVICE_UNAVAILABLE;
 
@@ -48,8 +48,7 @@ public class SakResourceBadAbacMappingToServiceUnavailableTest extends AbstractS
 	void finn_saker_giving_bad_abac_result_mapping_to_service_unavailable() {
 
 		opprett100Tilfeldigesaker();
-		final String tema = RandomStringUtils.secure().nextAlphabetic(4);
-		final Sak sak = testUtilityRepository.lagre(new SakTestData().tema(tema).build());
+		final Sak sak = testUtilityRepository.lagre(new SakTestData().tema(choosePopulatedTema()).build());
 
 		final ResponseEntity<?> response = executeGetRequestWithBearer(UriComponentsBuilder.newInstance()
 				.queryParam("tema", sak.getTema())
