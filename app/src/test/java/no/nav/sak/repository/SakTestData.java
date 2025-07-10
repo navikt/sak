@@ -58,11 +58,11 @@ public class SakTestData {
 	}
 
 	public static String generateValidOrgnr() {
-		return gyldigeOrgnr[RandomUtils.secure().randomInt(0, 3)];
+		return gyldigeOrgnr[RandomUtils.secure().randomInt(0, gyldigeOrgnr.length)];
 	}
 
 	public static String choosePopulatedTema() {
-		return populatedAktivTema[RandomUtils.secure().randomInt(0, 3)];
+		return populatedAktivTema[RandomUtils.secure().randomInt(0, populatedAktivTema.length)];
 	}
 }
 
