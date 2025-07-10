@@ -29,7 +29,7 @@ values ('MOB',
         '0',
         current_timestamp,
         'itest',
-        to_timestamp('21.08.2024 10.00.00,000000000', 'DD.MM.RRRR HH24.MI.SSXFF'),
+        current_timestamp,
         'itest');
 insert into t_k_fagomrade (k_fagomrade, dekode, dato_fom, dato_tom, er_gyldig, dato_opprettet, opprettet_av,
                            dato_endret, endret_av)
