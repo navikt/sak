@@ -30,6 +30,11 @@
       "application": "oebs-joark-api",
       "namespace": "team-oebs",
       "cluster": "prod-fss"
+    },
+    {
+      "application": "familie-integrasjoner",
+      "namespace": "teamfamilie",
+      "cluster": "prod-fss"
     }
   ]
 }

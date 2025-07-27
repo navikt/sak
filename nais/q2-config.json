@@ -42,6 +42,11 @@
       "application": "historisk-helt-backend",
       "namespace": "historisk",
       "cluster": "dev-gcp"
+    },
+    {
+      "application": "familie-integrasjoner",
+      "namespace": "teamfamilie",
+      "cluster": "dev-fss"
     }
 
   ]
