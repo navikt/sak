@@ -20,6 +20,11 @@
       "application": "gosys-q2",
       "namespace": "isa",
       "cluster": "dev-fss"
+    },
+    {
+      "application": "saf-q5",
+      "namespace": "teamdokumenthandtering",
+      "cluster": "dev-fss"
     }
   ]
 }

@@ -32,6 +32,11 @@
       "application": "oebs-joark-api",
       "namespace": "team-oebs",
       "cluster": "dev-fss"
+    },
+    {
+      "application": "saf-q1",
+      "namespace": "teamdokumenthandtering",
+      "cluster": "dev-fss"
     }
   ]
 }
