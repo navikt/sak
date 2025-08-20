@@ -35,6 +35,11 @@
       "application": "familie-integrasjoner",
       "namespace": "teamfamilie",
       "cluster": "prod-fss"
+    },
+    {
+      "application": "saf",
+      "namespace": "teamdokumenthandtering",
+      "cluster": "prod-fss"
     }
   ]
 }
