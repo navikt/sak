@@ -29,12 +29,6 @@ public class UnauthorizedExceptionHandlingFilter implements Filter {
 		OBJECT_MAPPER.enable(SerializationFeature.WRAP_ROOT_VALUE);
 	}
 
-	private final SakRestExceptionHandler sakRestExceptionHandler;
-
-	public UnauthorizedExceptionHandlingFilter(SakRestExceptionHandler sakRestExceptionHandler) {
-		this.sakRestExceptionHandler = sakRestExceptionHandler;
-	}
-
 	@Override
 	public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
 		try {

@@ -5,11 +5,7 @@ import no.nav.sak.infrastruktur.oicd.JwtClaimsTestData;
 import no.nav.sak.infrastruktur.oicd.JwtTestData;
 import no.nav.sak.repository.Sak;
 import no.nav.sak.repository.SakTestData;
-import no.nav.security.mock.oauth2.MockOAuth2Server;
-import no.nav.security.mock.oauth2.token.DefaultOAuth2TokenCallback;
-import no.nav.security.token.support.spring.test.EnableMockOAuth2Server;
 import org.jose4j.jwt.JwtClaims;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -21,14 +17,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.util.List;
-import java.util.Map;
-
-import static com.nimbusds.jwt.proc.DefaultJWTClaimsVerifier.DEFAULT_MAX_CLOCK_SKEW_SECONDS;
 import static com.nimbusds.oauth2.sdk.token.AccessTokenType.BEARER;
-import static no.nav.sak.infrastruktur.oicd.JwtTestData.entraClaims;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 @ActiveProfiles("itest")
@@ -36,27 +26,27 @@ import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 		classes = SakTestConfiguration.class,
 		webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
 )
-@EnableMockOAuth2Server
-public class AuthenticationFilterTest {
-	private static String bearerToken;
+public class AuthenticationFilterTest extends AbstractOauth2Test{
 	@Autowired
 	TestRestTemplate testRestTemplate;
-	@Autowired
-	private MockOAuth2Server server;
 
-	@BeforeEach
-	void before() {
-		bearerToken = bearerToken();
+	@Test
+	void skal_gi_tilgang_for_obo_token() {
+		skal_gis_tilgang_med_token(oboToken());
 	}
 
-	@Test()
-	void skal_gi_tilgang() {
+	@Test
+	void skal_gi_tilgang_for_client_credentials_token() {
+		skal_gis_tilgang_med_token(clientCredentialsToken());
+	}
+
+	private void skal_gis_tilgang_med_token(String token) {
 		HttpHeaders headers = new HttpHeaders();
-		headers.setBearerAuth(bearerToken);
+		headers.setBearerAuth(token);
 		headers.add("X-Correlation-ID", "Junit");
 		HttpEntity<String> httpEntity = new HttpEntity<>(headers);
 		ResponseEntity<String> responseEntity = testRestTemplate.exchange("/api/v1/saker/", HttpMethod.GET, httpEntity, String.class);
-		assertThat(responseEntity.getStatusCode()).isEqualTo(BAD_REQUEST);
+		assertThat(responseEntity.getStatusCode()).isNotEqualTo(UNAUTHORIZED);
 	}
 
 	@Test()
@@ -71,12 +61,12 @@ public class AuthenticationFilterTest {
 
 	@Test
 	void skal_nektes_adgang_uten_gyldig_header() {
-		skal_nektes_adgang_med_header("Auth", bearerToken);
+		skal_nektes_adgang_med_header("Auth", oboToken());
 	}
 
 	@Test
 	void skal_nektes_adgang_uten_gyldig_auth_header_identifier() {
-		skal_nektes_adgang_med_header("Authorization", "Invalididentifier" + " " + bearerToken);
+		skal_nektes_adgang_med_header("Authorization", "Invalididentifier" + " " + oboToken());
 	}
 
 	private void skal_nektes_adgang_med_header(String headerName, String headerValue) {
@@ -106,8 +96,7 @@ public class AuthenticationFilterTest {
 
 	@Test
 	void skal_nektes_adgang_naar_token_er_expired() {
-		String token = bearerToken(-(DEFAULT_MAX_CLOCK_SKEW_SECONDS + 1));
-		String header = BEARER.getValue() + " " + token;
+		String header = BEARER.getValue() + " " + expiredOboToken();
 
 		ResponseEntity<String> response = doRequest(HttpMethod.GET, header, String.class);
 		assertThat(response.getStatusCode()).isEqualTo(UNAUTHORIZED);
@@ -145,28 +134,4 @@ public class AuthenticationFilterTest {
 		HttpEntity<U> httpEntity = new HttpEntity<>(payload, headers);
 		return testRestTemplate.exchange("/api/v1/saker/" + path, method, httpEntity, responseType);
 	}
-
-	private String bearerToken() {
-		return bearerToken(entraClaims(), 3600);
-	}
-
-	private String bearerToken(int expiry) {
-		return bearerToken(entraClaims(), expiry);
-	}
-
-	private String bearerToken(Map<String, Object> claims, int expiry) {
-		return server.issueToken(
-				"entra",
-				"sak-itest",
-				new DefaultOAuth2TokenCallback(
-						"entra",
-						"Z123456",
-						"JWT",
-						List.of("aud-localhost"),
-						claims,
-						expiry
-				)
-		).serialize();
-	}
-
 }

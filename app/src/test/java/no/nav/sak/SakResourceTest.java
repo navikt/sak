@@ -63,6 +63,21 @@ class SakResourceTest extends AbstractSakResourceTest {
         verifyEqual(sakJson, opprettetSak);
     }
 
+	@Test
+	void hent_sak_med_client_credentials_token() {
+		final Sak opprettetSak =
+				testUtilityRepository
+						.lagre(
+								new SakTestData()
+										.aktoerId("1234567890123")
+										.build()
+						);
+
+		ResponseEntity<String> response = executeGetRequestWithBearerToken(URI.create(String.valueOf(opprettetSak.getSakId())), String.class, authHeaderBearerClientCredentialsToken);
+
+		assertThat(response.getStatusCode()).isEqualTo(OK);
+	}
+
     @Test
     void gir_404_naar_sak_ikke_finnes_for_gitt_id() {
         ResponseEntity<String> response = executeGetRequestWithBearer(URI.create("1"), String.class);
@@ -80,7 +95,7 @@ class SakResourceTest extends AbstractSakResourceTest {
 
     @Test
     void gir_405_naar_operasjon_ikke_tillatt() {
-        ResponseEntity<?> response = doRequest(URI.create("1"), HttpMethod.POST, authHeaderBearer,
+        ResponseEntity<?> response = doRequest(URI.create("1"), HttpMethod.POST, authHeaderBearerOnBehalfOfToken,
                 new SakJsonTestData(new SakTestData().build()).buildJsonString(), Object.class);
 
         assertThat(response.getStatusCode()).isEqualTo(METHOD_NOT_ALLOWED);
