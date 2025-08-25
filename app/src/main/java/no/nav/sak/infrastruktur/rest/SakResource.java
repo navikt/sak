@@ -53,6 +53,7 @@ import static java.util.stream.Collectors.toList;
 import static no.nav.sak.infrastruktur.ContextExtractor.getSubjectType;
 import static no.nav.sak.infrastruktur.SubjectType.SUBJECT_TYPE_EKSTERNBRUKER;
 import static no.nav.sak.infrastruktur.authentication.AuthenticationFilter.REQUEST_CONSUMERID;
+import static no.nav.sak.tokensupport.TokenUtils.hasClientCredentialsToken;
 import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -176,14 +177,17 @@ public class SakResource {
 			, HttpServletRequest ctx) {
 
 		log.info("finnSak Søker etter saker for: {}", sakSearchRequest);
-		for (String aktoerId : sakSearchRequest.getAktoerId()) {
-			final ABACResult abacResult =
-					sakPEP.autoriser(ctx, new AuthorizationRequest(aktoerId));
-			final ABACResult.Code abacResultCode = abacResult.getResultCode();
-			if (!ABACResult.Code.OK.equals(abacResultCode)) {
-				return makeResponseUponAbacFailure(abacResultCode);
-			} else if (!abacResult.hasAccess()) {
-				return ResponseEntity.ok(new ArrayList<>());
+
+		if (!hasClientCredentialsToken()) {
+			for (String aktoerId : sakSearchRequest.getAktoerId()) {
+				final ABACResult abacResult =
+						sakPEP.autoriser(ctx, new AuthorizationRequest(aktoerId));
+				final ABACResult.Code abacResultCode = abacResult.getResultCode();
+				if (!ABACResult.Code.OK.equals(abacResultCode)) {
+					return makeResponseUponAbacFailure(abacResultCode);
+				} else if (!abacResult.hasAccess()) {
+					return ResponseEntity.ok(new ArrayList<>());
+				}
 			}
 		}
 

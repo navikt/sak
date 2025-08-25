@@ -6,9 +6,6 @@ import org.jose4j.jws.JsonWebSignature;
 import org.jose4j.jwt.JwtClaims;
 import org.jose4j.lang.JoseException;
 
-import java.util.Map;
-import java.util.UUID;
-
 public class JwtTestData {
 	private JwtClaims jwtClaims = new JwtClaimsTestData().build();
 
@@ -32,15 +29,5 @@ public class JwtTestData {
 	public JwtTestData claims(JwtClaims jwtClaims) {
 		this.jwtClaims = jwtClaims;
 		return this;
-	}
-
-	public static Map<String, Object> entraClaims() {
-		return Map.of(
-				"azp_name", "itest:team:app",
-				"NAVident", "Z123456",
-				"oid", UUID.randomUUID().toString(),
-				"name", "Bjarne Betjent",
-				"scp", "api_admin defaultaccess"
-		);
 	}
 }

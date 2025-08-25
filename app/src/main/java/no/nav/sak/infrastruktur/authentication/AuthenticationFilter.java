@@ -68,7 +68,8 @@ public class AuthenticationFilter extends SakOncePerRequestFilter {
 						.increment();
 				MDC.put(REQUEST_CONSUMERID, TokenUtils.getClientConsumerId(TokenUtils.ISSUER_AZUREAD).orElseThrow(this::createUnauthorizedException));
 				httpRequest.setAttribute(REQUEST_CONSUMERID, TokenUtils.getClientConsumerId(TokenUtils.ISSUER_AZUREAD).orElseThrow(this::createUnauthorizedException));
-				httpRequest.setAttribute(REQUEST_USERNAME, TokenUtils.getNavIdent(TokenUtils.ISSUER_AZUREAD).orElseThrow(this::createUnauthorizedException));
+				httpRequest.setAttribute(REQUEST_USERNAME, TokenUtils.getUsername(TokenUtils.ISSUER_AZUREAD).orElseThrow(this::createUnauthorizedException));
+
 			} else {
 
 				if (!(Objects.equals(authIdentifier, OIDC.getValue()) || Objects.equals(authIdentifier, BASIC.getValue()))) {
