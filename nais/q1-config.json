@@ -19,6 +19,11 @@
   ],
   "INBOUND": [
     {
+      "application": "safselvbetjening-q1",
+      "namespace": "teamdokumenthandtering",
+      "cluster": "dev-fss"
+    },
+    {
       "application": "gosys-q1",
       "namespace": "isa",
       "cluster": "dev-fss"
