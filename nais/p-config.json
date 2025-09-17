@@ -45,6 +45,11 @@
       "application": "saf",
       "namespace": "teamdokumenthandtering",
       "cluster": "prod-fss"
+    },
+    {
+      "app": "historisk-helt-backend",
+      "namespace": "historisk",
+      "cluster": "prod-gcp"
     }
   ]
 }
