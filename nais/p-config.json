@@ -47,7 +47,7 @@
       "cluster": "prod-fss"
     },
     {
-      "app": "historisk-helt-backend",
+      "application": "historisk-helt-backend",
       "namespace": "historisk",
       "cluster": "prod-gcp"
     }
