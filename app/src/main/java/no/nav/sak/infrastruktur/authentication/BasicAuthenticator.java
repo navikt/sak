@@ -10,8 +10,8 @@ import org.ldaptive.LdapException;
 import org.ldaptive.auth.AuthenticationRequest;
 import org.ldaptive.auth.AuthenticationResponse;
 import org.ldaptive.auth.Authenticator;
-import org.ldaptive.auth.BindAuthenticationHandler;
 import org.ldaptive.auth.SearchDnResolver;
+import org.ldaptive.auth.SimpleBindAuthenticationHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,15 +59,14 @@ public class BasicAuthenticator {
 
 
 		final ConnectionConfig connectionConfig = new ConnectionConfig(this.ldapConfiguration.getUrl());
-		connectionConfig.setUseSSL(true);
-		connectionConfig.setConnectionInitializer(new BindConnectionInitializer(this.ldapConfiguration.getBindUser(), new Credential(this.ldapConfiguration.getBindPassword())));
+		connectionConfig.setConnectionInitializers(new BindConnectionInitializer(this.ldapConfiguration.getBindUser(), new Credential(this.ldapConfiguration.getBindPassword())));
 
 		final SearchDnResolver dnResolver = new SearchDnResolver(new DefaultConnectionFactory(connectionConfig));
 		dnResolver.setBaseDn(this.ldapConfiguration.getServiceUserBaseDN());
 		dnResolver.setUserFilter("(cn={user})");
 		dnResolver.setSubtreeSearch(true);
 
-		final BindAuthenticationHandler authenticationHandler = new BindAuthenticationHandler(new DefaultConnectionFactory(connectionConfig));
+		final SimpleBindAuthenticationHandler authenticationHandler = new SimpleBindAuthenticationHandler(new DefaultConnectionFactory(connectionConfig));
 		final Authenticator authenticator = new Authenticator(dnResolver, authenticationHandler);
 
 		try {
@@ -82,7 +81,7 @@ public class BasicAuthenticator {
 	}
 
 	private AuthenticationResult getAuthenticationResult(String username, AuthenticationResponse authenticationResponse) {
-		if (authenticationResponse.getResult()) {
+		if (authenticationResponse.isSuccess()) {
 			return AuthenticationResult
 					.success(username, username);
 		} else {
@@ -90,7 +89,7 @@ public class BasicAuthenticator {
 					.invalid(String.format("Kunne ikke autentisere %s mot %s: %s",
 							username,
 							this.ldapConfiguration.getServiceUserBaseDN(),
-							authenticationResponse.getMessage()));
+							authenticationResponse.getDiagnosticMessage()));
 		}
 	}
 }
