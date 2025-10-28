@@ -4,10 +4,7 @@
   "ABAC_PDP_ENDPOINT": "https://abac-sak.intern.nav.no/application/asm-pdp/authorize",
   "STS_ISSUER": "https://security-token-service.nais.adeo.no",
   "STS_JWKS": "https://security-token-service.nais.adeo.no/rest/v1/sts/jwks",
-  "LDAP": "/serviceuser/data/prod/srvssolinux",
-  "SRVSAK": "/serviceuser/data/prod/srvsak",
-  "SAKDB_CREDS": "/oracle/data/prod/creds/joark-sak",
-  "SAKDB_CONFIG": "/oracle/data/prod/config/joark",
+  "SAK_SECRET": "sak",
   "MIN_REPLICAS": 2,
   "MAX_REPLICAS": 12,
   "INGRESSES": [
