@@ -9,12 +9,28 @@ spec:
   envFrom:
     - secret: {{ SAK_SECRET }}
   env:
+    - name: JAVA_TRUSTSTORE_OPTIONS
+      value: '-Djavax.net.ssl.keyStore=$(NAV_TRUSTSTORE_PATH)
+              -Djavax.net.ssl.keyStorePassword=$(NAV_TRUSTSTORE_PASSWORD)'
+    - name: JDK_JAVA_OPTIONS
+      value: '-Dspring.profiles.active=nais -XX:MaxRAMPercentage=75
+              $(JAVA_PROXY_OPTIONS) $(JAVA_TRUSTSTORE_OPTIONS)'
     - name: ABAC_PDP_ENDPOINT
       value: {{ ABAC_PDP_ENDPOINT }}
     - name: STS_ISSUER
       value: {{ STS_ISSUER }}
     - name: STS_JWKS
       value: {{ STS_JWKS }}
+    - name: LDAP_USER_BASEDN
+      value: {{ LDAP_USER_BASEDN }}
+    - name: LDAP_SERVICEUSER_BASEDN
+      value: {{ LDAP_SERVICEUSER_BASEDN }}
+    - name: LDAP_DOMAIN
+      value: {{ LDAP_DOMAIN }}
+    - name: LDAP_BASEDN
+      value: {{ LDAP_BASEDN }}
+    - name: LDAP_URL
+      value: {{ LDAP_URL }}
     - name: OTEL_RESOURCE_ATTRIBUTES
       value: "deployment.environment.name={{ ENVIRONMENT }}"
   image: {{ image }}
