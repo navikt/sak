@@ -27,7 +27,7 @@
 		<abac.attribute.version>3.3.13</abac.attribute.version>
 		<token-support.version>3.2.0</token-support.version>
 
-		<logstash.encoder.version>8.1</logstash.encoder.version>
+		<logstash.encoder.version>9.0</logstash.encoder.version>
 		<commons-beanutils.version>1.11.0</commons-beanutils.version>
 		<guava.version>33.5.0-jre</guava.version>
 		<ldaptive.version>2.4.2</ldaptive.version>
