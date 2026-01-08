@@ -19,7 +19,7 @@ public class TokenUtils {
 
 	public static final String ISSUER_AZUREAD = "azuread";
 
-	private static final TokenValidationContextHolder contextHolder = JaxrsTokenValidationContextHolder.getHolder();
+	private static final TokenValidationContextHolder contextHolder = JaxrsTokenValidationContextHolder.INSTANCE.getHolder();
 
 	public static boolean hasTokenForIssuer(String issuer) {
 		return contextHolder.getTokenValidationContext() != null && contextHolder.getTokenValidationContext().hasTokenFor(issuer);

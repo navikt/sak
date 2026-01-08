@@ -58,7 +58,9 @@ class SakResourceTest extends AbstractSakResourceTest {
         assertThat(response.getHeaders().getContentType()).isEqualTo(APPLICATION_JSON);
 
         SakJson sakJson =  new GsonBuilder()
-            .registerTypeAdapter(LocalDateTime.class, (JsonDeserializer<LocalDateTime>) (jsonElement, type, jsonDeserializationContext) -> ZonedDateTime.parse(jsonElement.getAsJsonPrimitive().getAsString()).toLocalDateTime())
+            .registerTypeAdapter(LocalDateTime.class,
+					(JsonDeserializer<LocalDateTime>) (jsonElement, _, _) ->
+							ZonedDateTime.parse(jsonElement.getAsJsonPrimitive().getAsString()).toLocalDateTime())
             .create().fromJson(response.getBody(), SakJson.class);
         verifyEqual(sakJson, opprettetSak);
     }
@@ -73,7 +75,22 @@ class SakResourceTest extends AbstractSakResourceTest {
 										.build()
 						);
 
-		ResponseEntity<String> response = executeGetRequestWithBearerToken(URI.create(String.valueOf(opprettetSak.getSakId())), String.class, authHeaderBearerClientCredentialsToken);
+		ResponseEntity<String> response = executeGetRequest(URI.create(String.valueOf(opprettetSak.getSakId())), String.class, authHeaderBearerClientCredentialsToken);
+
+		assertThat(response.getStatusCode()).isEqualTo(OK);
+	}
+
+	@Test
+	void hent_sak_med_servicebruker_ldap() {
+		final Sak opprettetSak =
+				testUtilityRepository
+						.lagre(
+								new SakTestData()
+										.aktoerId("1234567890123")
+										.build()
+						);
+
+		ResponseEntity<String> response = executeGetRequest(URI.create(String.valueOf(opprettetSak.getSakId())), String.class, "Basic " + Base64.getEncoder().encodeToString("junit:password".getBytes()));
 
 		assertThat(response.getStatusCode()).isEqualTo(OK);
 	}
