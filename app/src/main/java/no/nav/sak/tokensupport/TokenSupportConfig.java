@@ -34,7 +34,7 @@ public class TokenSupportConfig {
 
 	@Bean
 	public TokenValidationContextHolder jaxrsContextHolder() {
-		return JaxrsTokenValidationContextHolder.getHolder();
+		return JaxrsTokenValidationContextHolder.INSTANCE.getHolder();
 	}
 
 }

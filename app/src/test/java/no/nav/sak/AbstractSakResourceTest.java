@@ -70,7 +70,7 @@ public abstract class AbstractSakResourceTest extends AbstractOauth2Test{
 		return executeGetRequestWithBearer(path, Object.class);
 	}
 
-	protected <T> ResponseEntity<T> executeGetRequestWithBearerToken(URI path, Class<T> responseType, String authHeader) {
+	protected <T> ResponseEntity<T> executeGetRequest(URI path, Class<T> responseType, String authHeader) {
 		return doRequest(path, HttpMethod.GET, authHeader, null, responseType);
 	}
 
