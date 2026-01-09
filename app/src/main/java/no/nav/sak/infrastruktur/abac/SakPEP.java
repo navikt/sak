@@ -20,7 +20,7 @@ import static no.nav.abac.xacml.NavAttributter.RESOURCE_FELLES_PERSON_AKTOERID_R
 import static no.nav.abac.xacml.NavAttributter.RESOURCE_FELLES_RESOURCE_TYPE;
 import static no.nav.sak.infrastruktur.abac.AbacExceptionTranslator.identifyException;
 import static no.nav.sak.infrastruktur.authentication.AuthenticationHeaderIdentifier.BASIC;
-import static no.nav.sak.infrastruktur.authentication.AuthenticationHeaderIdentifier.OIDC;
+import static no.nav.sak.infrastruktur.authentication.AuthenticationHeaderIdentifier.BEARER;
 import static org.apache.commons.lang3.StringUtils.substringAfter;
 import static org.apache.commons.lang3.StringUtils.substringBefore;
 import static org.apache.commons.lang3.StringUtils.substringBetween;
@@ -57,7 +57,7 @@ public class SakPEP {
 		if (Objects.equals(BASIC.getValue(), authIdentifier)) {
 			abacRequest.addAccessSubject(new ABACAttribute(StandardAttributter.SUBJECT_ID, (String) ctx.getAttribute(AuthenticationFilter.REQUEST_USERNAME)));
 			abacRequest.addAccessSubject(new ABACAttribute(NavAttributter.SUBJECT_FELLES_SUBJECTTYPE, SubjectType.SUBJECT_TYPE_SYSTEMBRUKER.getValue()));
-		} else if (Objects.equals(OIDC.getValue(), authIdentifier)) {
+		} else if (Objects.equals(BEARER.getValue(), authIdentifier)) {
 			final String tokenBody = substringBetween(token, ".");
 			abacRequest.addEnvironment(new ABACAttribute(ENVIRONMENT_FELLES_OIDC_TOKEN_BODY, tokenBody));
 		} else {

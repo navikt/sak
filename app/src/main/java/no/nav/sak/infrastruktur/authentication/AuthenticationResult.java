@@ -1,11 +1,15 @@
 package no.nav.sak.infrastruktur.authentication;
 
+import lombok.Getter;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
 public class AuthenticationResult {
+	@Getter
 	private final String user;
+	@Getter
 	private final String consumerId;
+	@Getter
 	private final boolean isValid;
 	private final String errorMessage;
 
@@ -22,25 +26,6 @@ public class AuthenticationResult {
 
 	public static AuthenticationResult success(String user, String consumerId) {
 		return new AuthenticationResult(user, consumerId, true, null);
-	}
-
-	public boolean isValid() {
-		return isValid;
-	}
-
-	public String getUser() {
-		return user;
-	}
-
-	public String getConsumerId() {
-		return consumerId;
-	}
-
-	public String getErrorMessage() {
-		if (isValid) {
-			throw new IllegalArgumentException("Can't get error message from valid token");
-		}
-		return errorMessage;
 	}
 
 	@Override

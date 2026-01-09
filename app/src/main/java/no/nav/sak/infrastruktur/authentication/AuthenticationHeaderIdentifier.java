@@ -2,7 +2,7 @@ package no.nav.sak.infrastruktur.authentication;
 
 public enum AuthenticationHeaderIdentifier {
 	BASIC("Basic"),
-	OIDC("Bearer");
+	BEARER("Bearer");
 
 	private final String headerKey;
 

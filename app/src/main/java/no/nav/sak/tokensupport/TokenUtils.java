@@ -11,13 +11,14 @@ import static org.springframework.util.StringUtils.truncate;
 
 public class TokenUtils {
 
+	public static final String ISSUER_STS = "sts";
+	public static final String ISSUER_ENTRA = "entra";
 	private static final int USERNAME_MAX_LENGTH = 40;
 	private static final String SUBJECT_CLAIM = "sub";
 	private static final String OID_CLAIM = "oid";
 	private static final String AZP_NAME_CLAIM = "azp_name";
 	private static final String NAVIDENT_CLAIM = "NAVident";
 
-	public static final String ISSUER_AZUREAD = "azuread";
 
 	private static final TokenValidationContextHolder contextHolder = JaxrsTokenValidationContextHolder.INSTANCE.getHolder();
 
@@ -26,38 +27,52 @@ public class TokenUtils {
 	}
 
 	public static boolean hasClientCredentialsToken() {
-		if (!hasTokenForIssuer(ISSUER_AZUREAD)) {
+		if (!hasTokenForIssuer(ISSUER_ENTRA)) {
 			return false;
 		}
-		JwtToken token = contextHolder.getTokenValidationContext().getJwtToken(ISSUER_AZUREAD);
+		JwtToken token = contextHolder.getTokenValidationContext().getJwtToken(ISSUER_ENTRA);
 		JwtTokenClaims claims = token.getJwtTokenClaims();
 		return isClientCredentialsToken(claims);
 	}
 
-	public static Optional<String> getUsername(String issuer) {
-		if (!hasTokenForIssuer(issuer)) {
-			throw new RuntimeException("No token for issuer");
-		}
-		JwtToken token = contextHolder.getTokenValidationContext().getJwtToken(ISSUER_AZUREAD);
-		JwtTokenClaims claims = token.getJwtTokenClaims();
-
-		if (isClientCredentialsToken(claims)) {
-			String azpName = claims.getStringClaim(AZP_NAME_CLAIM);
-			String parsedAzpName = parseAzpNameClaim(azpName);
-			return Optional.of(truncate(parsedAzpName, USERNAME_MAX_LENGTH));
+	public static Optional<String> getUsername(String issuerId) {
+		if (!hasTokenForIssuer(issuerId)) {
+			throw new RuntimeException("No token for issuerId");
 		}
 
-		return Optional.ofNullable(claims.getStringClaim(NAVIDENT_CLAIM));
+		if (ISSUER_ENTRA.equals(issuerId)) {
+			JwtToken token = contextHolder.getTokenValidationContext().getJwtToken(issuerId);
+			JwtTokenClaims claims = token.getJwtTokenClaims();
+
+			if (isClientCredentialsToken(claims)) {
+				String azpName = claims.getStringClaim(AZP_NAME_CLAIM);
+				String parsedAzpName = parseAzpNameClaim(azpName);
+				return Optional.of(truncate(parsedAzpName, USERNAME_MAX_LENGTH));
+			}
+
+			return Optional.ofNullable(claims.getStringClaim(NAVIDENT_CLAIM));
+		} else if (ISSUER_STS.equals(issuerId)) {
+			return getClientConsumerId(issuerId);
+		} else {
+			throw new UnsupportedOperationException("IssuerId not supported");
+		}
 	}
 
-	public static Optional<String> getClientConsumerId(String issuer) {
-		if (!hasTokenForIssuer(issuer)) {
-			throw new RuntimeException("No token for issuer");
+	public static Optional<String> getClientConsumerId(String issuerId) {
+		if (!hasTokenForIssuer(issuerId)) {
+			throw new RuntimeException("No token for issuerId");
 		}
-		JwtToken token = contextHolder.getTokenValidationContext().getJwtToken(ISSUER_AZUREAD);
+
+		JwtToken token = contextHolder.getTokenValidationContext().getJwtToken(issuerId);
 		JwtTokenClaims claims = token.getJwtTokenClaims();
 
-		return Optional.ofNullable(claims.getStringClaim(AZP_NAME_CLAIM));
+		if (ISSUER_ENTRA.equals(issuerId)) {
+			return Optional.ofNullable(claims.getStringClaim(AZP_NAME_CLAIM));
+		} else if (ISSUER_STS.equals(issuerId)) {
+			return Optional.of(token.getSubject());
+		} else {
+			throw new UnsupportedOperationException("IssuerId not supported");
+		}
 	}
 
 	private static boolean isClientCredentialsToken(JwtTokenClaims claims) {

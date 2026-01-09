@@ -3,15 +3,12 @@ package no.nav.sak.infrastruktur.authentication;
 import org.apache.commons.lang3.StringUtils;
 
 import static no.nav.sak.infrastruktur.authentication.AuthenticationHeaderIdentifier.BASIC;
-import static no.nav.sak.infrastruktur.authentication.AuthenticationHeaderIdentifier.OIDC;
 
 
 public class Authenticator {
 	private final BasicAuthenticator basicAuthenticator;
-	private final OidcTokenValidator oidcTokenValidator;
 
-	public Authenticator(OidcTokenValidator oidcTokenValidator, BasicAuthenticator basicAuthenticator) {
-		this.oidcTokenValidator = oidcTokenValidator;
+	public Authenticator(BasicAuthenticator basicAuthenticator) {
 		this.basicAuthenticator = basicAuthenticator;
 	}
 
@@ -25,9 +22,7 @@ public class Authenticator {
 			String identifier = authorizationHeader[0];
 			String credentials = authorizationHeader[1];
 
-			if (OIDC.getValue().equals(identifier)) {
-				return oidcTokenValidator.validate(credentials);
-			} else if (BASIC.getValue().equals(identifier)) {
+			if (BASIC.getValue().equals(identifier)) {
 				return basicAuthenticator.authenticate(credentials);
 			} else {
 				return AuthenticationResult.invalid("Authorization header identifier not supported");

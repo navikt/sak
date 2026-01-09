@@ -7,14 +7,12 @@ import no.nav.resilience.ResilienceConfig;
 import no.nav.sak.configuration.AbacProperties;
 import no.nav.sak.configuration.LdapProperties;
 import no.nav.sak.configuration.ServiceuserProperties;
-import no.nav.sak.configuration.StsProperties;
 import no.nav.sak.infrastruktur.abac.ABACClient;
 import no.nav.sak.infrastruktur.abac.SakPEP;
 import no.nav.sak.infrastruktur.authentication.AuthenticationResult;
 import no.nav.sak.infrastruktur.authentication.Authenticator;
 import no.nav.sak.infrastruktur.authentication.BasicAuthenticator;
 import no.nav.sak.infrastruktur.authentication.LdapConfiguration;
-import no.nav.sak.infrastruktur.authentication.OidcTokenValidator;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
@@ -28,8 +26,6 @@ import org.ehcache.config.builders.CacheConfigurationBuilder;
 import org.ehcache.config.builders.CacheManagerBuilder;
 import org.ehcache.config.builders.ExpiryPolicyBuilder;
 import org.ehcache.config.builders.ResourcePoolsBuilder;
-import org.jose4j.jwk.HttpsJwks;
-import org.jose4j.keys.resolvers.HttpsJwksVerificationKeyResolver;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -38,7 +34,6 @@ import org.springframework.context.annotation.Configuration;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.ZoneId;
-import java.util.Map;
 
 @Slf4j
 @EnableAutoConfiguration
@@ -46,8 +41,7 @@ import java.util.Map;
 @EnableConfigurationProperties({
 		AbacProperties.class,
 		LdapProperties.class,
-		ServiceuserProperties.class,
-		StsProperties.class
+		ServiceuserProperties.class
 })
 public class SakConfiguration {
 
@@ -96,11 +90,6 @@ public class SakConfiguration {
 	}
 
 	@Bean
-	public OidcTokenValidator oidcTokenValidator(StsProperties stsProperties) {
-		return new OidcTokenValidator(Map.of(stsProperties.issuer(), new HttpsJwksVerificationKeyResolver(new HttpsJwks(stsProperties.jwks()))));
-	}
-
-	@Bean
 	public LdapConfiguration ldapConfiguration(LdapProperties ldapProperties) {
 		return LdapConfiguration.builder()
 				.withUrl(ldapProperties.url())
@@ -128,8 +117,8 @@ public class SakConfiguration {
 	}
 
 	@Bean
-	public Authenticator authenticator(OidcTokenValidator oidcTokenValidator, BasicAuthenticator basicAuthenticator) {
-		return new Authenticator(oidcTokenValidator, basicAuthenticator);
+	public Authenticator authenticator(BasicAuthenticator basicAuthenticator) {
+		return new Authenticator(basicAuthenticator);
 	}
 
 	@Bean
