@@ -4,23 +4,13 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.resilience.ResilienceConfig;
-import no.nav.sak.configuration.AbacProperties;
 import no.nav.sak.configuration.LdapProperties;
 import no.nav.sak.configuration.SakProperties;
 import no.nav.sak.configuration.ServiceuserProperties;
-import no.nav.sak.infrastruktur.abac.ABACClient;
-import no.nav.sak.infrastruktur.abac.SakPEP;
 import no.nav.sak.infrastruktur.authentication.AuthenticationResult;
 import no.nav.sak.infrastruktur.authentication.Authenticator;
 import no.nav.sak.infrastruktur.authentication.BasicAuthenticator;
 import no.nav.sak.infrastruktur.authentication.LdapConfiguration;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.ehcache.Cache;
 import org.ehcache.CacheManager;
 import org.ehcache.config.builders.CacheConfigurationBuilder;
@@ -41,7 +31,6 @@ import java.time.ZoneId;
 @Configuration
 @EnableConfigurationProperties({
 		SakProperties.class,
-		AbacProperties.class,
 		LdapProperties.class,
 		ServiceuserProperties.class
 })
@@ -52,43 +41,6 @@ public class SakConfiguration {
 	@Bean
 	public Clock clock() {
 		return Clock.system(NORWAY_TIME);
-	}
-
-	@Bean
-	public SakPEP sakPEP(ABACClient abacClient, ResilienceConfig resilienceConfig) {
-		return new SakPEP(abacClient, resilienceConfig);
-	}
-
-	@Bean
-	public ABACClient createAbacClient(ServiceuserProperties serviceuserProperties, AbacProperties abacProperties) {
-		return new ABACClient(
-				abacProperties.endpoint(),
-				createHttpClient(serviceuserProperties, abacProperties));
-	}
-
-	private HttpClient createHttpClient(ServiceuserProperties serviceuserProperties, AbacProperties abacProperties) {
-
-		final int timeout = abacProperties.readTimeout();
-		final RequestConfig requestConfig = RequestConfig
-				.custom()
-				.setConnectionRequestTimeout(timeout)
-				.setSocketTimeout(timeout)
-				.setConnectTimeout(timeout)
-				.build();
-
-		final HttpClientBuilder httpClientBuilder = HttpClientBuilder
-				.create()
-				.setDefaultRequestConfig(requestConfig);
-
-		final UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(
-				serviceuserProperties.username(),
-				serviceuserProperties.password());
-
-		final CredentialsProvider provider = new BasicCredentialsProvider();
-		provider.setCredentials(AuthScope.ANY, credentials);
-		httpClientBuilder.setDefaultCredentialsProvider(provider);
-
-		return httpClientBuilder.build();
 	}
 
 	@Bean

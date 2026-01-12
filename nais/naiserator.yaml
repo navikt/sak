@@ -16,8 +16,6 @@ spec:
       value: "-XX:MaxRAMPercentage=75
               -XX:+UseCompactObjectHeaders
               $(JAVA_PROXY_OPTIONS) $(JAVA_TRUSTSTORE_OPTIONS)"
-    - name: ABAC_PDP_ENDPOINT
-      value: {{ ABAC_PDP_ENDPOINT }}
     - name: NO_NAV_SECURITY_JWT_ISSUER_STS_DISCOVERYURL
       value: {{ NO_NAV_SECURITY_JWT_ISSUER_STS_DISCOVERYURL }}
     - name: NO_NAV_SECURITY_JWT_ISSUER_STS_ACCEPTED_AUDIENCE
