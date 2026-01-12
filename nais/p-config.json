@@ -3,6 +3,7 @@
   "ENVIRONMENT": "p",
   "NO_NAV_SECURITY_JWT_ISSUER_STS_DISCOVERYURL": "https://security-token-service.nais.adeo.no/rest/v1/sts/.well-known/openid-configuration",
   "NO_NAV_SECURITY_JWT_ISSUER_STS_ACCEPTED_AUDIENCE": "srvArena,srvfamilie-ks-opps,srvdokprodbatch",
+  "SAK_BASIC_AUTH_TILGANG": "srv_oebs,srvmelosys,srvmelosys-eessi,srvray,srvutbetalingsmeld",
   "ABAC_PDP_ENDPOINT": "https://abac-sak.intern.nav.no/application/asm-pdp/authorize",
   "LDAP_USER_BASEDN": "ou=NAV,ou=BusinessUnits,dc=adeo,dc=no",
   "LDAP_SERVICEUSER_BASEDN": "ou=ServiceAccounts,dc=adeo,dc=no",

@@ -1,26 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configuration scan="true" scanPeriod="60 seconds">
+<configuration>
+	<include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+	<include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
 
-    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <pattern>[%d %level %logger %mdc{uuid}] - %m%n</pattern>
-        </encoder>
-    </appender>
+	<logger name="no.nav" level="DEBUG" additivity="false">
+		<appender-ref ref="CONSOLE"/>
+	</logger>
 
-    <logger name="no.nav" level="DEBUG" additivity="false">
-        <appender-ref ref="STDOUT"/>
-    </logger>
+	<logger name="org.ldaptive" level="OFF" additivity="false">
+		<appender-ref ref="CONSOLE"/>
+	</logger>
 
-    <logger name="org.ldaptive" level="OFF" additivity="false">
-        <appender-ref ref="STDOUT"/>
-    </logger>
+	<logger name="org.glassfish" level="OFF" additivity="false">
+		<appender-ref ref="CONSOLE"/>
+	</logger>
 
-    <logger name="org.glassfish" level="OFF" additivity="false">
-        <appender-ref ref="STDOUT"/>
-    </logger>
-
-    <root level="OFF">
-        <appender-ref ref="STDOUT"/>
-    </root>
+	<root level="OFF">
+		<appender-ref ref="CONSOLE"/>
+	</root>
 
 </configuration>

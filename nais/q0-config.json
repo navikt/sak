@@ -3,6 +3,7 @@
   "ENVIRONMENT": "q0",
   "NO_NAV_SECURITY_JWT_ISSUER_STS_DISCOVERYURL": "https://security-token-service.dev.adeo.no/rest/v1/sts/.well-known/openid-configuration",
   "NO_NAV_SECURITY_JWT_ISSUER_STS_ACCEPTED_AUDIENCE": "srvArena,srvfamilie-ks-opps,srvdokprodbatch",
+  "SAK_BASIC_AUTH_TILGANG": "",
   "ABAC_PDP_ENDPOINT": "https://abac-sak-q0.dev.intern.nav.no/application/asm-pdp/authorize",
   "LDAP_USER_BASEDN": "ou=NAV,ou=BusinessUnits,dc=preprod,dc=local",
   "LDAP_SERVICEUSER_BASEDN": "ou=ServiceAccounts,dc=preprod,dc=local",

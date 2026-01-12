@@ -68,6 +68,7 @@ public class AuthenticationFilter extends SakOncePerRequestFilter {
 		try {
 			String authHeader = httpRequest.getHeader(AUTHORIZATION);
 			String authIdentifier = mapAuthIdentifier(authHeader);
+			// SakJwtTokenValidationFilter har allerede evaluert Bearer med issuer sts og entra
 			if (hasTokenForIssuer(ISSUER_ENTRA)) {
 				handleBearerMetadata(ISSUER_ENTRA, httpRequest, authIdentifier);
 			} else if (hasTokenForIssuer(ISSUER_STS)) {
