@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 @Component
@@ -49,9 +50,15 @@ public class UnauthorizedExceptionHandlingFilter implements Filter {
 			String path = servletRequest instanceof HttpServletRequest httpServletRequest ? httpServletRequest.getRequestURI() : "<unknown path>";
 			log.error("sak encountered an unexpected exception when handling request path={} correlationId={} uuid={}",
 					path, exception.getCorrelationId(), exception.getUuid(), exception);
+			if (servletResponse instanceof HttpServletResponse httpServletResponse) {
+				httpServletResponse.setStatus(INTERNAL_SERVER_ERROR.value());
+			}
 		} catch (RuntimeException unexpectedRuntimeException)  {
 			String path = servletRequest instanceof HttpServletRequest httpServletRequest ? httpServletRequest.getRequestURI() : "<unknown path>";
 			log.error("sak encountered an unexpected exception when handling request @ {}", path, unexpectedRuntimeException);
+			if (servletResponse instanceof HttpServletResponse httpServletResponse) {
+				httpServletResponse.setStatus(INTERNAL_SERVER_ERROR.value());
+			}
 		}
 
 	}

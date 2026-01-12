@@ -1,9 +1,9 @@
 {
   "APP_NAME": "sak-q1",
   "ENVIRONMENT": "q1",
+  "NO_NAV_SECURITY_JWT_ISSUER_STS_DISCOVERYURL": "https://security-token-service.dev.adeo.no/rest/v1/sts/.well-known/openid-configuration",
+  "NO_NAV_SECURITY_JWT_ISSUER_STS_ACCEPTED_AUDIENCE": "srvArena,srvfamilie-ks-opps,srvdokprodbatch",
   "ABAC_PDP_ENDPOINT": "https://abac-sak-q1.dev.intern.nav.no/application/asm-pdp/authorize",
-  "STS_ISSUER": "https://security-token-service.nais.preprod.local",
-  "STS_JWKS": "https://security-token-service.nais.preprod.local/rest/v1/sts/jwks",
   "LDAP_USER_BASEDN": "ou=NAV,ou=BusinessUnits,dc=preprod,dc=local",
   "LDAP_SERVICEUSER_BASEDN": "ou=ServiceAccounts,dc=preprod,dc=local",
   "LDAP_DOMAIN": "PREPROD.LOCAL",
@@ -17,6 +17,7 @@
     "https://sak-q1.nais.preprod.local",
     "https://sak-q1.dev.adeo.no",
     "https://sak-q1.dev.intern.nav.no",
+    "https://sak-q1.intern.dev.nav.no",
     "https://sak-q1.dev-fss-pub.nais.io"
   ],
   "INBOUND": [

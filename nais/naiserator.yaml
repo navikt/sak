@@ -17,10 +17,10 @@ spec:
               $(JAVA_PROXY_OPTIONS) $(JAVA_TRUSTSTORE_OPTIONS)"
     - name: ABAC_PDP_ENDPOINT
       value: {{ ABAC_PDP_ENDPOINT }}
-    - name: STS_ISSUER
-      value: {{ STS_ISSUER }}
-    - name: STS_JWKS
-      value: {{ STS_JWKS }}
+    - name: NO_NAV_SECURITY_JWT_ISSUER_STS_DISCOVERYURL
+      value: {{ NO_NAV_SECURITY_JWT_ISSUER_STS_DISCOVERYURL }}
+    - name: NO_NAV_SECURITY_JWT_ISSUER_STS_ACCEPTED_AUDIENCE
+      value: {{ NO_NAV_SECURITY_JWT_ISSUER_STS_ACCEPTED_AUDIENCE }}
     - name: LDAP_USER_BASEDN
       value: {{ LDAP_USER_BASEDN }}
     - name: LDAP_SERVICEUSER_BASEDN
@@ -58,8 +58,9 @@ spec:
     cpuThresholdPercentage: 50
   resources:
     limits:
-      memory: 1024Mi
+      memory: 2000Mi
     requests:
+      memory: 768Mi
       cpu: 60m
   accessPolicy:
     inbound:
@@ -86,5 +87,3 @@ spec:
     autoInstrumentation:
       enabled: true
       runtime: java
-      destinations:
-        - id: "elastic-apm"

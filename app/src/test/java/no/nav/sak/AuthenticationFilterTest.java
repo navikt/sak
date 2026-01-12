@@ -19,6 +19,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import static com.nimbusds.oauth2.sdk.token.AccessTokenType.BEARER;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 @ActiveProfiles("itest")
@@ -26,7 +27,7 @@ import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 		classes = SakTestConfiguration.class,
 		webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
 )
-public class AuthenticationFilterTest extends AbstractOauth2Test{
+public class AuthenticationFilterTest extends AbstractOauth2Test {
 	@Autowired
 	TestRestTemplate testRestTemplate;
 
@@ -38,6 +39,20 @@ public class AuthenticationFilterTest extends AbstractOauth2Test{
 	@Test
 	void skal_gi_tilgang_for_client_credentials_token() {
 		skal_gis_tilgang_med_token(clientCredentialsToken());
+	}
+
+	@Test
+	void skal_gi_tilgang_for_sts_token() {
+		skal_gis_tilgang_med_token(stsToken());
+	}
+
+	@Test
+	void skal_gi_tilgang_til_actuator_uten_token() {
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("X-Correlation-ID", "Junit");
+		HttpEntity<String> httpEntity = new HttpEntity<>(headers);
+		ResponseEntity<String> responseEntity = testRestTemplate.exchange("/actuator/health", HttpMethod.GET, httpEntity, String.class);
+		assertThat(responseEntity.getStatusCode()).isEqualTo(OK);
 	}
 
 	private void skal_gis_tilgang_med_token(String token) {
@@ -56,7 +71,7 @@ public class AuthenticationFilterTest extends AbstractOauth2Test{
 
 	@Test
 	void skal_nektes_adgang_uten_gyldig_bearer_token() {
-		skal_nektes_adgang_med_header("Authorization", "Invalidtoken");
+		skal_nektes_adgang_med_header("Authorization", "Bearer Invalidtoken");
 	}
 
 	@Test
@@ -81,7 +96,7 @@ public class AuthenticationFilterTest extends AbstractOauth2Test{
 		}
 
 		HttpEntity<String> httpEntity1 = new HttpEntity<>(headers);
-		ResponseEntity<String> response1 = testRestTemplate.exchange("/api/v1/saker/" + "1", HttpMethod.GET, httpEntity1, String.class);
+		ResponseEntity<String> response1 = testRestTemplate.exchange("/api/v1/saker/1", HttpMethod.GET, httpEntity1, String.class);
 		assertThat(response1.getStatusCode()).isEqualTo(expectedStatus);
 
 		HttpEntity<String> httpEntity2 = new HttpEntity<>(headers);

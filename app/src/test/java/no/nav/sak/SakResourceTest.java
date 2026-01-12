@@ -5,7 +5,6 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
-import no.nav.sak.infrastruktur.oicd.JwtTestData;
 import no.nav.sak.infrastruktur.rest.SakJson;
 import no.nav.sak.repository.Sak;
 import no.nav.sak.repository.SakSearchCriteria;
@@ -81,6 +80,21 @@ class SakResourceTest extends AbstractSakResourceTest {
 	}
 
 	@Test
+	void hent_sak_med_rest_sts_token() {
+		final Sak opprettetSak =
+				testUtilityRepository
+						.lagre(
+								new SakTestData()
+										.aktoerId("1234567890123")
+										.build()
+						);
+
+		ResponseEntity<String> response = executeGetRequest(URI.create(String.valueOf(opprettetSak.getSakId())), String.class, "Bearer " + stsToken());
+
+		assertThat(response.getStatusCode()).isEqualTo(OK);
+	}
+
+	@Test
 	void hent_sak_med_servicebruker_ldap() {
 		final Sak opprettetSak =
 				testUtilityRepository
@@ -90,7 +104,8 @@ class SakResourceTest extends AbstractSakResourceTest {
 										.build()
 						);
 
-		ResponseEntity<String> response = executeGetRequest(URI.create(String.valueOf(opprettetSak.getSakId())), String.class, "Basic " + Base64.getEncoder().encodeToString("junit:password".getBytes()));
+		String unencoded = USERNAME + ":" + PASSWORD;
+		ResponseEntity<String> response = executeGetRequest(URI.create(String.valueOf(opprettetSak.getSakId())), String.class, "Basic " + Base64.getEncoder().encodeToString(unencoded.getBytes()));
 
 		assertThat(response.getStatusCode()).isEqualTo(OK);
 	}
@@ -140,8 +155,8 @@ class SakResourceTest extends AbstractSakResourceTest {
 
     @Test
     void beskyttede_ressurser_tilgjengelige_naar_gyldig_authheader_for_oidc() {
-        String authHeaderOIDC = "Bearer " + new JwtTestData().build();
-        verifyBeskyttedeRessurserTilgjengelig(authHeaderOIDC);
+        String authorizationHeader = "Bearer " + oboToken();
+        verifyBeskyttedeRessurserTilgjengelig(authorizationHeader);
     }
 
     @Test

@@ -98,7 +98,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 						type = SecuritySchemeType.HTTP,
 						scheme = "basic",
 						description = """
-								Autorisasjon med basic auth er deprekert. Brukes kun av teamet.
+								Autorisasjon med basic auth er deprekert.
 								"""
 				)
 		}
@@ -287,7 +287,7 @@ public class SakResource {
 						.medApplikasjon(sak.getApplikasjon());
 
 		return sak.getFagsakNr() != null &&
-			   !sakJpaRepository.finnSaker(sakSearchCriteria).isEmpty();
+				!sakJpaRepository.finnSaker(sakSearchCriteria).isEmpty();
 	}
 
 	private ResponseEntity<?> makeResponseUponAbacFailure(ABACResult.Code abacResultCode) {
