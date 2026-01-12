@@ -37,6 +37,7 @@ import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.METHOD_NOT_ALLOWED;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 class SakResourceTest extends AbstractSakResourceTest {
@@ -108,6 +109,14 @@ class SakResourceTest extends AbstractSakResourceTest {
 		ResponseEntity<String> response = executeGetRequest(URI.create(String.valueOf(opprettetSak.getSakId())), String.class, "Basic " + Base64.getEncoder().encodeToString(unencoded.getBytes()));
 
 		assertThat(response.getStatusCode()).isEqualTo(OK);
+	}
+
+	@Test
+	void gir_401_naar_ldap_username_ikke_i_auth_set() {
+		String unencoded = "dummy:passord";
+		ResponseEntity<String> response = executeGetRequest(URI.create("1"), String.class, "Basic " + Base64.getEncoder().encodeToString(unencoded.getBytes()));
+
+		assertThat(response.getStatusCode()).isEqualTo(UNAUTHORIZED);
 	}
 
     @Test
@@ -498,7 +507,7 @@ class SakResourceTest extends AbstractSakResourceTest {
         assertThat(response.getStatusCode()).isEqualTo(OK);
         assertThat(response.getHeaders().getContentType()).isEqualTo(APPLICATION_JSON);
         List<SakJson> sakJsons = new GsonBuilder()
-            .registerTypeAdapter(LocalDateTime.class, (JsonDeserializer<LocalDateTime>) (jsonElement, type, jsonDeserializationContext) -> ZonedDateTime.parse(jsonElement.getAsJsonPrimitive().getAsString()).toLocalDateTime())
+            .registerTypeAdapter(LocalDateTime.class, (JsonDeserializer<LocalDateTime>) (jsonElement, _, _) -> ZonedDateTime.parse(jsonElement.getAsJsonPrimitive().getAsString()).toLocalDateTime())
             .create().fromJson(response.getBody(), new TypeToken<List<SakJson>>() {}.getType());
         assertThat(sakJsons.size()).isEqualTo(expectedSize);
         return sakJsons;

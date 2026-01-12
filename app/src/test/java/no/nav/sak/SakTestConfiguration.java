@@ -3,6 +3,7 @@ package no.nav.sak;
 import no.nav.resilience.ResilienceConfig;
 import no.nav.sak.configuration.AbacProperties;
 import no.nav.sak.configuration.LdapProperties;
+import no.nav.sak.configuration.SakProperties;
 import no.nav.sak.configuration.ServiceuserProperties;
 import no.nav.sak.infrastruktur.abac.ABACClient;
 import no.nav.sak.infrastruktur.abac.ABACJunitClient;
@@ -18,6 +19,7 @@ import org.springframework.context.annotation.Primary;
 
 @Configuration
 @EnableConfigurationProperties({
+		SakProperties.class,
 		AbacProperties.class,
 		LdapProperties.class,
 		ServiceuserProperties.class
@@ -39,7 +41,7 @@ public class SakTestConfiguration {
 
 	@Bean
 	@Primary
-	public Authenticator testAuthenticator(LdapProperties ldapProperties) {
+	public Authenticator testAuthenticator(SakProperties sakProperties, LdapProperties ldapProperties) {
 		LdapConfiguration ldapConfiguration = LdapConfiguration.builder()
 				.withUrl(ldapProperties.url())
 				.withServiceUserBaseDN(ldapProperties.serviceuserBasedn())
@@ -47,7 +49,7 @@ public class SakTestConfiguration {
 				.withBindPassword(null)
 				.build();
 
-		JunitBasicAuthenticator junitBasicAuthenticator = new JunitBasicAuthenticator(ldapConfiguration);
+		JunitBasicAuthenticator junitBasicAuthenticator = new JunitBasicAuthenticator(sakProperties, ldapConfiguration);
 
 		return new Authenticator(junitBasicAuthenticator);
 	}

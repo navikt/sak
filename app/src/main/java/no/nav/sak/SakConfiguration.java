@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.resilience.ResilienceConfig;
 import no.nav.sak.configuration.AbacProperties;
 import no.nav.sak.configuration.LdapProperties;
+import no.nav.sak.configuration.SakProperties;
 import no.nav.sak.configuration.ServiceuserProperties;
 import no.nav.sak.infrastruktur.abac.ABACClient;
 import no.nav.sak.infrastruktur.abac.SakPEP;
@@ -39,6 +40,7 @@ import java.time.ZoneId;
 @EnableAutoConfiguration
 @Configuration
 @EnableConfigurationProperties({
+		SakProperties.class,
 		AbacProperties.class,
 		LdapProperties.class,
 		ServiceuserProperties.class
@@ -112,8 +114,10 @@ public class SakConfiguration {
 	}
 
 	@Bean
-	public BasicAuthenticator basicAuthenticator(LdapConfiguration ldapConfiguration, Cache<String, AuthenticationResult> cache) {
-		return new BasicAuthenticator(ldapConfiguration, cache);
+	public BasicAuthenticator basicAuthenticator(SakProperties sakProperties,
+												 LdapConfiguration ldapConfiguration,
+												 Cache<String, AuthenticationResult> cache) {
+		return new BasicAuthenticator(sakProperties, ldapConfiguration, cache);
 	}
 
 	@Bean

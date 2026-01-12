@@ -1,5 +1,6 @@
 package no.nav.sak.infrastruktur.authentication;
 
+import no.nav.sak.configuration.SakProperties;
 import org.apache.commons.lang3.Validate;
 import org.ehcache.Cache;
 import org.ldaptive.BindConnectionInitializer;
@@ -16,15 +17,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Base64;
+import java.util.Set;
 
 public class BasicAuthenticator {
 
 	private static final Logger log = LoggerFactory.getLogger(BasicAuthenticator.class);
 
+	private final Set<String> basicAuthAccess;
 	private final LdapConfiguration ldapConfiguration;
 	private final Cache<String, AuthenticationResult> cache;
 
 	public BasicAuthenticator(
+			final SakProperties sakProperties,
 			final LdapConfiguration ldapConfiguration,
 			final Cache<String, AuthenticationResult> cache) {
 
@@ -32,15 +36,22 @@ public class BasicAuthenticator {
 		Validate.notNull(ldapConfiguration, "ldapConfiguration cannot be null");
 		Validate.notNull(cache, "cache cannot be null");
 
+		this.basicAuthAccess = sakProperties.getBasicAuthTilgang();
 		this.ldapConfiguration = ldapConfiguration;
 		this.cache = cache;
-
 	}
 
 	public AuthenticationResult authenticate(final String credentialsBase64) {
-
 		final String[] credentials = (new String(Base64.getDecoder().decode(credentialsBase64))).split(":");
 		final String username = credentials[0];
+
+		if(basicAuthAccess.contains(username)) {
+			return doAuthenticate(credentialsBase64, credentials, username);
+		}
+		return AuthenticationResult.invalid("Servicebruker har ikke tilgang");
+	}
+
+	private AuthenticationResult doAuthenticate(String credentialsBase64, String[] credentials, String username) {
 		if (this.cache.containsKey(credentialsBase64)) {
 			return this.cache.get(credentialsBase64);
 		} else {

@@ -1,5 +1,6 @@
 package no.nav.sak.infrastruktur.authentication.basic;
 
+import no.nav.sak.configuration.SakProperties;
 import no.nav.sak.infrastruktur.authentication.AuthenticationResult;
 import no.nav.sak.infrastruktur.authentication.LdapConfiguration;
 import no.nav.sak.infrastruktur.authentication.BasicAuthenticator;
@@ -14,8 +15,8 @@ public class JunitBasicAuthenticator extends BasicAuthenticator {
     public static final String USERNAME = "junit";
     public static final String PASSWORD = "password";
 
-    public JunitBasicAuthenticator(LdapConfiguration ldapConfiguration) {
-        super(ldapConfiguration, mock(Cache.class));
+    public JunitBasicAuthenticator(SakProperties sakProperties, LdapConfiguration ldapConfiguration) {
+        super(sakProperties, ldapConfiguration, mock(Cache.class));
     }
 
     public AuthenticationResult authenticateWithLdap(String username, String password) {

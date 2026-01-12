@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configuration>
+<included>
 	<include resource="org/springframework/boot/logging/logback/defaults.xml"/>
 
     <appender name="STDOUT_JSON" class="ch.qos.logback.core.ConsoleAppender">
@@ -21,10 +21,6 @@
         <appender-ref ref="STDOUT_JSON"/>
     </logger>
 
-    <logger name="org.flyway" level="DEBUG" additivity="false">
-        <appender-ref ref="STDOUT_JSON"/>
-    </logger>
-
     <logger name="no.nav.security.token.support" level="ERROR" additivity="false">
         <appender-ref ref="STDOUT_JSON"/>
     </logger>
@@ -33,5 +29,5 @@
         <appender-ref ref="STDOUT_JSON"/>
     </root>
 
-</configuration>
+</included>
 
