@@ -22,10 +22,7 @@
 	<properties>
 		<java.version>25</java.version>
 
-		<!-- oppgavehandtering-resilience-repoet er arkivert, så den burde bli erstattet  -->
-		<oppgavehandtering-resilience.version>1.00.08</oppgavehandtering-resilience.version>
 		<token-support.version>5.0.40</token-support.version>
-
 		<logstash.encoder.version>8.1</logstash.encoder.version>
 		<commons-beanutils.version>1.11.0</commons-beanutils.version>
 		<guava.version>33.5.0-jre</guava.version>
@@ -38,12 +35,6 @@
 
 	<dependencyManagement>
 		<dependencies>
-			<dependency>
-				<groupId>no.nav.oppgavehandtering</groupId>
-				<artifactId>oppgavehandtering-resilience</artifactId>
-				<version>${oppgavehandtering-resilience.version}</version>
-			</dependency>
-
 			<dependency>
 				<groupId>org.springdoc</groupId>
 				<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
