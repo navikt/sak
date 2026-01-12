@@ -10,7 +10,7 @@
   "LDAP_BASEDN": "dc=adeo,dc=no",
   "LDAP_URL": "ldaps://ldapgw.adeo.no",
   "SAK_SECRET": "sak",
-  "MIN_REPLICAS": 2,
+  "MIN_REPLICAS": 4,
   "MAX_REPLICAS": 12,
   "INGRESSES": [
     "https://sak.nais.adeo.no",

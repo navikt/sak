@@ -58,8 +58,9 @@ spec:
     cpuThresholdPercentage: 50
   resources:
     limits:
-      memory: 1024Mi
+      memory: 2000Mi
     requests:
+      memory: 768Mi
       cpu: 60m
   accessPolicy:
     inbound:
@@ -86,5 +87,3 @@ spec:
     autoInstrumentation:
       enabled: true
       runtime: java
-      destinations:
-        - id: "elastic-apm"
