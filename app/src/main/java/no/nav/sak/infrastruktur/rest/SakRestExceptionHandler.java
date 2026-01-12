@@ -31,7 +31,6 @@ import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.METHOD_NOT_ALLOWED;
 import static org.springframework.http.HttpStatus.NOT_ACCEPTABLE;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
-import static org.springframework.http.HttpStatus.SERVICE_UNAVAILABLE;
 import static org.springframework.http.HttpStatus.UNSUPPORTED_MEDIA_TYPE;
 
 @ControllerAdvice
@@ -66,21 +65,6 @@ public class SakRestExceptionHandler extends ResponseEntityExceptionHandler {
 				.body(new ErrorResponse(MDC.get("uuid"), "Fant ingen ressurs for denne adressen"));
 	}
 
-	@ExceptionHandler({ExternalApiException.class})
-	public ResponseEntity<Object> externalApiExceptionMapper(ExternalApiException externalApiException) {
-		log.error("Det oppstod en feilsituasjon i forbindelse med kall mot et eksternt API", externalApiException);
-		return ResponseEntity
-				.status(INTERNAL_SERVER_ERROR)
-				.body(new ErrorResponse(MDC.get("uuid"), externalApiException.getMessage()));
-	}
-
-	@ExceptionHandler({ServiceUnavailableException.class})
-	public ResponseEntity<Object> serviceUnavailableExceptionMapper(ServiceUnavailableException serviceUnavailableException) {
-		log.warn("sak serviceunavailable downstream", serviceUnavailableException);
-		return ResponseEntity
-				.status(SERVICE_UNAVAILABLE)
-				.body(new ErrorResponse(MDC.get("uuid"), serviceUnavailableException.getMessage()));
-	}
 	@Override
 	protected ResponseEntity<Object> handleHttpRequestMethodNotSupported(HttpRequestMethodNotSupportedException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
 		log.info("Mottatt kall mot ressurs som ikke støttes @ {}", getPathForRequest(request), ex);
@@ -88,6 +72,7 @@ public class SakRestExceptionHandler extends ResponseEntityExceptionHandler {
 				.status(METHOD_NOT_ALLOWED)
 				.body(new ErrorResponse(MDC.get("uuid"), "Angitt operasjon er ikke tillatt"));
 	}
+
 	@Override
 	protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
 		log.info("Mottatt kall mot ressurs som ikke støttes @ {}", getPathForRequest(request), ex);
@@ -132,6 +117,7 @@ public class SakRestExceptionHandler extends ResponseEntityExceptionHandler {
 	protected ResponseEntity<Object> handleNoHandlerFoundException(NoHandlerFoundException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
 		return this.notFoundExceptionMapper(ex, request);
 	}
+
 	@Override
 	protected ResponseEntity<Object> handleNoResourceFoundException(NoResourceFoundException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
 		return this.notFoundExceptionMapper(ex, request);

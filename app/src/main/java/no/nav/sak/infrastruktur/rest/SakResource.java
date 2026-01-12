@@ -19,9 +19,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.sak.infrastruktur.ErrorResponse;
-import no.nav.sak.infrastruktur.abac.ABACResult;
-import no.nav.sak.infrastruktur.abac.AuthorizationRequest;
-import no.nav.sak.infrastruktur.abac.SakPEP;
 import no.nav.sak.infrastruktur.authentication.AuthenticationFilter;
 import no.nav.sak.repository.Sak;
 import no.nav.sak.repository.SakJpaRepository;
@@ -29,7 +26,6 @@ import no.nav.sak.repository.SakSearchCriteria;
 import no.nav.sak.validering.TemaService;
 import no.nav.security.token.support.core.api.Protected;
 import org.slf4j.MDC;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -41,7 +37,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -53,11 +48,8 @@ import static java.util.stream.Collectors.toList;
 import static no.nav.sak.infrastruktur.ContextExtractor.getSubjectType;
 import static no.nav.sak.infrastruktur.SubjectType.SUBJECT_TYPE_EKSTERNBRUKER;
 import static no.nav.sak.infrastruktur.authentication.AuthenticationFilter.REQUEST_CONSUMERID;
-import static no.nav.sak.tokensupport.TokenUtils.hasClientCredentialsToken;
 import static org.springframework.http.HttpStatus.CONFLICT;
-import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
-import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Protected
@@ -112,14 +104,11 @@ public class SakResource {
 	public static final String API_V1_SAKER_TRAILING_SLASH = API_V1_SAKER + "/";
 	private final SakJpaRepository sakJpaRepository;
 	private final TemaService temaService;
-	private final SakPEP sakPEP;
 
 	SakResource(SakJpaRepository sakJpaRepository,
-				TemaService temaService,
-				final SakPEP sakPEP) {
+				TemaService temaService) {
 		this.sakJpaRepository = sakJpaRepository;
 		this.temaService = temaService;
-		this.sakPEP = sakPEP;
 	}
 
 	@GetMapping(path = "/{id}", produces = APPLICATION_JSON_VALUE)
@@ -173,23 +162,10 @@ public class SakResource {
 					@ApiResponse(responseCode = "503", content = @Content(schema = @Schema(implementation = ErrorResponse.class)), description = "En eller flere tjenester som sak er avhengig av er ikke tilgjengelige eller svarer ikke.")
 			})
 	public ResponseEntity<?> finnSaker(
-			@Valid final SakSearchRequest sakSearchRequest
-			, HttpServletRequest ctx) {
+			@Valid final SakSearchRequest sakSearchRequest,
+			HttpServletRequest ctx) {
 
 		log.info("finnSak Søker etter saker for: {}", sakSearchRequest);
-
-		if (!hasClientCredentialsToken()) {
-			for (String aktoerId : sakSearchRequest.getAktoerId()) {
-				final ABACResult abacResult =
-						sakPEP.autoriser(ctx, new AuthorizationRequest(aktoerId));
-				final ABACResult.Code abacResultCode = abacResult.getResultCode();
-				if (!ABACResult.Code.OK.equals(abacResultCode)) {
-					return makeResponseUponAbacFailure(abacResultCode);
-				} else if (!abacResult.hasAccess()) {
-					return ResponseEntity.ok(new ArrayList<>());
-				}
-			}
-		}
 
 		final List<Sak> saker = sakJpaRepository.finnSaker(sakSearchRequest.toCriteria());
 		log.info("finnSak hentet antall_arkivsaker={}", saker.size());
@@ -290,23 +266,4 @@ public class SakResource {
 				!sakJpaRepository.finnSaker(sakSearchCriteria).isEmpty();
 	}
 
-	private ResponseEntity<?> makeResponseUponAbacFailure(ABACResult.Code abacResultCode) {
-		return ResponseEntity
-				.status(mapABACResultCodeToResponseStatus(abacResultCode))
-				.body(
-						new ErrorResponse(
-								MDC.get("uuid"),
-								abacResultCode.getDescription()
-						)
-				);
-	}
-
-	private HttpStatus mapABACResultCodeToResponseStatus(ABACResult.Code abacResultCode) {
-		if (ABACResult.Code.OK.equals(abacResultCode)) {
-			return OK;
-		} else {
-			return INTERNAL_SERVER_ERROR;
-		}
-
-	}
 }

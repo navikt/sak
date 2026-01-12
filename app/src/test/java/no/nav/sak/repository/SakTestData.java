@@ -8,7 +8,6 @@ import java.time.LocalDateTime;
 public class SakTestData {
 	private static final String[] gyldigeOrgnr = {"999263550", "991012133", "895106402"};
 	// Se V6__populate_fagomrade.sql
-	// MOB er inaktiv
 	private static final String[] populatedAktivTema = {"AAP", "FOR", "PEN"};
 	private String tema = choosePopulatedTema();
 	private String aktoerId = RandomStringUtils.secure().nextNumeric(13);
