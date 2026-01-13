@@ -3,7 +3,6 @@ package no.nav.sak;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import lombok.extern.slf4j.Slf4j;
-import no.nav.resilience.ResilienceConfig;
 import no.nav.sak.configuration.LdapProperties;
 import no.nav.sak.configuration.SakProperties;
 import no.nav.sak.configuration.ServiceuserProperties;
@@ -86,10 +85,4 @@ public class SakConfiguration {
 								.version("v1")
 				);
 	}
-
-	@Bean
-	public ResilienceConfig resilienceConfig() {
-		return ResilienceConfig.ofDefaults();
-	}
-
 }

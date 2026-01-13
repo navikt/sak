@@ -10,8 +10,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.ws.rs.Priorities;
 import lombok.extern.slf4j.Slf4j;
-import no.nav.resilience.ResilienceConfig;
-import no.nav.resilience.ResilienceExecutor;
 import no.nav.sak.infrastruktur.ErrorResponse;
 import no.nav.sak.infrastruktur.SakOncePerRequestFilter;
 import no.nav.sak.infrastruktur.rest.UnauthorizedException;
@@ -50,15 +48,14 @@ public class AuthenticationFilter extends SakOncePerRequestFilter {
 	private static final String VALID_NO = "NO";
 	private static final String VALID_YES = "YES";
 
+	private final Authenticator authenticator;
 	private final Counter.Builder authCounter;
-
-	private final ResilienceExecutor<String, AuthenticationResult> resilienceExecutor;
 	private final MeterRegistry meterRegistry;
 
 	@Autowired
-	public AuthenticationFilter(Authenticator authenticator, ResilienceConfig resilienceConfig, MeterRegistry meterRegistry) {
+	public AuthenticationFilter(Authenticator authenticator, MeterRegistry meterRegistry) {
+		this.authenticator = authenticator;
 		this.meterRegistry = meterRegistry;
-		this.resilienceExecutor = new ResilienceExecutor<>(authenticator::authenticate, resilienceConfig);
 		this.authCounter = Counter.builder("authentication_counter")
 				.description("Antall autentiseringer");
 	}
@@ -74,7 +71,7 @@ public class AuthenticationFilter extends SakOncePerRequestFilter {
 			} else if (hasTokenForIssuer(ISSUER_STS)) {
 				handleBearerMetadata(ISSUER_STS, httpRequest, authIdentifier);
 			} else {
-				AuthenticationResult result = resilienceExecutor.execute(authHeader);
+				AuthenticationResult result = authenticator.authenticate(authHeader);
 				if (!result.isValid()) {
 					incrementAuthCounter(result.getConsumerId(), httpRequest, VALID_NO, authIdentifier);
 					throw createUnauthorizedException("Kunne ikke autorisere bruker");
