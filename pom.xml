@@ -26,7 +26,7 @@
 		<logstash.encoder.version>8.1</logstash.encoder.version>
 		<commons-beanutils.version>1.11.0</commons-beanutils.version>
 		<guava.version>33.5.0-jre</guava.version>
-		<ldaptive.version>2.4.2</ldaptive.version>
+		<ldaptive.version>2.5.0</ldaptive.version>
 		<jose4j.version>0.9.6</jose4j.version>
 		<springdoc-openapi-starter-webmvc-ui.version>2.8.14</springdoc-openapi-starter-webmvc-ui.version>
 		<datasource-proxy-spring-boot-starter.version>1.12.0</datasource-proxy-spring-boot-starter.version>
