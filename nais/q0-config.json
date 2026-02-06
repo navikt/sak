@@ -10,8 +10,8 @@
   "LDAP_BASEDN": "dc=preprod,dc=local",
   "LDAP_URL": "ldaps://ldapgw.preprod.local",
   "SAK_SECRET": "sak-q0",
-  "MIN_REPLICAS": 1,
-  "MAX_REPLICAS": 2,
+  "MIN_REPLICAS": 0,
+  "MAX_REPLICAS": 0,
   "INGRESSES": [
     "https://sak-q0.nais.preprod.local",
     "https://sak-q0.dev.adeo.no",
