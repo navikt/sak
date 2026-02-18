@@ -7,11 +7,13 @@ import no.nav.sak.infrastruktur.authentication.Authenticator;
 import no.nav.sak.infrastruktur.authentication.LdapConfiguration;
 import no.nav.sak.infrastruktur.authentication.basic.JunitBasicAuthenticator;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureTestRestTemplate;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
+@AutoConfigureTestRestTemplate
 @Configuration
 @EnableConfigurationProperties({
 		SakProperties.class,

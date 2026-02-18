@@ -26,15 +26,6 @@ public class TokenUtils {
 		return contextHolder.getTokenValidationContext() != null && contextHolder.getTokenValidationContext().hasTokenFor(issuer);
 	}
 
-	public static boolean hasClientCredentialsToken() {
-		if (!hasTokenForIssuer(ISSUER_ENTRA)) {
-			return false;
-		}
-		JwtToken token = contextHolder.getTokenValidationContext().getJwtToken(ISSUER_ENTRA);
-		JwtTokenClaims claims = token.getJwtTokenClaims();
-		return isClientCredentialsToken(claims);
-	}
-
 	public static Optional<String> getUsername(String issuerId) {
 		if (!hasTokenForIssuer(issuerId)) {
 			throw new RuntimeException("No token for issuerId");
