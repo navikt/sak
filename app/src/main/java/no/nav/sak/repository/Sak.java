@@ -13,6 +13,8 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -40,35 +42,33 @@ public class Sak {
 	@GeneratedValue(strategy = SEQUENCE, generator = SAK_SEQUENCE)
 	@SequenceGenerator(name = SAK_SEQUENCE, sequenceName = DATABASE_SAK_SEQUENCE, allocationSize = 1)
 	@Column(name = "id", nullable = false, length = 11)
-	private Long sakId;
+	private @Nullable Long sakId;
 
 	@Column(name = "tema", nullable = false, length = 40)
-	private String tema;
+	private @NonNull String tema;
 
 	@Column(name = "applikasjon", length = 40)
-	private String applikasjon;
+	private @Nullable String applikasjon;
 
 	@Column(name = "fagsaknr", length = 40)
-	private String fagsakNr;
+	private @Nullable String fagsakNr;
 
 	@ToString.Exclude
 	@Column(name = "aktoerid", length = 40)
-	private String aktoerId;
+	private @Nullable String aktoerId;
 
 	@Column(name = "orgnr", length = 9)
-	private String orgnr;
+	private @Nullable String orgnr;
 
 	@Column(name = "opprettet_av", nullable = false, length = 40)
-	private String opprettetAv;
+	private @NonNull String opprettetAv;
 
 	@Column(name = "opprettet_tidspunkt", nullable = false)
-	private LocalDateTime opprettetTidspunkt;
+	private @NonNull LocalDateTime opprettetTidspunkt;
 
-	/**
-	 * Modellert som enum i dokarkiv
-	 */
+	/// Modellert som enum i dokarkiv
 	@Column(name = "k_sak_status", length = 40)
-	private String sakStatus;
+	private @Nullable String sakStatus;
 
 	@Override
 	public boolean equals(Object o) {

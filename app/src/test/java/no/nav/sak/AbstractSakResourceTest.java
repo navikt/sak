@@ -9,8 +9,8 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.resttestclient.TestRestTemplate;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -29,7 +29,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 )
 @Transactional
 @EnableMockOAuth2Server
-public abstract class AbstractSakResourceTest extends AbstractOauth2Test{
+public abstract class AbstractSakResourceTest extends AbstractOauth2Test {
 
 	private final static String CORRELATION_ID = "junit";
 	public static final URI SAKER_BASE_PATH = URI.create("/api/v1/saker/");
