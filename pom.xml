@@ -25,7 +25,7 @@
 		<token-support.version>6.0.2</token-support.version>
 		<logstash.encoder.version>9.0</logstash.encoder.version>
 		<commons-beanutils.version>1.11.0</commons-beanutils.version>
-		<guava.version>33.5.0-jre</guava.version>
+		<guava.version>33.6.0-jre</guava.version>
 		<ldaptive.version>2.5.0</ldaptive.version>
 		<jose4j.version>0.9.6</jose4j.version>
 		<springdoc-openapi-starter-webmvc-ui.version>3.0.3</springdoc-openapi-starter-webmvc-ui.version>
