@@ -45,6 +45,11 @@
       "application": "saf-q1",
       "namespace": "teamdokumenthandtering",
       "cluster": "dev-fss"
+    },
+    {
+      "application": "melosys-q1",
+      "namespace": "teammelosys",
+      "cluster": "dev-fss"
     }
   ]
 }

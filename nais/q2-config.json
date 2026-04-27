@@ -61,6 +61,11 @@
       "application": "saf",
       "namespace": "teamdokumenthandtering",
       "cluster": "dev-fss"
+    },
+    {
+      "application": "melosys",
+      "namespace": "teammelosys",
+      "cluster": "dev-fss"
     }
   ]
 }
