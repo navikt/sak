@@ -49,11 +49,6 @@
       "cluster": "prod-fss"
     },
     {
-      "application": "historisk-helt-backend",
-      "namespace": "historisk",
-      "cluster": "prod-gcp"
-    },
-    {
       "application": "melosys",
       "namespace": "teammelosys",
       "cluster": "prod-fss"
