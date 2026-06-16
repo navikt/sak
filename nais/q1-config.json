@@ -50,6 +50,11 @@
       "application": "melosys-q1",
       "namespace": "teammelosys",
       "cluster": "dev-fss"
+    },
+    {
+      "application": "melosys-eessi-q1",
+      "namespace": "teammelosys",
+      "cluster": "dev-fss"
     }
   ]
 }

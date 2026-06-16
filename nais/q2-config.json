@@ -61,6 +61,11 @@
       "application": "melosys",
       "namespace": "teammelosys",
       "cluster": "dev-fss"
+    },
+    {
+      "application": "melosys-eessi",
+      "namespace": "teammelosys",
+      "cluster": "dev-fss"
     }
   ]
 }
