@@ -2,7 +2,6 @@ package no.nav.sak;
 
 import no.nav.sak.configuration.LdapProperties;
 import no.nav.sak.configuration.SakProperties;
-import no.nav.sak.configuration.ServiceuserProperties;
 import no.nav.sak.infrastruktur.authentication.Authenticator;
 import no.nav.sak.infrastruktur.authentication.LdapConfiguration;
 import no.nav.sak.infrastruktur.authentication.basic.JunitBasicAuthenticator;
@@ -17,8 +16,7 @@ import org.springframework.context.annotation.Primary;
 @Configuration
 @EnableConfigurationProperties({
 		SakProperties.class,
-		LdapProperties.class,
-		ServiceuserProperties.class
+		LdapProperties.class
 })
 @ComponentScan(basePackages = "no.nav.sak")
 public class SakTestConfiguration {

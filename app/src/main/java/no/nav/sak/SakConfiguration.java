@@ -5,7 +5,6 @@ import io.swagger.v3.oas.models.info.Info;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.sak.configuration.LdapProperties;
 import no.nav.sak.configuration.SakProperties;
-import no.nav.sak.configuration.ServiceuserProperties;
 import no.nav.sak.infrastruktur.authentication.AuthenticationResult;
 import no.nav.sak.infrastruktur.authentication.Authenticator;
 import no.nav.sak.infrastruktur.authentication.BasicAuthenticator;
@@ -30,8 +29,7 @@ import java.time.ZoneId;
 @Configuration
 @EnableConfigurationProperties({
 		SakProperties.class,
-		LdapProperties.class,
-		ServiceuserProperties.class
+		LdapProperties.class
 })
 public class SakConfiguration {
 
