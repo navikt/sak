@@ -23,7 +23,7 @@ import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON;
 		classes = SakTestConfiguration.class,
 		webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
 )
-public class SakResourceExceptionHandlingTest extends AbstractSakResourceTest {
+public class SakControllerExceptionHandlingTest extends AbstractSakControllerTest {
 
 	@MockitoBean
 	SakJpaRepository sakJpaRepository;

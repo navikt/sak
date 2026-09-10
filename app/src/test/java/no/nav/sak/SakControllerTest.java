@@ -40,7 +40,7 @@ import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
-class SakResourceTest extends AbstractSakResourceTest {
+class SakControllerTest extends AbstractSakControllerTest {
 
     @Test
     void henter_sak_for_gitt_id() {

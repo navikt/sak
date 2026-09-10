@@ -42,19 +42,21 @@ import java.util.Objects;
 import java.util.Optional;
 
 import static io.swagger.v3.oas.annotations.enums.SecuritySchemeIn.HEADER;
+import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 import static no.nav.sak.infrastruktur.ContextExtractor.getSubjectType;
 import static no.nav.sak.infrastruktur.SubjectType.SUBJECT_TYPE_EKSTERNBRUKER;
 import static no.nav.sak.infrastruktur.authentication.AuthenticationFilter.REQUEST_CONSUMERID;
+import static no.nav.sak.infrastruktur.authentication.AuthenticationFilter.REQUEST_USERNAME;
 import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Protected
 @RestController
-@RequestMapping({SakResource.API_V1_SAKER, SakResource.API_V1_SAKER_TRAILING_SLASH})
+@RequestMapping({SakController.API_V1_SAKER, SakController.API_V1_SAKER_TRAILING_SLASH})
 @Tag(name = "/api/v1/saker")
 @OpenAPIDefinition(
 		info = @Info(
@@ -97,16 +99,16 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 )
 @Slf4j
 @Transactional(readOnly = true)
-public class SakResource {
+public class SakController {
 
 	public static final String API_V1_SAKER_PATH_SEGMENT = "api/v1/saker";
 	public static final String API_V1_SAKER = "/" + API_V1_SAKER_PATH_SEGMENT;
 	public static final String API_V1_SAKER_TRAILING_SLASH = API_V1_SAKER + "/";
+
 	private final SakJpaRepository sakJpaRepository;
 	private final TemaService temaService;
 
-	SakResource(SakJpaRepository sakJpaRepository,
-				TemaService temaService) {
+	SakController(SakJpaRepository sakJpaRepository, TemaService temaService) {
 		this.sakJpaRepository = sakJpaRepository;
 		this.temaService = temaService;
 	}
@@ -116,9 +118,7 @@ public class SakResource {
 			parameters = {@Parameter(name = "X-Correlation-ID", required = true, in = ParameterIn.HEADER)},
 			security = {@SecurityRequirement(name = "bearerAuth"), @SecurityRequirement(name = "Basic Auth")},
 			responses = {
-					@ApiResponse(responseCode = "200",
-							description = "OK",
-							content = @Content(schema = @Schema(implementation = SakJson.class))),
+					@ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = SakJson.class))),
 					@ApiResponse(responseCode = "401", content = @Content(schema = @Schema(implementation = ErrorResponse.class)), description = "Konsument mangler gyldig token"),
 					@ApiResponse(responseCode = "403", content = @Content(schema = @Schema(implementation = ErrorResponse.class)), description = "Konsument har ikke tilgang til å gjennomføre handlingen"),
 					@ApiResponse(responseCode = "404", content = @Content(schema = @Schema(implementation = ErrorResponse.class)), description = "Det finnes ingen sak for angitt id"),
@@ -126,16 +126,14 @@ public class SakResource {
 					@ApiResponse(responseCode = "503", content = @Content(schema = @Schema(implementation = ErrorResponse.class)), description = "En eller flere tjenester som sak er avhengig av er ikke tilgjengelige eller svarer ikke.")
 
 			})
-	public ResponseEntity<?> hentSak(
-			@PathVariable("id") final Long id,
-			HttpServletRequest ctx) {
-
+	public ResponseEntity<?> hentSak(@PathVariable("id") Long id, HttpServletRequest ctx) {
 		log.info("hentSak henter sakId={}", id);
-		final Optional<Sak> sak = sakJpaRepository.findById(id);
+		Optional<Sak> sak = sakJpaRepository.findById(id);
 
 		if (sak.isPresent()) {
-			final Sak eksisterendeSak = sak.get();
+			Sak eksisterendeSak = sak.get();
 			log.info("hentSak har hentet sakId={}", id);
+
 			return ResponseEntity.ok().body(
 					new SakJson(eksisterendeSak));
 		} else {
@@ -144,7 +142,7 @@ public class SakResource {
 					.status(NOT_FOUND)
 					.body(new ErrorResponse(
 							MDC.get("uuid"),
-							String.format("Fant ingen sak med id: %s", id)));
+							format("Fant ingen sak med id: %s", id)));
 		}
 	}
 
@@ -153,22 +151,18 @@ public class SakResource {
 			security = {@SecurityRequirement(name = "bearerAuth"), @SecurityRequirement(name = "Basic Auth")},
 			parameters = {@Parameter(name = "X-Correlation-ID", required = true, in = ParameterIn.HEADER)},
 			responses = {
-					@ApiResponse(responseCode = "200",
-							description = "OK",
-							content = @Content(schema = @Schema(implementation = SakJson.class, type = "list"))),
+					@ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = SakJson.class, type = "list"))),
 					@ApiResponse(responseCode = "400", content = @Content(schema = @Schema(implementation = ErrorResponse.class)), description = "Ugyldig input"),
 					@ApiResponse(responseCode = "401", content = @Content(schema = @Schema(implementation = ErrorResponse.class)), description = "Konsument mangler gyldig token"),
 					@ApiResponse(responseCode = "500", content = @Content(schema = @Schema(implementation = ErrorResponse.class)), description = "Ukjent feilsituasjon har oppstått i Sak"),
 					@ApiResponse(responseCode = "503", content = @Content(schema = @Schema(implementation = ErrorResponse.class)), description = "En eller flere tjenester som sak er avhengig av er ikke tilgjengelige eller svarer ikke.")
 			})
-	public ResponseEntity<?> finnSaker(
-			@Valid final SakSearchRequest sakSearchRequest,
-			HttpServletRequest ctx) {
-
+	public ResponseEntity<?> finnSaker(@Valid SakSearchRequest sakSearchRequest, HttpServletRequest ctx) {
 		log.info("finnSak Søker etter saker for: {}", sakSearchRequest);
 
-		final List<Sak> saker = sakJpaRepository.finnSaker(sakSearchRequest.toCriteria());
+		List<Sak> saker = sakJpaRepository.finnSaker(sakSearchRequest.toCriteria());
 		log.info("finnSak hentet antall_arkivsaker={}", saker.size());
+
 		return ResponseEntity.ok(
 				saker.stream()
 						.filter(s -> harTilgangTilSakInterneRegler(ctx, s))
@@ -184,9 +178,7 @@ public class SakResource {
 					""",
 			security = {@SecurityRequirement(name = "bearerAuth"), @SecurityRequirement(name = "Basic Auth")},
 			responses = {
-					@ApiResponse(responseCode = "201",
-							description = "Saken er opprettet",
-							headers = @Header(name = "location", description = "Angir URI til den opprettede saken")),
+					@ApiResponse(responseCode = "201", description = "Saken er opprettet", headers = @Header(name = "location", description = "Angir URI til den opprettede saken")),
 					@ApiResponse(responseCode = "400", content = @Content(schema = @Schema(implementation = ErrorResponse.class)), description = "Ugyldig input"),
 					@ApiResponse(responseCode = "401", content = @Content(schema = @Schema(implementation = ErrorResponse.class)), description = "Konsument mangler gyldig token"),
 					@ApiResponse(responseCode = "403", content = @Content(schema = @Schema(implementation = ErrorResponse.class)), description = "Konsument har ikke tilgang til å gjennomføre handlingen"),
@@ -195,13 +187,12 @@ public class SakResource {
 					@ApiResponse(responseCode = "503", content = @Content(schema = @Schema(implementation = ErrorResponse.class)), description = "En eller flere tjenester som sak er avhengig av er ikke tilgjengelige eller svarer ikke.")
 			})
 	public ResponseEntity<?> opprettSak(
-			@RequestBody @Valid @Parameter(name = "Saken som skal opprettes", required = true) SakJson sakJson
-			, ServletUriComponentsBuilder servletUriComponentsBuilder
-			, HttpServletRequest ctx
+			@RequestBody @Valid @Parameter(name = "Saken som skal opprettes", required = true) SakJson sakJson,
+			ServletUriComponentsBuilder servletUriComponentsBuilder,
+			HttpServletRequest ctx
 	) {
-
-		final String user = (String) ctx.getAttribute(AuthenticationFilter.REQUEST_USERNAME);
-		final Sak innsendtSak = sakJson.toSak(user);
+		String user = (String) ctx.getAttribute(REQUEST_USERNAME);
+		Sak innsendtSak = sakJson.toSak(user);
 
 		log.info("opprettSak er kalt");
 
@@ -210,8 +201,7 @@ public class SakResource {
 					.status(CONFLICT)
 					.body(new ErrorResponse(
 							MDC.get("uuid"),
-							String.format(
-									"Det finnes allerede en sak for fagsaknr=%s, applikasjon=%s, aktør=%s, orgnr=%s",
+							format("Det finnes allerede en sak for fagsaknr=%s, applikasjon=%s, aktør=%s, orgnr=%s",
 									innsendtSak.getFagsakNr(),
 									innsendtSak.getApplikasjon(),
 									innsendtSak.getAktoerId() == null ? null : "*****",
@@ -221,13 +211,13 @@ public class SakResource {
 					.status(CONFLICT)
 					.body(new ErrorResponse(
 							MDC.get("uuid"),
-							String.format("Tema=%s er inaktivt. Kontakt #team_dokumentløsninger", innsendtSak.getTema())
+							format("Tema=%s er inaktivt. Kontakt #team_dokumentløsninger", innsendtSak.getTema())
 					));
 		} else {
-
 			Sak opprettetSak = sakJpaRepository.persist(innsendtSak);
 			Long opprettetSakId = opprettetSak.getSakId();
 			log.info("opprettSak har opprettet arkivsakId={}", opprettetSakId);
+
 			URI path = servletUriComponentsBuilder
 					.pathSegment(API_V1_SAKER_PATH_SEGMENT)
 					.pathSegment(String.valueOf(opprettetSakId))
@@ -239,11 +229,9 @@ public class SakResource {
 		}
 	}
 
-	private boolean harTilgangTilSakInterneRegler(final HttpServletRequest ctx,
-												  final Sak sak) {
-
-		final boolean temaKontroll = Objects.equals("KTR", sak.getTema());
-		final boolean harTilgang = !(temaKontroll && Objects.equals(getSubjectType(ctx), SUBJECT_TYPE_EKSTERNBRUKER));
+	private boolean harTilgangTilSakInterneRegler(HttpServletRequest ctx, Sak sak) {
+		boolean temaKontroll = Objects.equals("KTR", sak.getTema());
+		boolean harTilgang = !(temaKontroll && Objects.equals(getSubjectType(ctx), SUBJECT_TYPE_EKSTERNBRUKER));
 		if (!harTilgang) {
 			log.info("Filtrerer ut sak med sakId={} for ekstern bruker fordi den har tema={} ", sak.getSakId(), sak.getTema());
 		}
@@ -252,18 +240,14 @@ public class SakResource {
 	}
 
 	private boolean fagSakFinnesFraFoer(Sak sak) {
+		SakSearchCriteria sakSearchCriteria = SakSearchCriteria.create()
+				.medOrgnr(sak.getOrgnr())
+				.medAktoerId(sak.getAktoerId() != null ? singletonList(sak.getAktoerId()) : emptyList())
+				.medFagsakNr(sak.getFagsakNr())
+				.medTema(singletonList(sak.getTema()))
+				.medApplikasjon(sak.getApplikasjon());
 
-		final SakSearchCriteria sakSearchCriteria =
-				SakSearchCriteria
-						.create()
-						.medOrgnr(sak.getOrgnr())
-						.medAktoerId(sak.getAktoerId() != null ? singletonList(sak.getAktoerId()) : emptyList())
-						.medFagsakNr(sak.getFagsakNr())
-						.medTema(sak.getTema() != null ? singletonList(sak.getTema()) : emptyList())
-						.medApplikasjon(sak.getApplikasjon());
-
-		return sak.getFagsakNr() != null &&
-				!sakJpaRepository.finnSaker(sakSearchCriteria).isEmpty();
+		return sak.getFagsakNr() != null && !sakJpaRepository.finnSaker(sakSearchCriteria).isEmpty();
 	}
 
 }

@@ -29,7 +29,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 )
 @Transactional
 @EnableMockOAuth2Server
-public abstract class AbstractSakResourceTest extends AbstractOauth2Test {
+public abstract class AbstractSakControllerTest extends AbstractOauth2Test {
 
 	private final static String CORRELATION_ID = "junit";
 	public static final URI SAKER_BASE_PATH = URI.create("/api/v1/saker/");

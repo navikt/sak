@@ -13,7 +13,7 @@ import java.net.URI;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpStatus.OK;
 
-public class UnprotectedResourcesConfigurationTest extends AbstractSakResourceTest {
+public class UnprotectedResourcesConfigurationTest extends AbstractSakControllerTest {
 
 	@ParameterizedTest
 	@CsvSource(value = {
