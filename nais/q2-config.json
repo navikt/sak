@@ -66,6 +66,11 @@
       "application": "melosys-eessi",
       "namespace": "teammelosys",
       "cluster": "dev-fss"
+    },
+    {
+      "application": "watson-admin-api",
+      "namespace": "holmes",
+      "cluster": "dev-gcp"
     }
   ]
 }
