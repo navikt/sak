@@ -44,6 +44,11 @@
       "cluster": "prod-fss"
     },
     {
+      "application": "familie-integrasjoner",
+      "namespace": "teamfamilie",
+      "cluster": "prod-gcp"
+    },
+    {
       "application": "saf",
       "namespace": "teamdokumenthandtering",
       "cluster": "prod-fss"
