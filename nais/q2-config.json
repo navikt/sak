@@ -53,6 +53,11 @@
       "cluster": "dev-fss"
     },
     {
+      "application": "familie-integrasjoner",
+      "namespace": "teamfamilie",
+      "cluster": "dev-gcp"
+    },
+    {
       "application": "saf",
       "namespace": "teamdokumenthandtering",
       "cluster": "dev-fss"
