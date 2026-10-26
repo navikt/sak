@@ -27,6 +27,11 @@
       "cluster": "dev-fss"
     },
     {
+      "application": "dokprod-infotrygdbrev-q1",
+      "namespace": "teamdokumenthandtering",
+      "cluster": "dev-gcp"
+    },
+    {
       "application": "gosys-q1",
       "namespace": "isa",
       "cluster": "dev-fss"
