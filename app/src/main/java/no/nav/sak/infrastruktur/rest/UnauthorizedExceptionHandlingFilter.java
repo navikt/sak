@@ -41,15 +41,14 @@ public class UnauthorizedExceptionHandlingFilter implements Filter {
 				httpServletResponse.getWriter().write(s);
 
 				String path = servletRequest instanceof HttpServletRequest httpServletRequest ? httpServletRequest.getRequestURI() : "<unknown path>";
-				log.warn("sak request unauthorized path={} correlationId={} uuid={}", path,
-						unauthorizedException.getCorrelationId(), unauthorizedException.getUuid(), unauthorizedException);
+				log.warn("sak request unauthorized path={} uuid={}", path, unauthorizedException.getUuid(), unauthorizedException);
 			} else {
 				log.error("sak request unauthorized (not http request)", unauthorizedException);
 			}
-		} catch (CorrelatableSakRuntimeException exception) {
+		} catch (SakRuntimeException exception) {
 			String path = servletRequest instanceof HttpServletRequest httpServletRequest ? httpServletRequest.getRequestURI() : "<unknown path>";
-			log.error("sak encountered an unexpected exception when handling request path={} correlationId={} uuid={}",
-					path, exception.getCorrelationId(), exception.getUuid(), exception);
+			log.error("sak encountered an unexpected exception when handling request path={} uuid={}",
+					path, exception.getUuid(), exception);
 			if (servletResponse instanceof HttpServletResponse httpServletResponse) {
 				httpServletResponse.setStatus(INTERNAL_SERVER_ERROR.value());
 			}

@@ -49,7 +49,6 @@ public class AuthenticationFilterTest extends AbstractOauth2Test {
 	@Test
 	void skal_gi_tilgang_til_actuator_uten_token() {
 		HttpHeaders headers = new HttpHeaders();
-		headers.add("X-Correlation-ID", "Junit");
 		HttpEntity<String> httpEntity = new HttpEntity<>(headers);
 		ResponseEntity<String> responseEntity = testRestTemplate.exchange("/actuator/health", HttpMethod.GET, httpEntity, String.class);
 		assertThat(responseEntity.getStatusCode()).isEqualTo(OK);
@@ -58,7 +57,6 @@ public class AuthenticationFilterTest extends AbstractOauth2Test {
 	private void skal_gis_tilgang_med_token(String token) {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setBearerAuth(token);
-		headers.add("X-Correlation-ID", "Junit");
 		HttpEntity<String> httpEntity = new HttpEntity<>(headers);
 		ResponseEntity<String> responseEntity = testRestTemplate.exchange("/api/v1/saker/", HttpMethod.GET, httpEntity, String.class);
 		assertThat(responseEntity.getStatusCode()).isNotEqualTo(UNAUTHORIZED);
@@ -90,7 +88,6 @@ public class AuthenticationFilterTest extends AbstractOauth2Test {
 
 	private void skal_nektes_adgang_med_header(String headerName, String headerValue, HttpStatus expectedStatus) {
 		HttpHeaders headers = new HttpHeaders();
-		headers.add("X-Correlation-ID", "Junit");
 		if (headerName != null) {
 			headers.add(headerName, headerValue);
 		}
@@ -144,7 +141,6 @@ public class AuthenticationFilterTest extends AbstractOauth2Test {
 
 	private <T, U> ResponseEntity<T> doRequest(String path, HttpMethod method, String authHeader, U payload, Class<T> responseType) {
 		HttpHeaders headers = new HttpHeaders();
-		headers.add("X-Correlation-ID", "Junit");
 		headers.add("Authorization", authHeader);
 		HttpEntity<U> httpEntity = new HttpEntity<>(payload, headers);
 		return testRestTemplate.exchange("/api/v1/saker/" + path, method, httpEntity, responseType);

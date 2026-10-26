@@ -31,7 +31,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 @EnableMockOAuth2Server
 public abstract class AbstractSakResourceTest extends AbstractOauth2Test {
 
-	private final static String CORRELATION_ID = "junit";
 	public static final URI SAKER_BASE_PATH = URI.create("/api/v1/saker/");
 	static String authHeaderBearerOnBehalfOfToken;
 	static String authHeaderBearerClientCredentialsToken;
@@ -58,7 +57,6 @@ public abstract class AbstractSakResourceTest extends AbstractOauth2Test {
 
 	protected <T, U> ResponseEntity<T> doRequest(URI path, HttpMethod method, String authHeader, U payload, Class<T> responseType) {
 		HttpHeaders headers = new HttpHeaders();
-		headers.add("X-Correlation-ID", CORRELATION_ID);
 		headers.add("Authorization", authHeader);
 		headers.setContentType(APPLICATION_JSON);
 		HttpEntity<U> httpEntity = new HttpEntity<>(payload, headers);

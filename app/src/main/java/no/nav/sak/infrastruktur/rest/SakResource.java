@@ -3,7 +3,6 @@ package no.nav.sak.infrastruktur.rest;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.info.Contact;
@@ -66,9 +65,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 						Konsumenter som behøver å hente arkivsaker skal bruke <a href="https://confluence.adeo.no/spaces/BOA/pages/402023600/Query+saker">saf saker GraphQL query</a> i stedet.
 						
 						Nye konsumenter som skal opprette arkivsaker må avklare bruk med <a href="https://nav-it.slack.com/archives/C6W9E5GPJ">Team Dokumentløsninger</a>.
-						
-						Sak API forventer at header <strong>"X-Correlation-ID"</strong> er angitt for alle tjenestekall. Denne logges alltid i Sak, og benyttes for å kunne sammenstille hendelser
-						på tvers av kallkjeder. Bruk en korrelasjonsId
 						""",
 				contact = @Contact(
 						name = "Team Dokumentløsninger"
@@ -113,7 +109,6 @@ public class SakResource {
 
 	@GetMapping(path = "/{id}", produces = APPLICATION_JSON_VALUE)
 	@Operation(summary = "Henter informasjon om sak, gitt en id",
-			parameters = {@Parameter(name = "X-Correlation-ID", required = true, in = ParameterIn.HEADER)},
 			security = {@SecurityRequirement(name = "bearerAuth"), @SecurityRequirement(name = "Basic Auth")},
 			responses = {
 					@ApiResponse(responseCode = "200",
@@ -151,7 +146,6 @@ public class SakResource {
 	@GetMapping(produces = APPLICATION_JSON_VALUE)
 	@Operation(summary = "Finner saker for angitte søkekriterier",
 			security = {@SecurityRequirement(name = "bearerAuth"), @SecurityRequirement(name = "Basic Auth")},
-			parameters = {@Parameter(name = "X-Correlation-ID", required = true, in = ParameterIn.HEADER)},
 			responses = {
 					@ApiResponse(responseCode = "200",
 							description = "OK",
