@@ -24,6 +24,11 @@
       "cluster": "prod-fss"
     },
     {
+      "application": "dokprod-infotrygdbrev",
+      "namespace": "teamdokumenthandtering",
+      "cluster": "prod-gcp"
+    },
+    {
       "application": "gosys",
       "namespace": "isa",
       "cluster": "prod-fss"
