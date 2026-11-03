@@ -7,8 +7,6 @@ import no.nav.security.token.support.jaxrs.JaxrsTokenValidationContextHolder;
 
 import java.util.Optional;
 
-import static org.springframework.util.StringUtils.truncate;
-
 public class TokenUtils {
 
 	public static final String ISSUER_STS = "sts";
@@ -86,4 +84,10 @@ public class TokenUtils {
 		}
 	}
 
+	private static String truncate(String original, int maxLength) {
+		if (original == null || original.length() <= maxLength) {
+			return original;
+		}
+		return original.substring(0, maxLength - 3) + "...";
+	}
 }
