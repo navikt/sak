@@ -12,7 +12,7 @@ import lombok.Value;
 @ToString
 @Getter(AccessLevel.PACKAGE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Builder(access = AccessLevel.PUBLIC, builderClassName = "Builder", setterPrefix = "with", buildMethodName = "build")
+@Builder(access = AccessLevel.PUBLIC, builderClassName = "LdapConfigurationBuilder", setterPrefix = "with")
 public class LdapConfiguration {
 
 	@NonNull
@@ -24,7 +24,8 @@ public class LdapConfiguration {
 	@ToString.Exclude
 	String bindPassword;
 
-	public static class Builder {
+	@SuppressWarnings("unused")
+	public static class LdapConfigurationBuilder {
 		public LdapConfiguration build() {
 			LdapConfigurationValidator.validate(serviceUserBaseDN, url, bindUser, bindPassword);
 			return new LdapConfiguration(serviceUserBaseDN, url, bindUser, bindPassword);
